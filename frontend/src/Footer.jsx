@@ -1,7 +1,7 @@
 function Footer() {
     return(
         <div className="footer">
-            <div className="right">
+            <div className="left">
                 <img src="./src/assets/bg-logo.svg" alt="" />
                 <div>
                     <h1 className="team">DevTeam 1</h1>
@@ -12,7 +12,7 @@ function Footer() {
                     </div>
                 </div>
             </div>
-            <div className="left">
+            <div className="right">
                 <h1>Contact Us:</h1>
                 <div style={{height: "20px"}}></div>
                 <p>cat@devteam1.com</p>

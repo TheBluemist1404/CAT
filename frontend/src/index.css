@@ -1,93 +1,90 @@
 /* FONT */
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
 
 :root {
-  font-family: "Roboto Condensed", sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  --primary-color: #1e1e2f;
+  --box-color: #2b2b3b;
+  --secondary-color: #d9d9d9;
+  --text-color: #fff;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --heading-font: 'Roboto Serif';
+  --text-font: 'Roboto Condensed';
+  --code-font: 'Fira Code' 
 }
+
 body{
-  background-color: #1e1e2f;
+  background-color: var(--primary-color);
 }
 
 /* HEADER */
 .header{
+  font-family: var(--text-font);
   display: flex;
   flex-direction: row;
   align-items: start;
+  margin-left: 30px;
 }
 
 .navbar{
-  margin-left: 30px;
-  margin-top: 50px;
+  margin-left: 80px;
+  margin-top: 70px;
   width: fit-content;
   display: flex;
-  gap: 220px;
+  gap: 180px;
   flex-direction:row;
   align-items: center;
   justify-content: space-between;
 }
 
 .navbar div {
-  font-size: 24px;
+  font-size: 28px;
+  font-weight: normal;
 }
 
 /* ----------------------------------- */
 /* FOOTER */
 
 .footer {
-  background-color: #d9d9d9;
-  color: #1e1e2f;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
   display: flex;
   align-items: center;
   flex-direction: row;
   justify-content: space-between;
 }
 
-.right {
+.left {
   margin: 40px 10px;
   display: flex;
   flex-direction: row;
   gap: 20px;
 }
 
-.right .team{
+.left .team{
   font-size: 32px;
-  margin-bottom: -30px;
 }
 
-.right p{
+.left p{
   font-size: 24px;
 }
 
 .social-media{
-  margin-top: -20px;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 10px;
 }
 
-.left{
+.right{
   margin-right: 200px;
   width: min(20vw, 200px);
 }
 
-.left h1{
+.right h1{
   font-size: 32px;
 }
 
-.left p{
-  margin-top: -10px;
+.right p{    
   font-size: 24px;
 }
 /* COPYRIGHT */
