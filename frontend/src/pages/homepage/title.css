@@ -1,0 +1,19 @@
+.title{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    text-align: center;
+}
+
+.subhead{
+    font-family: var(--text-font);
+    font-size: 28px;
+}
+
+.head{
+    font-family: var(--heading-font);
+    font-size: 64px;
+    margin-top: 20px;
+    margin-bottom: 80px;
+}
