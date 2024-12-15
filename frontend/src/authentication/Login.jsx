@@ -1,5 +1,5 @@
 import React from "react";
-import "./profile.css";
+import "./login.css";
 import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css";
 
 const SignupForm = () => {
