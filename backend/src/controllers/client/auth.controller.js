@@ -8,13 +8,13 @@ module.exports.signup = async (req, res) => {
     const email = req.body.email;
     const username = req.body.username;
     const checkUserExist = await User.findOne({
-        email: email,
+        username: username,
         deleted: false,
     });
 
     if (checkUserExist) {
         res.status(409).json({
-            message: 'Email already exists',
+            message: 'Username already exists',
         });
         return;
     }
@@ -32,10 +32,10 @@ module.exports.signup = async (req, res) => {
 
 // [POST] /auth/login
 module.exports.login = async (req, res) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
     const existingUser = await User.findOne({
-        email: email,
+        username: username,
         deleted: false,
     })
     if (!existingUser) {
