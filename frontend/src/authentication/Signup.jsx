@@ -4,7 +4,7 @@ import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.cs
 
 const Register = () => {
   return (
-    <div>
+    <div style={{ background: "url('image 9.png') no-repeat center center fixed", backgroundSize: "cover" }}>
       <form action="action_page.php" method="post">
         <div className="taskbar">
           <nav className="link">
