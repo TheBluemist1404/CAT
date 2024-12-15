@@ -1,0 +1,280 @@
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+body{
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  height: 100vh;
+  background-position: center;
+}
+.taskbar {
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 64%; 
+  color: white; 
+  display: flex;
+  justify-content: space-between; 
+  align-items: center; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  padding: 10px 20px; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+  z-index: 1000; 
+}
+
+.link {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  width: 100%; 
+  max-width: 1200px; 
+  padding: 0 20px; 
+  z-index: 3;
+}
+
+
+.link a {
+  text-decoration: none; 
+  color: white; 
+  font-size: 16px; 
+  padding: 0 10px; 
+  text-align: center; 
+  flex: 1; 
+  transition: color 0.3s; 
+}
+
+
+.link a:hover {
+  color: #00bcd4; 
+}
+
+
+.link .logo img {
+  height: 50px; 
+  object-fit: contain; 
+}
+.container {
+  position: relative; 
+  top: 100px;
+  height: 500px;
+  width: 40%;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  background-color: #1E1E2F;
+  background-color: rgba(30, 30, 47, 0.5); 
+  border-radius: 10%;
+  z-index: 1; 
+}
+
+.signup {
+  position: absolute; 
+  top: 30px;
+  left: 50%; 
+  transform: translate(-50%, -50%); 
+  z-index: 2; 
+  font-size: 35px;
+  font-weight: bold; 
+  color: white; 
+  padding: 20px; 
+  border-radius: 10px; 
+  text-align: center;
+}
+
+ 
+.wave-group {
+  position: absolute;
+  top: 100px;
+  left: 10%;
+  z-index: 2;
+  text-align: center;
+  
+}
+
+.wave-group .input {
+  font-size: 20px;
+  padding: 10px 10px 10px 5px;
+  display: block;
+  width: 500px;
+  border: none;
+  border-bottom: 1px solid #ffffff;
+  color: #ffffff;
+  background: transparent;
+}
+
+.wave-group .input:focus {
+  outline: none;
+}
+
+.wave-group .label {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: normal;
+  position: absolute;
+  pointer-events: none;
+  left: 5px;
+  top: 10px;
+  display: flex;
+}
+
+.wave-group .label-char {
+  transition: 0.2s ease all;
+  transition-delay: calc(var(--index) * .05s);
+}
+
+.wave-group .input:focus ~ label .label-char,
+.wave-group .input:valid ~ label .label-char {
+  transform: translateY(-20px);
+  font-size: 20px;
+  color: #ffffff;
+}
+
+.wave-group .bar {
+  position: relative;
+  display: block;
+  width: 515px;
+}
+
+.wave-group .bar:before,.wave-group .bar:after {
+  content: '';
+  height: 1px;
+  width: 0;
+  bottom: 1px;
+  position: absolute;
+  background: #ffffff;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+}
+
+.wave-group .bar:before {
+  left: 50%;
+}
+
+.wave-group .bar:after {
+  right: 50%;
+}
+
+.wave-group .input:focus ~ .bar:before,
+.wave-group .input:focus ~ .bar:after {
+  width: 50%;
+}
+
+
+
+.user {
+  position: absolute;
+  top: 110px;
+  left: 550px;
+  width: 100px;
+  height: 100px; 
+  background-size: contain;
+  z-index: 3;
+  pointer-events: none;
+}
+.email{
+    position: absolute;
+    top: 73px;
+    left: 10%;
+  }
+.e{
+    position: absolute;
+    top: 110px;
+    left: 485px;
+    width: 100px;
+    height: 100px; 
+    background-size: contain;
+    z-index: 3;
+    pointer-events: none;  
+}
+.password{
+  position: absolute;
+  top: 140px;
+  left: 10%;
+}
+
+.lock {
+  position: absolute;
+  top: 110px;
+  left: 485px;
+  width: 100px;
+  height: 100px; 
+  background-size: contain;
+  z-index: 3;
+  pointer-events: none;
+}
+button {
+  position: absolute;
+  background-color: #2B2B3B;
+  border-radius: 10px;
+  color: white;
+  top: 420px;
+  left: 505px;
+  padding: 14px 20px;
+  border: none;
+  cursor: pointer;
+  width: 520px;
+  text-align: center;
+  z-index: 3;
+  font-size: 20px;
+}
+button:hover {
+  opacity: 0.8;
+}
+p{
+  color: #ffffff;
+  display: inline;
+}
+
+
+
+p:hover {
+  color: #606083; 
+  
+}
+.reg{
+  position: absolute;
+  color: #ffffff;
+  top: 490px;
+  left: 660px;
+  z-index: 3;
+}
+.fb{
+  position: absolute;
+  top: 530px;
+  left: 720px;
+  width: 25px;
+  height: 25px; 
+  background-size: contain;
+  
+  z-index: 3;
+}
+.fb:hover{
+  background-color: #007bff;
+  transform: scale(1.2);
+  width: 30px;
+  height: 30px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+.gg{
+  position: absolute;
+  top: 530px;
+  left: 790px;
+  width: 25px;
+  height: 25px; 
+  background-size: contain;
+  z-index: 3;
+}
+  
+.gg:hover{ 
+  transform: scale(1.2); 
+  cursor: pointer;
+}
