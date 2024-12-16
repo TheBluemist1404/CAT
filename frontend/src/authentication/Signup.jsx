@@ -1,81 +1,81 @@
-import React from 'react';
-import './signup.css'; 
-import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css";
+import background from '@homepage-assets/coding-on-laptop.jpg'
+import "./signup.css";
+import Header from "../Header";
+import Footer from '../Footer';
 
-const Register = () => {
+
+const Signup = () => {
   return (
-    <div style={{ background: "url('image 9.png') no-repeat center center fixed", backgroundSize: "cover" }}>
+    
+    <div className="bg" style={{'--backgroundImage': `url(${background})`}}>
+      <div className="Header"><Header/></div>
       <form action="action_page.php" method="post">
-        <div className="taskbar">
-          <nav className="link">
-            <a className="logo"><img src="CAT-removebg-preview.png" alt="logo" /></a>
-            <a>About</a>
-            <a>Forum</a>
-            <a>LiveCode</a>
-            <a>Contact</a>
-          </nav>
-        </div>
-      </form>
-
-      <form action="action_page.php" method="post">
-        <div className="container">
-          <div className="signup">Join The CATs</div>
-          
+        <div className="con">
+          <div className="signup">Sign up</div>
           <div className="name">
             <div className="wave-group">
-              <input required="" type="text" className="input" />
+              <input required type="text" className="input" />
               <span className="bar"></span>
               <label className="label">
-                <span className="label-char" style={{ '--index': 0 }}>N</span>
-                <span className="label-char" style={{ '--index': 1 }}>a</span>
-                <span className="label-char" style={{ '--index': 2 }}>m</span>
-                <span className="label-char" style={{ '--index': 3 }}>e</span>
+                <span className="label-char" style={{ "--index": 0 }}>N</span>
+                <span className="label-char" style={{ "--index": 1 }}>a</span>
+                <span className="label-char" style={{ "--index": 2 }}>m</span>
+                <span className="label-char" style={{ "--index": 3 }}>e</span>
               </label>
             </div>
-            <a className="user"><i className="fa-solid fa-user" style={{ fontSize: '25px', color: 'rgb(255, 255, 255)' }}></i></a>
-          </div>
-
-          <div className="email">
-            <div className="wave-group">
-              <input required="" type="text" className="input" />
-              <span className="bar"></span>
-              <label className="label">
-                <span className="label-char" style={{ '--index': 0 }}>E</span>
-                <span className="label-char" style={{ '--index': 1 }}>m</span>
-                <span className="label-char" style={{ '--index': 2 }}>a</span>
-                <span className="label-char" style={{ '--index': 3 }}>i</span>
-                <span className="label-char" style={{ '--index': 4 }}>l</span>
-              </label>
-            </div>
-            <a className="e"><i className="fa-regular fa-envelope" style={{ fontSize: '25px', color: 'rgb(255, 255, 255)' }}></i></a>
+            <a className="user">
+              <img src="/src/assets/user.svg" alt="" />
+            </a>
           </div>
 
           <div className="password">
             <div className="wave-group">
-              <input required="" type="password" className="input" />
+              <input required type="password" className="input" />
               <span className="bar"></span>
               <label className="label">
-                <span className="label-char" style={{ '--index': 0 }}>P</span>
-                <span className="label-char" style={{ '--index': 1 }}>a</span>
-                <span className="label-char" style={{ '--index': 2 }}>s</span>
-                <span className="label-char" style={{ '--index': 3 }}>w</span>
-                <span className="label-char" style={{ '--index': 4 }}>o</span>
-                <span className="label-char" style={{ '--index': 5 }}>r</span>
-                <span className="label-char" style={{ '--index': 6 }}>d</span>
+                <span className="label-char" style={{ "--index": 0 }}>P</span>
+                <span className="label-char" style={{ "--index": 1 }}>a</span>
+                <span className="label-char" style={{ "--index": 2 }}>s</span>
+                <span className="label-char" style={{ "--index": 3 }}>w</span>
+                <span className="label-char" style={{ "--index": 4 }}>o</span>
+                <span className="label-char" style={{ "--index": 5 }}>r</span>
+                <span className="label-char" style={{ "--index": 6 }}>d</span>
               </label>
             </div>
-            <a className="lock"><i className="fa-solid fa-lock" style={{ fontSize: '25px', color: 'rgb(255, 255, 255)' }}></i></a>
+            <a className="lock">
+              <img src="/src/assets/lock.svg" alt="" />
+            </a>
+          </div>
+          <div className="email">
+            <div className="wave-group">
+              <input required type="text" className="input" />
+              <span className="bar"></span>
+              <label className="label">
+                <span className="label-char" style={{ "--index": 0 }}>E</span>
+                <span className="label-char" style={{ "--index": 1 }}>m</span>
+                <span className="label-char" style={{ "--index": 2 }}>a</span>
+                <span className="label-char" style={{ "--index": 3 }}>i</span>
+                <span className="label-char" style={{ "--index": 4 }}>l</span>
+              </label>
+            </div>
+            <a className="e">
+              <img src="/src/assets/email.svg" alt="email" />
+            </a>
           </div>
 
-          <button type="submit">login</button>
-          
-          <div className="reg">Don't have an account?<p> Register</p></div>
-          <a className="fb"><i className="fab fa-facebook" style={{ fontSize: '30px', color: 'rgb(255, 255, 255)' }}></i></a>
-          <a className="gg"><i className="fa-brands fa-google" style={{ fontSize: '30px', color: 'rgb(255, 255, 255)' }}></i></a>
+          <button type="submit">Login</button>
+
+          <a className="fb">
+            <img src="/src/assets/facebook.svg" alt="" />
+          </a>
+          <a className="gg">
+            <img src="/src/assets/gmail.svg" alt="" />
+          </a>
         </div>
       </form>
+      <Footer/>
     </div>
   );
-}
+};
 
-export default Register;
+export default Signup;
