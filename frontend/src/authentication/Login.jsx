@@ -1,28 +1,17 @@
-import React from "react";
+import background from '@homepage-assets/coding-on-laptop.jpg'
 import "./login.css";
-import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css";
+import Header from "../Header";
+import Footer from '../Footer';
 
-const SignupForm = () => {
+
+const Login = () => {
   return (
-    <div style={{ background: "url('image 9.png') no-repeat center center fixed", backgroundSize: "cover" }}>
+    
+    <div className="bg" style={{'--backgroundImage': `url(${background})`}}>
+      <div className="Header"><Header/></div>
       <form action="action_page.php" method="post">
-        <div className="taskbar">
-          <nav className="link">
-            <a className="logo">
-              <img src="CAT-removebg-preview.png" alt="logo" />
-            </a>
-            <a href="#">About</a>
-            <a href="#">Forum</a>
-            <a href="#">LiveCode</a>
-            <a href="#">Contact</a>
-          </nav>
-        </div>
-      </form>
-
-      <form action="action_page.php" method="post">
-        <div className="container">
+        <div className="con">
           <div className="signup">Sign up</div>
-
           <div className="name">
             <div className="wave-group">
               <input required type="text" className="input" />
@@ -35,7 +24,7 @@ const SignupForm = () => {
               </label>
             </div>
             <a className="user">
-              <i className="fa-solid fa-user" style={{ fontSize: 25, color: "rgb(255, 255, 255)" }}></i>
+              <img src="/src/assets/user.svg" alt="" />
             </a>
           </div>
 
@@ -54,7 +43,7 @@ const SignupForm = () => {
               </label>
             </div>
             <a className="lock">
-              <i className="fa-solid fa-lock" style={{ fontSize: 25, color: "rgb(255, 255, 255)" }}></i>
+              <img src="/src/assets/lock.svg" alt="" />
             </a>
           </div>
 
@@ -65,15 +54,17 @@ const SignupForm = () => {
           </div>
 
           <a className="fb">
-            <i className="fab fa-facebook" style={{ fontSize: 30, color: "rgb(255, 255, 255)" }}></i>
+            <img src="/src/assets/facebook.svg" alt="" />
           </a>
           <a className="gg">
-            <i className="fa-brands fa-google" style={{ fontSize: 30, color: "rgb(255, 255, 255)" }}></i>
+            <img src="/src/assets/gmail.svg" alt="" />
           </a>
         </div>
       </form>
+      <Footer/>
     </div>
   );
 };
 
-export default SignupForm;
+export default Login;
+
