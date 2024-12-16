@@ -36,10 +36,11 @@ const Login = () => {
                 <span className="label-char" style={{ "--index": 0 }}>P</span>
                 <span className="label-char" style={{ "--index": 1 }}>a</span>
                 <span className="label-char" style={{ "--index": 2 }}>s</span>
-                <span className="label-char" style={{ "--index": 3 }}>w</span>
-                <span className="label-char" style={{ "--index": 4 }}>o</span>
-                <span className="label-char" style={{ "--index": 5 }}>r</span>
-                <span className="label-char" style={{ "--index": 6 }}>d</span>
+                <span className="label-char" style={{ "--index": 3 }}>s</span>
+                <span className="label-char" style={{ "--index": 4 }}>w</span>
+                <span className="label-char" style={{ "--index": 5 }}>o</span>
+                <span className="label-char" style={{ "--index": 6 }}>r</span>
+                <span className="label-char" style={{ "--index": 7 }}>d</span>
               </label>
             </div>
             <a className="lock">
