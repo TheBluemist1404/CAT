@@ -1,4 +1,3 @@
-
 import background from '@homepage-assets/coding-on-laptop.jpg'
 import "./login.scss";
 import Header from "../Header";
