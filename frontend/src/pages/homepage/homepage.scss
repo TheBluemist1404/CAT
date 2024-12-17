@@ -1,0 +1,433 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.homepage{
+    .container {
+        color: var(--text-color);
+        position: relative; 
+    }
+    
+    .container::before{
+        content: ''; 
+        position: absolute; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%;
+        background-image: var(--backgroundImage);
+        background-attachment: fixed;
+        background-size: cover;
+        z-index: -1;
+        filter: blur(2px);
+    }
+    
+    /* -------------------------------- */
+    /* INTRO */
+    .intro{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 80vh;
+    }
+    .box{
+        width: 700px;
+        max-height: fit-content;
+        padding: 120px;
+        background-color: #2b2b3b50;
+        backdrop-filter: blur(4px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .box p{
+        font-family: "Roboto Serif";
+        font-size: 56px;
+        text-transform: uppercase;
+    }
+    .box h1{
+        margin: 0 20px;
+        font-family: "JetBrains Mono";
+        font-size: 180px;
+        font-weight: normal;
+        text-transform: uppercase;
+    }
+    .box .subhead{
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+    .subhead #where{
+        font-family: 'Roboto Condensed';
+        font-size: 24px;
+    }
+    
+    .subhead #code{
+        text-align: justify;
+        font-family: 'Fira Code';
+        font-size: 18px;
+        color: var(--highlight-red);
+        font-weight: bold;
+        background-color: #1e1e1e;
+    
+        padding: 3px;
+        border-radius: 7px;
+    }
+    
+    /* ------------------------------------------ */
+    /* ABOUT */
+    .about{
+        background-color: var(--primary-color);
+        color: var(--text-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .title{
+        margin-top: 80px;
+        margin-bottom: 60px;
+    }
+    
+    .about-content{
+        display: flex;
+        flex-direction: row;
+        width: 980px;
+        justify-content: space-between center;
+        gap: 100px;
+    
+        font-family: var(--text-font);
+        margin-bottom: 200px;
+    }
+    .about-img{
+        width: 600px;
+    }
+    
+    .about-img img{
+        height: 400px;
+        width: 500px;
+        object-fit: cover;
+    }
+    .about-intro{
+        font-size: 48px;
+        letter-spacing: 7px;
+        max-width: 300px;
+        max-height: fit-content;
+    }
+    
+    .about-desc{
+        font-size: 28px;
+        font-weight: lighter;
+        margin-top: 60px;
+    }
+    
+    .decor1{
+        width: 430px;
+        height: 430px;
+        border-radius: 50%;
+        background: linear-gradient(-30deg, var(--secondary-color), 10%, #2e2e4c );
+        /* background-color: var(--secondary-color); */
+    
+        position: absolute;
+        right: 0;
+        top: 15%;
+        transform: translateX(50%);
+    }
+    
+    /* ----------------------------------------- */
+    /* FORUM */
+    .forum{
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .forum-content{
+        display: flex;
+        flex-direction: row;
+        gap: 300px;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .forum-intro{
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+        justify-content: center;
+        height: 238px;
+        padding: 10px 30px;
+        border-top: 2px  solid var(--primary-color);
+        border-bottom: 2px  solid var(--primary-color);
+    }
+    .forum-intro div{
+        font-family: var(--text-font);
+        font-size: 28px;
+    }
+    .forum-intro .forum-pitch{
+        font-family: var(--heading-font);
+        font-size: 60px;
+        font-weight: 600;
+    }
+    .forum-img{
+        height: auto;
+        max-width: fit-content;
+    }
+    
+    .forum-img img { 
+        position: relative;
+        max-height: 100%; 
+        max-width: 100%;
+    }
+    
+    #pseudo{
+        position: absolute;
+        transform: translate(-110%, 25%);
+    }
+    
+    /* ------------------------------- */
+    /* FORUM BUBBLE */
+    .forum-desc{
+        margin-top: 100px;
+        margin-bottom: 300px;
+    }
+    .bubble{
+        display: flex; 
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center; 
+        padding: 20px;
+        margin: -10px;
+    
+        font-family: var(--text-font);
+        color: #302612;
+        font-weight: 400;
+        text-align: center;
+        line-height: 52px;
+        letter-spacing: 2px;
+    
+        z-index: 2;
+    }
+    
+    .bub1{
+        width: 478px;
+        height: 478px;
+        border-radius: 50%;
+        background: linear-gradient(-20deg, #ffffff, 30%, #fa1d33);
+    
+        font-size: 35px;
+    
+        transform: translate(-65%);
+    }
+    
+    .bub2{
+        width: 415px;
+        height: 415px;
+        border-radius: 50%;
+        background: linear-gradient(70deg, #ffffff, 30%, #ecd44a);
+    
+        font-size: 30px;
+    
+        transform: translate(100%);
+    }
+    
+    .bub3{
+        width: 366px;
+        height: 366px;
+        border-radius: 50%;
+        background: linear-gradient(-100deg, #ffffff, 30%, #42c8f5);
+    
+        font-size: 30px;
+    
+        transform: translate(-30%);
+    }
+    
+    .forum-desc svg{
+        position: absolute;
+        transform: translateY(-85%);
+        z-index: 1;
+    }
+    
+    /* LIVE CODE */
+    .live-code{
+        background-color: var(--primary-color);
+        color: var(--text-color);
+    
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .code-img{
+        margin-top: -80px;
+        width: 500px;
+        height: auto;
+        object-fit: cover;
+    }
+    
+    .code-img img{
+        width: 500px;
+        object-fit: cover;
+    }
+    
+    .bento-container{
+        margin-top: 60px;
+        display: grid;
+        grid-template-columns: repeat(4, 280px);
+        grid-template-rows: repeat(2, 280px);
+        
+        grid-template-areas: 
+        "box1  box2  box3  box3"
+        "box4  box4  box5  box5"
+        ;
+        gap: 20px;
+    }
+    .item{
+        all: unset;
+    }
+    
+    .box1{
+        grid-area: box1;
+    }
+    
+    .box2{
+        grid-area: box2;
+    }
+    
+    .box3{
+        grid-area: box3;
+    }
+    
+    .box4{
+        grid-area: box4;
+    }
+    
+    .box5{
+        grid-area: box5;
+    }
+    
+    .live-pitch{
+        position: relative;
+        font-family: var(--text-font);
+        font-size: 60px;
+        font-weight: 300;
+        justify-items: center;
+    
+        margin-top: 200px;
+        margin-bottom: 200px;
+        z-index: 1;
+    }
+    
+    .live-pitch div{
+        margin-top: 70px;
+    }
+    
+    .live-pitch::before{
+        content: ' ';
+        width: 100%;
+        height: 100%;
+        background-color: #2e2e4c;
+        filter: blur(100px) brightness(1.2);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        z-index: -1;
+    }
+    .live-pitch div span{
+        position: relative;
+        z-index: -1;
+    }
+    
+    #blue-span::before{
+        content: ' ';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        z-index: 1;
+        background-color: var(--highlight-blue);
+        opacity: .5;
+    }
+    
+    #red-span::before{
+        content: ' ';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        z-index: 1;
+        background-color: var(--highlight-red);
+        opacity: .5;
+    }
+    
+    
+    .live-pitch div span::after{
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+    
+        top: -60px;
+        right: -60px;
+    
+        font-size: 24px;
+        justify-content: center;
+        text-align: center;
+        line-height: 50px;
+    }
+    
+    #blue-span:after{
+        content: 'V';
+        background-color: var(--highlight-blue);
+    }
+    
+    #red-span::after{
+        content:'H';
+        background-color: var(--highlight-red);
+    }
+    
+    /* OUTRO using box property from INTRO since they are quite similar*/ 
+    .outro{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    
+    .outro p{
+        text-transform: none;
+        font-size: 32px;
+        font-family: var(--text-font);
+    }
+    
+    .outro h1{
+        text-align: center;
+        font-family: var(--heading-font);
+        font-size: 120px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .outro .join-box{
+        background-color: #1e1e1e;
+        padding: 20px;
+        border-radius: 20px;
+    }
+    
+    .outro #join{
+        color: var(--highlight-red);
+        font-family: var(--text-font);
+        font-size: 24px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+}

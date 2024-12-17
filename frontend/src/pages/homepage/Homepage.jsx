@@ -1,4 +1,4 @@
-import './homepage.css'
+import './homepage.scss'
 import './title.css'
 import './card.css'
 
@@ -11,6 +11,7 @@ import team from '@homepage-assets/code-team.png'
 
 import Header from '../../Header';
 import Footer from '../../Footer';
+import TypingEffect from './TypingEffect'
 
 
 function Title({subhead, head}){
@@ -33,16 +34,16 @@ function Card({subhead, head}) {
 
 function Homepage(){
     return(
-        <div>
+        <div className='homepage'>
             <div className='container' style={{'--backgroundImage': `url(${background})`}}>
-                <Header/>
+                <Header> </Header>
                 <div className="intro">
                     <div className="box">
                         <p>welcome to</p>
                         <h1>c.a.t</h1>
                         <div className="subhead">
                             <div id='where'>where we</div>
-                            <div id='code'>code-all-time</div>
+                            <TypingEffect text={"code-all-time"} speed={150}></TypingEffect>
                         </div>
                     </div>
                 </div>
@@ -139,8 +140,7 @@ function Homepage(){
                     </div>
                 </div>
             </div>
-                <Footer/>
-                
+            <Footer/>
         </div>
         
     )

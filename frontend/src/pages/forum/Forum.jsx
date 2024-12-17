@@ -3,11 +3,11 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Content from "./Content";
 import Pagination from "./Pagination";
-import "./style.css";
+import "./style.scss";
 
 function Forum() {
   return (
-    <div className="Forum">
+    <div className="forum">
       <Header />
       <Sidebar />
       <Content />
