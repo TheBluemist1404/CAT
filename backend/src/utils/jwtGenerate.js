@@ -6,5 +6,5 @@ module.exports.generateToken = (user) => {
         id: user._id,
         email: user.email
     }
-    return jwt.sign(payload, secretKey, { expiresIn: "3h" })
+    return jwt.sign(payload, secretKey);
 };

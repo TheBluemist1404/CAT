@@ -14,7 +14,7 @@ module.exports.signup = async (req, res) => {
 
     if (checkUserExist) {
         res.status(409).json({
-            message: 'Username already exists',
+            message: 'User already exists',
         });
         return;
     }
@@ -45,7 +45,7 @@ module.exports.login = async (req, res) => {
         return;
     }
 
-    const isPasswordMatch = bcrypt.compare(password, existingUser.password);
+    const isPasswordMatch = await bcrypt.compare(password, existingUser.password);
     if (!isPasswordMatch) {
         res.status(403).json({
             message: 'Invalid password',
