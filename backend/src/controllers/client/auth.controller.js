@@ -6,9 +6,9 @@ const { generateToken } = require("../../utils/jwtGenerate");
 // [POST] /auth/signup
 module.exports.signup = async (req, res) => {
     const email = req.body.email;
-    const username = req.body.username;
+    const fullName = req.body.fullName;
     const checkUserExist = await User.findOne({
-        username: username,
+        email: email,
         deleted: false,
     });
 
@@ -23,7 +23,7 @@ module.exports.signup = async (req, res) => {
 
     const user = new User({
         email: email,
-        username: username,
+        fullName: fullName,
         password: password,
     });
     await user.save();
@@ -32,10 +32,10 @@ module.exports.signup = async (req, res) => {
 
 // [POST] /auth/login
 module.exports.login = async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     const existingUser = await User.findOne({
-        username: username,
+        email: email,
         deleted: false,
     })
     if (!existingUser) {
