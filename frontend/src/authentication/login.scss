@@ -1,3 +1,7 @@
+*{
+  margin: 0;
+  padding: 0;
+}
 .login{
   .bg::before{
     content: ''; 
@@ -5,8 +9,9 @@
     top: 0; 
     left: 0; 
     width: 100%; 
-    height: 100%;
+    height: 100vh;
     background-image: var(--backgroundImage);
+    background-size: cover;
     background-attachment: fixed;
     background-size: cover;
     z-index: -1;
@@ -17,8 +22,8 @@
   .con {
     position: relative; 
     top: 0px;
-    height: 500px;
-    width: 40%;
+    height: 520px;
+    width: 35%;
     color: white;
     display: flex;
     justify-content: space-between;
@@ -26,41 +31,39 @@
     left: 50%;
     transform: translateX(-50%);
     padding: 10px 20px;
-    background-color: #222238;
-    opacity: 80%;
+    background-color: #2b2b3b; 
     border-radius: 10%;
-    z-index: 0; 
+    z-index: 0;
+    background: rgba(43, 43, 59, 0.43); 
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); 
+    backdrop-filter: blur(7.7px);
+    -webkit-backdrop-filter: blur(7.7px);
+    border: 1px solid rgba(43, 43, 59, 1);
   }
   
   .signup {
     position: absolute; 
-    top: 30px;
+    top: 40px;
     left: 50%; 
     transform: translate(-50%, -50%); 
     z-index: 2; 
     font-size: 35px;
-    font-weight: bold; 
-    color: white; 
+    font-weight: bolder; 
+    color: #ffffff; 
     padding: 20px; 
     border-radius: 10px; 
     text-align: center;
+    font-family: 'Roboto Serif';
   }
   
   
-  .wave-group {
-    position: absolute;
-    top: 100px;
-    left: 10%;
-    z-index: 2;
-    text-align: center;
-    
-  }
   
   .wave-group .input {
     font-size: 20px;
     padding: 10px 10px 10px 5px;
     display: block;
-    width: 500px;
+    width: 450px;
     border: none;
     border-bottom: 1px solid #ffffff;
     color: #ffffff;
@@ -125,18 +128,20 @@
     width: 50%;
   }
   
-  
-  
-  .user {
+  .wave-group {
+    position: absolute;
+    top: 100px;
+    left: 10%;
+    z-index: 2;
+    text-align: center;
+    
+  }
+  .user{
     position: absolute;
     top: 110px;
-    left: 550px;
-    width: 100px;
-    height: 100px; 
-    background-size: contain;
-    z-index: 3;
-    pointer-events: none;
+    left: 500px;
   }
+  
   
   .password{
     position: absolute;
@@ -147,7 +152,7 @@
   .lock {
     position: absolute;
     top: 110px;
-    left: 490px;
+    left: 445px;
     width: 100px;
     height: 100px; 
     background-size: contain;
@@ -164,7 +169,7 @@
     padding: 14px 20px;
     border: none;
     cursor: pointer;
-    width: 520px;
+    width: 470px;
     text-align: center;
     z-index: 3;
     font-size: 20px;
@@ -175,6 +180,7 @@
   p{
     color: #ffffff;
     display: inline;
+    font-weight: bold;
   }
   
   
@@ -184,17 +190,17 @@
   }
   .reg{
     position: absolute;
-    color: #ffffff;
     top: 350px;
-    left:225px;
+    left:165px;
+    font-size: 20px;
     z-index: 3;
   }
   .fb{
     position: absolute;
     top: 400px;
-    left: 250px;
-    width: 25px;
-    height: 25px; 
+    left: 220px;
+    width: 40px;
+    height: 40px; 
     background-size: contain;
     
     z-index: 3;
@@ -205,10 +211,10 @@
   }
   .gg{
     position: absolute;
-    top: 405px;
-    left: 350px;
-    width: 25px;
-    height: 25px; 
+    top: 395px;
+    left: 340px;
+    width: 30px;
+    height: 30px; 
     background-size: contain;
     z-index: 3;
   }
