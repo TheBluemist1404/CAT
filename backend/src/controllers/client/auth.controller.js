@@ -3,7 +3,7 @@ const hashPassword = require("../../utils/hashPassword");
 const bcrypt = require("bcrypt");
 const { generateToken } = require("../../utils/jwtGenerate");
 
-// [POST] /auth/signup
+// [POST] /api/v1/auth/signup
 module.exports.signup = async (req, res) => {
     const email = req.body.email;
     const fullName = req.body.fullName;
@@ -30,7 +30,7 @@ module.exports.signup = async (req, res) => {
     res.status(201).end();
 };
 
-// [POST] /auth/login
+// [POST] /api/v1/auth/login
 module.exports.login = async (req, res) => {
     const { email, password } = req.body;
 

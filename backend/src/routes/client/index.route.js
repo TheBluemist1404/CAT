@@ -3,5 +3,7 @@ const router = express.Router();
 const authRoutes = require("./auth.route");
 
 module.exports = (app) => {
-    app.use("/auth", authRoutes);
+    const version = "/api/v1";
+    
+    app.use(version + "/auth", authRoutes);
 };
