@@ -1,3 +1,8 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext } from './AuthProvider';
+
 import background from '@homepage-assets/coding-on-laptop.jpg'
 import "./login.scss";
 import Header from "../Header";
@@ -5,11 +10,20 @@ import Header from "../Header";
 
 
 const Login = () => {
+  const {isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const login = (event) => {
+    event.preventDefault();
+    setIsLoggedIn(true);    
+    navigate('/')
+  }
+
   return (
-    
-    <div className="bg" style={{'--backgroundImage': `url(${background})`}}>
+    <div className="login">
+      <div className="bg" style={{'--backgroundImage': `url(${background})`}}>
       <Header/>
-      <form action="action_page.php" method="post">
+      <form action="action_page.php" method="post" onSubmit={login}>
         <div className="con">
           <div className="signup">Login</div>
           <div className="name">
@@ -31,7 +45,7 @@ const Login = () => {
             </a>
           </div>
 
-          <div className="password">
+          {/* <div className="password">
             <div className="wave-group">
               <input required type="password" className="input" />
               <span className="bar"></span>
@@ -57,14 +71,15 @@ const Login = () => {
           </div>
 
           <a className="fb">
-            <img src="/src/assets/facebook-svgrepo-com.svg" alt="" />
+            <img src="/src/assets/facebook-svgrepo-com.svg" alt="" /> 
           </a>
           <a className="gg">
             <img src="/src/assets/gmail.svg" alt="" />
-          </a>
+          </a> */}
         </div>
       </form>
       
+    </div>
     </div>
   );
 };

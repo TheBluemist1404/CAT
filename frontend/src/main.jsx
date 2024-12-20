@@ -1,7 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
+import './index.scss'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import { AuthProvider } from './authentication/AuthProvider'
 
 import Homepage from './pages/homepage/Homepage'
 import Login from './authentication/Login'
@@ -11,13 +12,15 @@ import Forum from './pages/forum/Forum'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<Homepage/>}/>
-        <Route path='/auth/login' element={<Login/>}/>
-        <Route path='/auth/signup' element={<Signup/>}/>
-        <Route path='/forum' element={<Forum/>}/>
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<Homepage/>}/>
+          <Route path='/auth/login' element={<Login/>}/>
+          <Route path='/auth/signup' element={<Signup/>}/>
+          <Route path='/forum' element={<Forum/>}/>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   </StrictMode>
 )

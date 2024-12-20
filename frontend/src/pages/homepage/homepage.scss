@@ -22,7 +22,42 @@
         z-index: -1;
         filter: blur(2px);
     }
+
+    .head{
+        margin: 0 30px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
     
+    .login{
+        margin-right: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        transform: translateY(-7px);
+    }
+
+    .login-button{
+        font-family: var(--text-font);
+        color: #1e1e1e;
+        font-size: 24px;
+        font-weight: bold;
+        background-color: var(--secondary-color);
+        width: fit-content;
+        height: fit-content;
+
+        box-sizing: content-box;
+        padding: 10px 20px;
+        border: solid #1e1e1e 2px;
+        border-radius: 40px;
+    }
+
+    .login-button:hover{
+        cursor: pointer;
+        background-color: #adadad;
+    }
     /* -------------------------------- */
     /* INTRO */
     .intro{
@@ -192,7 +227,7 @@
     /* ------------------------------- */
     /* FORUM BUBBLE */
     .forum-desc{
-        margin-top: 100px;
+        margin-top: 200px;
         margin-bottom: 300px;
     }
     .bubble{
@@ -201,7 +236,7 @@
         align-items: center; 
         justify-content: center; 
         padding: 20px;
-        margin: -10px;
+        // margin: -10px;
     
         font-family: var(--text-font);
         color: #302612;
@@ -219,7 +254,7 @@
         border-radius: 50%;
         background: linear-gradient(-20deg, #ffffff, 30%, #fa1d33);
     
-        font-size: 35px;
+        font-size: 32px;
     
         transform: translate(-65%);
     }
@@ -230,7 +265,7 @@
         border-radius: 50%;
         background: linear-gradient(70deg, #ffffff, 30%, #ecd44a);
     
-        font-size: 30px;
+        font-size: 28px;
     
         transform: translate(100%);
     }
@@ -241,7 +276,7 @@
         border-radius: 50%;
         background: linear-gradient(-100deg, #ffffff, 30%, #42c8f5);
     
-        font-size: 30px;
+        font-size: 24px;
     
         transform: translate(-30%);
     }

@@ -1,3 +1,7 @@
+import { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { AuthContext } from '../../authentication/AuthProvider'
+
 import './homepage.scss'
 import './title.css'
 import './card.css'
@@ -33,10 +37,25 @@ function Card({subhead, head}) {
 }
 
 function Homepage(){
+    const navigate = useNavigate();
+
+    const {isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
+
+    const login = () => {
+        navigate('/auth/login');
+    }
+
     return(
         <div className='homepage'>
             <div className='container' style={{'--backgroundImage': `url(${background})`}}>
-                <Header> </Header>
+                <div className="head">
+                    <Header/>
+                    <div className='login'>
+                        {
+                           !isLoggedIn ? (<div className="login-button" onClick={login}>Login</div>): (<>Hello</>)
+                        }
+                    </div>
+                </div>
                 <div className="intro">
                     <div className="box">
                         <p>welcome to</p>
@@ -77,7 +96,7 @@ function Homepage(){
                     <div className="forum-desc">
                         <div className={`bubble bub1`}>
                             <div>
-                                A large community of developers, varies on all fields.
+                                A <span style={{textDecoration: 'underline', fontWeight: 'bold' }}>large community</span> of developers, varies on all fields.
                             </div>
                             <div>
                                 The best place to step out and learn new things!
@@ -85,10 +104,10 @@ function Homepage(){
                         </div>
                         <div className={`bubble bub2`}>
                             <div>
-                                Stuck on a problem?
+                                Stuck on a <span style={{textDecoration: 'underline', fontWeight: 'bold' }}>problem</span>?
                             </div>
                             <div>
-                                Share and the community is here to help!
+                            <span style={{textDecoration: 'underline', fontWeight: 'bold' }}>Share</span> and the community is here to help!
                             </div>
                         </div>
                         <div className={`bubble bub3`}>
@@ -96,7 +115,7 @@ function Homepage(){
                                 Find the topics your are interested in with ease
                             </div>
                             <div>
-                                Search with #TAGS available
+                                Search with <span style={{textDecoration: 'underline', fontWeight: 'bold' }}>#TAG</span> available
                             </div>
                         </div>
                         <svg width="506" height="1632" viewBox="0 0 506 1632" fill="none" xmlns="http://www.w3.org/2000/svg">
