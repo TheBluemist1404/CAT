@@ -1,8 +1,6 @@
-import axios from 'axios';
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useState, useContext } from 'react';
+import { useContext } from 'react';
 import { AuthContext } from './AuthProvider';
 
 import background from '@homepage-assets/coding-on-laptop.jpg'
@@ -12,22 +10,13 @@ import Header from "../Header";
 
 
 const Login = () => {
-  const {setIsLoggedIn, setUser} = useContext(AuthContext);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
+  const {isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
   const navigate = useNavigate();
 
   const login = (event) => {
     event.preventDefault();
-    try {
-      const response = async () => await axios.post('/auth/login', {email, password});
-      setIsLoggedIn(true);
-      setUser(response.data.user)
-      navigate('/')
-    } catch (error) {
-      console.error("Login failed",error);
-    }
+    setIsLoggedIn(true);    
+    navigate('/')
   }
 
   return (
@@ -39,7 +28,7 @@ const Login = () => {
           <div className="signup">Login</div>
           <div className="name">
             <div className="wave-group">
-              <input required type="text" className="input" value={email} onChange={(e)=> setEmail(e.target.value)}/>
+              <input required type="text" className="input" />
               <span className="bar"></span>
               <label className="label">
                 <span className="label-char" style={{ "--index": 0 }}>E</span>
@@ -58,7 +47,7 @@ const Login = () => {
 
           <div className="password">
             <div className="wave-group">
-              <input required type="password" className="input" value={password} onChange={(e)=> setPassword(e.target.value)}/>
+              <input required type="password" className="input" />
               <span className="bar"></span>
               <label className="label">
                 <span className="label-char" style={{ "--index": 0 }}>P</span>
@@ -91,7 +80,7 @@ const Login = () => {
       </form>
       
     </div>
-  </div>
+    </div>
   );
 };
 
