@@ -30,7 +30,7 @@ module.exports.signup = async (req, res) => {
 
         await user.save();
 
-        res.status(201).end();
+        res.status(201).json({user: user});
     } catch (err) {
         res.status(500).json({
             message: err.message,
@@ -63,7 +63,7 @@ module.exports.login = async (req, res) => {
         }
 
         const token = generateToken(existingUser);  
-        res.status(200).json({ token: token });
+        res.status(200).json({user: existingUser, token: token });
     } catch (err) {
         res.status(500).json({
             message: err.message,

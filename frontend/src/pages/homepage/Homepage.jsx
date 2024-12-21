@@ -39,7 +39,7 @@ function Card({subhead, head}) {
 function Homepage(){
     const navigate = useNavigate();
 
-    const {isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
+    const {isLoggedIn, user} = useContext(AuthContext);
 
     const login = () => {
         navigate('/auth/login');
@@ -52,7 +52,7 @@ function Homepage(){
                     <Header/>
                     <div className='login'>
                         {
-                           !isLoggedIn ? (<div className="login-button" onClick={login}>Login</div>): (<>Hello</>)
+                           !isLoggedIn ? (<div className="login-button" onClick={login}>Login</div>): (<>Hello {user.fullName} </>)
                         }
                     </div>
                 </div>
