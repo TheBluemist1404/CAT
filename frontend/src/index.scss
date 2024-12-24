@@ -32,7 +32,7 @@ body{
     margin-top: 70px;
     width: fit-content;
     display: flex;
-    gap: 180px;
+    gap: 10vw;
     flex-direction:row;
     align-items: center;
     justify-content: space-between;
@@ -92,12 +92,13 @@ body{
   .right p{    
     font-size: 24px;
   }
-  /* COPYRIGHT */
-  .copyright{
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    padding: 20px;
-  }
+}
+
+/* COPYRIGHT */
+.copyright{
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  padding: 20px;
 }
 

@@ -31,33 +31,87 @@
     }
     
     .login{
-        margin-right: 40px;
+        position: relative;
+        margin-right: 80px;
         display: flex;
+        flex-direction: row;
         justify-content: center;
         align-items: center;
 
-        transform: translateY(-7px);
+        .login-button{
+            font-family: var(--text-font);
+            color: #1e1e1e;
+            font-size: 24px;
+            font-weight: bold;
+            background-color: var(--secondary-color);
+            width: fit-content;
+            height: fit-content;
+    
+            box-sizing: content-box;
+            padding: 10px 20px;
+            border: solid #1e1e1e 2px;
+            border-radius: 40px;
+        }
+    
+        .login-button:hover{
+            cursor: pointer;
+            background-color: #adadad;
+        }
+
+        .logged-in{
+            height: 40px;
+            padding: 0 20px 0 0;
+            border-radius: 20px;
+            background-color: #ffffff31;
+
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            user-select: none;
+            cursor: pointer;
+
+            .avatar{
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: #fff;
+            }
+    
+            .username{
+                line-height: 40px; //Same height as container
+                color: var(--text-color);
+                font-family: var(--code);
+                font-size: 20px;
+            }
+        }
+
+        .action{
+            max-height: 100px;
+            overflow: hidden;
+            margin-top: 20px;
+            box-sizing: border-box;
+            padding: 5px 0;
+            flex-direction: column;
+            background-color: #ffffff31;
+
+            div{
+                box-sizing: border-box;
+                padding: 2px 0;
+                height: max-content;
+                text-align: center;
+                font-family: var(--text-font);
+                font-size: 24px;
+
+                cursor: pointer;
+            }
+
+            div:hover{
+                background-color: #d9d9d92b;
+            }
+        }
     }
 
-    .login-button{
-        font-family: var(--text-font);
-        color: #1e1e1e;
-        font-size: 24px;
-        font-weight: bold;
-        background-color: var(--secondary-color);
-        width: fit-content;
-        height: fit-content;
-
-        box-sizing: content-box;
-        padding: 10px 20px;
-        border: solid #1e1e1e 2px;
-        border-radius: 40px;
-    }
-
-    .login-button:hover{
-        cursor: pointer;
-        background-color: #adadad;
-    }
+    
     /* -------------------------------- */
     /* INTRO */
     .intro{
@@ -75,6 +129,10 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+    }
+
+    .intro .box{
+        transform: translateY(-10%);
     }
     
     .box p{
@@ -205,7 +263,8 @@
     }
     .forum-intro .forum-pitch{
         font-family: var(--heading-font);
-        font-size: 60px;
+        font-size: 50px;
+        text-transform: uppercase;
         font-weight: 600;
     }
     .forum-img{
@@ -430,14 +489,14 @@
         background-color: var(--highlight-red);
     }
     
-    /* OUTRO using box property from INTRO since they are quite similar*/ 
+    /* OUTRO*/ 
     .outro{
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
     }
-    
+
     .outro p{
         text-transform: none;
         font-size: 32px;

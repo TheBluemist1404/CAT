@@ -1,9 +1,12 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect} from "react";
+import { useNavigate } from "react-router-dom";
 
 function Header(){
     const [hoveredIndex, setHoveredIndex] = useState(null);
     const linkRefs = useRef([])
 
+    const naviagte = useNavigate();
+    
     useEffect(() => { 
         linkRefs.current.forEach((link, index) => { 
             if (link) { 
@@ -20,17 +23,18 @@ function Header(){
         }); 
     },[hoveredIndex]);
 
-    const navbar = ["About", "Forum","Live Code", "Contact"];
+    const navbar = [{sect: "About", link: "/"}, {sect: "Forum", link: "/forum"},{sect: "Live Code", link: "/"}];
 
     return(
         <div className="header"> 
-            <img src="/src/assets/logo.svg" alt="" />
+            <img src="/src/assets/logo.svg" alt="" onClick={()=>naviagte('/')} style={{cursor: 'pointer'}}/>
             <div className="navbar">
-                {navbar.map((sect, index) => (
+                {navbar.map((obj, index) => (
                     <div ref={el => linkRefs.current[index] = el}
                      onMouseEnter={() => setHoveredIndex(index)} 
-                     onMouseLeave={() => setHoveredIndex(null)}>
-                        {sect}
+                     onMouseLeave={() => setHoveredIndex(null)}
+                     onClick={() => naviagte(obj.link)}>
+                        {obj.sect}
                     </div>
                 ))}
             </div>

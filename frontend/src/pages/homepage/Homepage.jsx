@@ -1,9 +1,9 @@
-import { useContext } from 'react'
+import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../authentication/AuthProvider'
 
 import './homepage.scss'
-import './title.css'
+import './title.scss'
 import './card.css'
 
 //alias set up in vite.config.js
@@ -39,12 +39,17 @@ function Card({subhead, head}) {
 function Homepage(){
     const navigate = useNavigate();
 
-    const {isLoggedIn, user} = useContext(AuthContext);
+    const {isLoggedIn, setIsLoggedIn, user} = useContext(AuthContext);
 
     const login = () => {
         navigate('/auth/login');
     }
 
+    const [dropdown, setDropdown] = useState(false)
+
+    const toggleDropdown = ()=>{
+        setDropdown(!dropdown);
+    }
     return(
         <div className='homepage'>
             <div className='container' style={{'--backgroundImage': `url(${background})`}}>
@@ -52,11 +57,22 @@ function Homepage(){
                     <Header/>
                     <div className='login'>
                         {
-                           !isLoggedIn ? (<div className="login-button" onClick={login}>Login</div>): (<>Hello {user.fullName} </>)
+                           !isLoggedIn ? (<div className="login-button" onClick={login}>Login</div>): ( 
+                           <div style={{position: 'absolute', top: '70px', right: '0px'}}>
+                               <div className='logged-in' onClick={toggleDropdown}>
+                                    <div className="avatar"></div>
+                                    <div className='username'>{user.fullName}</div>
+                               </div>
+                               <div className="action" style={{ display: dropdown ? 'flex' : 'none'}}>
+                                    <div className="to-profile" onClick={()=>{navigate('/profile')}}>Profile</div>
+                                    <div className="logout" onClick={()=>{setIsLoggedIn(false)}}>Logout</div>
+                               </div>
+                           </div>
+                           )
                         }
                     </div>
                 </div>
-                <div className="intro">
+                <section className="intro">
                     <div className="box">
                         <p>welcome to</p>
                         <h1>c.a.t</h1>
@@ -65,8 +81,8 @@ function Homepage(){
                             <TypingEffect text={"code-all-time"} speed={150}></TypingEffect>
                         </div>
                     </div>
-                </div>
-                <div className="about" style={{position: 'relative', overflow: 'hidden'}}>
+                </section>
+                <section className="about" style={{position: 'relative', overflow: 'hidden'}}>
                     <div className="decor1"></div>
                     <Title
                       subhead={"who we are"}
@@ -79,9 +95,9 @@ function Homepage(){
                             <div className="about-desc">with a passion to bring the joy of coding to all the curious minds</div>
                         </div>
                     </div>
-                </div>
-                <div className="forum">
-                    <Title subhead={'Join our'} head={'Forum'}/>
+                </section>
+                <section className="forum">
+                    <Title subhead={'Join our'} head={'Forum    '}/>
                     <div className='forum-content'>
                         <div className="forum-intro">
                             <div>A journey is no fun without</div>
@@ -122,8 +138,8 @@ function Homepage(){
                         <path d="M44.4994 0.50107C1080 299.501 47 586.5 44.5 796.5C42 1006.5 521.499 868.502 492 1141C462.5 1413.5 1.00001 1631.5 1.00001 1631.5" stroke="black" stroke-dasharray="10.1 10.1"/>
                         </svg>
                     </div>
-                </div>
-                <div className="live-code">
+                </section>
+                <section className="live-code">
                     <Title subhead={'work with team'} head={'Live Code'}/>
                     <div className="code-img"><img src={team} alt="" /></div>
                     <div className="bento-container">                        
@@ -148,8 +164,8 @@ function Homepage(){
                         <div>-</div>
                         <div>In our <span id='red-span'>modern IDE</span></div>
                     </div>
-                </div>
-                <div className="outro">
+                </section>
+                <section className="outro">
                     <div className="box">
                         <p>and we will continue</p>
                         <h1>our passion</h1>
@@ -157,7 +173,7 @@ function Homepage(){
                             <div id='join'>join us now</div>
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
             <Footer/>
         </div>
