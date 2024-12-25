@@ -5,5 +5,5 @@ const validation = require("../../middlewares/client/validation.middleware");
 
 router.post("/signup", validation.validateSignup, controller.signup);
 router.post("/login", validation.validateLogin,controller.login);
-
+router.post("/logout", controller.logout);
 module.exports = router;
