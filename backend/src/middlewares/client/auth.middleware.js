@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
-const BlackList = require("../../models/client/blackList.model");
-const { secretKey } = require("../../config/jwt");
+require('dotenv').config();
 
 module.exports.authenticateToken = async (req, res, next) => {
     const authHeader = req.header("Authorization");
@@ -15,16 +14,8 @@ module.exports.authenticateToken = async (req, res, next) => {
             message: "Unauthorized: Invalid token format!",
         })
     }
-    const checkIfBlacklisted = await BlackList.findOne({
-        token: token
-    });
-    if (checkIfBlacklisted) {
-        return res.status(401).json({
-            message: "This session has expired. Please login!" 
-        });
-    }
 
-    jwt.verify(token, secretKey, (err, user) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err) {
             return res.status(403).json({
                 message: "Forbidden: Invalid token!",
