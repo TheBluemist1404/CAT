@@ -1,9 +1,10 @@
-const express = require("express");
-const router = express.Router();
-const authRoutes = require("./auth.route");
+const express = require('express');
+const authRoutes = require('./auth.route');
+const tokenRoutes = require('./token.route');
 
-module.exports = (app) => {
-    const version = "/api/v1";
-    
-    app.use(version + "/auth", authRoutes);
+module.exports = app => {
+  const version = '/api/v1';
+
+  app.use(version + '/auth', authRoutes);
+  app.use(version + '/token', tokenRoutes);
 };
