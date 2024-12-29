@@ -40,6 +40,11 @@
     backdrop-filter: blur(7.7px);
     -webkit-backdrop-filter: blur(7.7px);
     border: 1px solid rgba(43, 43, 59, 1);
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
   }
   
   .signup {
@@ -57,13 +62,23 @@
     font-family: 'Roboto Serif';
   }
   
-  
+  .wave-group {
+    position: absolute;
+    top: 100px;
+    left: 10%;
+    width: 80%;
+    z-index: 2;
+    text-align: center;
+    
+   
+    
+  }
   
   .wave-group .input {
     font-size: 20px;
     padding: 10px 10px 10px 5px;
     display: block;
-    width: 450px;
+    width: 97%;
     border: none;
     border-bottom: 1px solid #ffffff;
     color: #ffffff;
@@ -71,6 +86,7 @@
   }
   
   .wave-group .input:focus {
+    
     outline: none;
   }
   
@@ -98,9 +114,10 @@
   }
   
   .wave-group .bar {
-    position: relative;
+    position: absolute;
     display: block;
-    width: 465px;
+    width: 100%;
+    text-align: center;
   }
   
   .wave-group .bar:before,.wave-group .bar:after {
@@ -128,48 +145,39 @@
     width: 50%;
   }
   
-  .wave-group {
-    position: absolute;
-    top: 100px;
-    left: 10%;
-    z-index: 2;
-    text-align: center;
-    
-  }
+  
   .user{
-    position: absolute;
-    top: 110px;
-    left: 500px;
+    position: absolute; 
+    bottom: 0; 
+    right: 0; 
+
   }
   
   
   .password{
     position: absolute;
     top: 100px;
-    left: 10%;
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+    background-color: blue;
   }
   
   .lock {
-    position: absolute;
-    top: 110px;
-    left: 445px;
-    width: 100px;
-    height: 100px; 
-    background-size: contain;
-    z-index: 3;
-    pointer-events: none;
+    position: absolute; 
+    bottom: 0; 
+    right: 0; 
   }
   button {
     position: absolute;
     background-color: #2B2B3B;
     border-radius: 10px;
     color: white;
-    top: 280px;
-    left: 60px;
+    margin-top: 50px;
+    width: 80%;
     padding: 14px 20px;
     border: none;
     cursor: pointer;
-    width: 470px;
     text-align: center;
     z-index: 3;
     font-size: 20px;
@@ -191,14 +199,14 @@
   .reg{
     position: absolute;
     top: 350px;
-    left:165px;
     font-size: 20px;
     z-index: 3;
+    text-align: center;
   }
   .fb{
     position: absolute;
     top: 400px;
-    left: 220px;
+    left: 35%;
     width: 40px;
     height: 40px; 
     background-size: contain;
@@ -212,7 +220,7 @@
   .gg{
     position: absolute;
     top: 395px;
-    left: 340px;
+    right: 35%;
     width: 30px;
     height: 30px; 
     background-size: contain;
