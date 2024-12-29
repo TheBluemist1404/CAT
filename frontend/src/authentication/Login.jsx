@@ -41,6 +41,9 @@ const Login = () => {
           <div className="signup">Login</div>
           <div className="name">
             <div className="wave-group">
+            <a className="user">
+                <img src="/src/assets/user.svg" alt="" />
+              </a>
               <input required type="text" className="input" value={email} onChange={(e)=>setEmail(e.target.value)} />
               <span className="bar"></span>
               <label className="label">
@@ -49,17 +52,17 @@ const Login = () => {
                 <span className="label-char" style={{ "--index": 2 }}>a</span>
                 <span className="label-char" style={{ "--index": 3 }}>i</span>
                 <span className="label-char" style={{ "--index": 4 }}>l</span>
-                
-                
               </label>
+              
             </div>
-            <a className="user">
-              <img src="/src/assets/user.svg" alt="" />
-            </a>
+            
           </div>
 
           <div className="password">
             <div className="wave-group">
+              <a className="lock">
+                <img src="/src/assets/lock.svg" alt="" />
+              </a>
               <input required type="password" className="input" value={password} onChange={(e)=>setPassword(e.target.value)} />
               <span className="bar"></span>
               <label className="label">
@@ -72,9 +75,7 @@ const Login = () => {
                 <span className="label-char" style={{ "--index": 6 }}>d</span>
               </label>
             </div>
-            <a className="lock">
-              <img src="/src/assets/lock.svg" alt="" />
-            </a>
+            
           </div>
 
           <button type="submit">Login</button>
