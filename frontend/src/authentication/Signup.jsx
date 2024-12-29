@@ -39,6 +39,9 @@ const Signup = () => {
             <div className="signup">Join The CATs</div>
             <div className="name">
               <div className="wave-group">
+                <a className="user">
+                  <img src="/src/assets/user.svg" alt="" />
+                </a>
                 <input required type="text" className="input" value={fullName} onChange={(e)=>{setFullName(e.target.value)}} />
                 <span className="bar"></span>
                 <label className="label">
@@ -54,12 +57,13 @@ const Signup = () => {
       
                 </label>
               </div>
-              <a className="user">
-                <img src="/src/assets/user.svg" alt="" />
-              </a>
+              
             </div>
             <div className="email">
                 <div className="wave-group">
+                  <a className="e">
+                    <img src="/src/assets/email.svg" alt="email" />
+                  </a>
                   <input required type="text" className="input" value={email} onChange={(e)=>setEmail(e.target.value)} />
                   <span className="bar"></span>
                   <label className="label">
@@ -70,13 +74,14 @@ const Signup = () => {
                     <span className="label-char" style={{ "--index": 4 }}>l</span>
                   </label>
                 </div>
-                <a className="e">
-                  <img src="/src/assets/email.svg" alt="email" />
-                </a>
+                
             </div>
       
             <div className="password">
               <div className="wave-group">
+                <a className="lock">
+                  <img src="/src/assets/lock.svg" alt="" />
+                </a>
                 <input required type="password" className="input" value={password} onChange={(e)=>setPassword(e.target.value)}/>
                 <span className="bar"></span>
                 <label className="label">
@@ -89,13 +94,11 @@ const Signup = () => {
                   <span className="label-char" style={{ "--index": 6 }}>d</span>
                 </label>
               </div>
-              <a className="lock">
-                <img src="/src/assets/lock.svg" alt="" />
-              </a>
+              
             </div>
             <button type="submit">Sign up</button>
             <div className="reg">
-              Already have an account?<p> Login</p>
+              Already have an account?<p > Login</p>
             </div>
             <a className="fb">
               <img src="/src/assets/facebook-svgrepo-com.svg" alt="" />
