@@ -69,7 +69,6 @@ module.exports.login = async (req, res) => {
 
     const { accessToken, refreshToken } = await generateToken(existingUser);
     res.status(200).json({
-      user: existingUser,
       accessToken: accessToken,
       refreshToken: refreshToken,
     });
@@ -98,7 +97,7 @@ module.exports.logout = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: 'Internal Server Error',
+      message: err.message,
     });
   }
 };
