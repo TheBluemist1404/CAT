@@ -54,3 +54,13 @@ module.exports.validateRefreshToken = async (req, res, next) => {
   }
   next();
 };
+
+module.exports.validateCreate = (req, res, next) => {
+  if (!req.body.title) {
+    res.status(400).json({
+      message: 'Please enter title of the post!',
+    });
+    return;
+  }
+  next();
+};
