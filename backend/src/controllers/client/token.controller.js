@@ -4,6 +4,7 @@ require('dotenv').config();
 
 // [POST] /api/v1/token
 module.exports.getNewToken = async (req, res) => {
+  const refreshToken = req.body.refreshToken;
   try {
     jwt.verify(
       refreshToken,
