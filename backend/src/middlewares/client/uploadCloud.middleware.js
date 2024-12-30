@@ -16,22 +16,16 @@ module.exports.uploadMulti = async (req, res, next) => {
     return;
   }
 
-  try {
+  if (req.files.length > 0) {
     const images = req.files;
-    console.log(req.files);
-    console.log('-------');
     const imageURLs = [];
     for (const image of images) {
       const result = await cloudinary.uploader.upload(image.path);
       imageURLs.push(result.secure_url);
     }
-    req.body.images = imageURLs;
-    next();
-  } catch (err) {
-    res.status(400).json({
-      message: err.message,
-    });
+    req.body[req.files[0].fieldname] = imageURLs;
   }
+  next();
 };
 
 module.exports.uploadSingle = async (req, res, next) => {
@@ -41,16 +35,11 @@ module.exports.uploadSingle = async (req, res, next) => {
     });
     return;
   }
-  
-  try {
+
+  if (req.file) {
     const image = req.file;
-    console.log(req.file);
     const result = await cloudinary.uploader.upload(image.path);
     req.body[req.file.fieldname] = result.secure_url;
-    next();
-  } catch (err) {
-    res.status(400).json({
-      message: err.message,
-    });
   }
+  next();
 };
