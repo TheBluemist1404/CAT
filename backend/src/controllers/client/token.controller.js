@@ -17,15 +17,17 @@ module.exports.getNewToken = async (req, res) => {
         const payload = {
           id: tokenDetail.id,
           email: tokenDetail.email,
+          fullName: tokenDetail.fullName,
+          avatar: tokenDetail.avatar,
         };
         const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
           expiresIn: '10m',
         });
 
         res.status(200).json({
-          message: "Access token created successfully",
-          accessToken: accessToken
-        })
+          message: 'Access token created successfully',
+          accessToken: accessToken,
+        });
       },
     );
   } catch (err) {
