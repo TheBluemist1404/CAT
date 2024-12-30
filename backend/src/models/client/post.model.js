@@ -18,16 +18,25 @@ const postSchema = new mongoose.Schema(
         ref: 'Tag',
       },
     ],
+    deleted: {
+      type: Boolean,
+      default: false,
+    },
+    status: {
+      type: String,
+      enum: ['public', 'private'],
+      default: 'public',
+    },
   },
   { timestamps: true },
 );
 
 postSchema.index({ tag: 1 });
-postSchema.index( { userId: 1 });
+postSchema.index({ userId: 1 });
 postSchema.virtual('likes', {
   ref: 'Like',
   localField: '_id',
-  foreignField: 'postId'
+  foreignField: 'postId',
 });
 
 const Post = mongoose.model('posts', postSchema);
