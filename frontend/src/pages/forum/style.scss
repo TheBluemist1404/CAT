@@ -96,6 +96,22 @@
         position: fixed;
         top: 60px;
     }
+    .create-post-button {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: left;
+        gap: 10px;
+        padding: 15px;
+        padding-left: 20px;
+        width: 140px;
+        height: 40px;
+        background-color: #1E1E2F;
+        border: none;
+        border-radius: 5px;
+        color: #FFFFFF;
+    }
+    
     
     .sidebar-button {
         margin-top: 10px;
@@ -313,11 +329,7 @@
     .comments-list {
         margin-top: 10px;
     }
-    
-    .show-more{
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
+
     
     .comment {
         margin-top: 10px;
@@ -380,6 +392,41 @@
         width: 12px;
         height: 12px;
     }
+
+    .create-comment {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+        margin-top: 10px;
+    }
+    
+    .create-comment-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .create-comment-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+    
+    .create-comment-input {
+        width: 100%;
+        min-height: 40px; /* Initially same height as the avatar */
+        max-height: 200px; /* Max height for the comment input */
+        resize: none;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #2B2B3B;
+        color: #FFFFFF;
+        font-size: 14px;
+        line-height: 1.5;
+        overflow-y: auto;
+    }
     
     /* Pagination Styles */
     .pagination {
@@ -420,4 +467,154 @@
         color: #FFFFFF;
         border-radius: 5px;
     }
+}
+
+.create-post-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7); 
+    filter: blur(10px); 
+    z-index: 999; 
+    display: none; 
+}
+
+.create-post-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7); 
+    filter: blur(10px); 
+    z-index: 999; 
+    display: none; 
+}
+
+/* Modal content */
+.create-post-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1E1E2F;
+    padding: 30px;
+    border-radius: 8px;
+    width: 600px; 
+    z-index: 1000; 
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.7);
+    display: none; 
+}
+
+/* Modal header */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.create-avatar {
+    margin-top: 0px;
+    margin-left: 0px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.create-user-name {
+    position: absolute;
+    margin-top: -10px;
+    margin-left: 50px;
+    height: fit-content;
+    width: fit-content;
+    font-weight: bold;
+    font-size: 14px;
+    color: #FFFFFF;
+}
+
+.create-time {
+    position: absolute;
+    margin-top: 20px;
+    margin-left: 50px;
+    height: fit-content;
+    width: fit-content;
+    font-size: 12px;
+    color: #FFFFFF;
+}
+.close-button {
+    background: none;
+    border: none;
+    color: #FF4B5C;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Modal body */
+.modal-body {
+    margin-top: 20px;
+}
+
+.modal-body textarea {
+    width: 100%;
+    height: 120px; /* Increased textarea height */
+    resize: none;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #2B2B3B;
+    color: #FFFFFF;
+    font-size: 16px;
+}
+
+/* Visibility options */
+.visibility-options {
+    margin-top: 15px;
+    color: #FFFFFF;
+}
+
+.visibility-options label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.visibility-dropdown {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #2B2B3B;
+    color: #FFFFFF;
+    border: 1px solid #3E3E5A;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Visibility dropdown options styling */
+.visibility-dropdown option {
+    background-color: #1E1E2F;
+    color: #FFFFFF;
+}
+
+/* Submit button */
+.submit-button {
+    margin-top: 20px;
+    padding: 12px;
+    background-color: #FF4B5C;
+    border: none;
+    border-radius: 5px;
+    color: #FFFFFF;
+    width: 100%;
+    cursor: pointer;
+}
+
+/* Close button hover effect */
+.close-button:hover {
+    color: #FF4B5C;
+}
+
+.submit-button:hover {
+    background-color: #E13C4E;
 }
