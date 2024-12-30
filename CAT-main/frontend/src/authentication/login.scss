@@ -1,0 +1,236 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+.login{
+  .bg::before{
+    content: ''; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100vh;
+    background-image: var(--backgroundImage);
+    background-size: cover;
+    background-attachment: fixed;
+    background-size: cover;
+    z-index: -1;
+    filter: blur(2px);
+  }
+  
+  
+  .con {
+    position: relative; 
+    top: 0px;
+    height: 520px;
+    width: 35%;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background-color: #2b2b3b; 
+    border-radius: 10%;
+    z-index: 0;
+    background: rgba(43, 43, 59, 0.43); 
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); 
+    backdrop-filter: blur(7.7px);
+    -webkit-backdrop-filter: blur(7.7px);
+    border: 1px solid rgba(43, 43, 59, 1);
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+  }
+  
+  .signup {
+    position: absolute; 
+    top: 40px;
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    z-index: 2; 
+    font-size: 35px;
+    font-weight: bolder; 
+    color: #ffffff; 
+    padding: 20px; 
+    border-radius: 10px; 
+    text-align: center;
+    font-family: 'Roboto Serif';
+  }
+  
+  .wave-group {
+    position: absolute;
+    top: 100px;
+    left: 10%;
+    width: 80%;
+    z-index: 2;
+    text-align: center;
+    
+   
+    
+  }
+  
+  .wave-group .input {
+    font-size: 20px;
+    padding: 10px 10px 10px 5px;
+    display: block;
+    width: 97%;
+    border: none;
+    border-bottom: 1px solid #ffffff;
+    color: #ffffff;
+    background: transparent;
+  }
+  
+  .wave-group .input:focus {
+    
+    outline: none;
+  }
+  
+  .wave-group .label {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: normal;
+    position: absolute;
+    pointer-events: none;
+    left: 5px;
+    top: 10px;
+    display: flex;
+  }
+  
+  .wave-group .label-char {
+    transition: 0.2s ease all;
+    transition-delay: calc(var(--index) * .05s);
+  }
+  
+  .wave-group .input:focus ~ label .label-char,
+  .wave-group .input:valid ~ label .label-char {
+    transform: translateY(-20px);
+    font-size: 20px;
+    color: #ffffff;
+  }
+  
+  .wave-group .bar {
+    position: absolute;
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .wave-group .bar:before,.wave-group .bar:after {
+    content: '';
+    height: 1px;
+    width: 0;
+    bottom: 1px;
+    position: absolute;
+    background: #ffffff;
+    transition: 0.2s ease all;
+    -moz-transition: 0.2s ease all;
+    -webkit-transition: 0.2s ease all;
+  }
+  
+  .wave-group .bar:before {
+    left: 50%;
+  }
+  
+  .wave-group .bar:after {
+    right: 50%;
+  }
+  
+  .wave-group .input:focus ~ .bar:before,
+  .wave-group .input:focus ~ .bar:after {
+    width: 50%;
+  }
+  
+  
+  .user{
+    position: absolute; 
+    bottom: 0; 
+    right: 0; 
+
+  }
+  
+  
+  .password{
+    position: absolute;
+    top: 100px;
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+    background-color: blue;
+  }
+  
+  .lock {
+    position: absolute; 
+    bottom: 0; 
+    right: 0; 
+  }
+  button {
+    position: absolute;
+    background-color: #2B2B3B;
+    border-radius: 10px;
+    color: white;
+    margin-top: 50px;
+    width: 80%;
+    padding: 14px 20px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    z-index: 3;
+    font-size: 20px;
+  }
+  button:hover {
+    opacity: 0.8;
+  }
+  p{
+    color: #ffffff;
+    display: inline;
+    font-weight: bold;
+  }
+  
+  
+  p:hover {
+    color: #606083; 
+    
+  }
+  .reg{
+    position: absolute;
+    top: 350px;
+    font-size: 20px;
+    z-index: 3;
+    text-align: center;
+  }
+  .fb{
+    position: absolute;
+    top: 400px;
+    left: 35%;
+    width: 40px;
+    height: 40px; 
+    background-size: contain;
+    
+    z-index: 3;
+  }
+  .fb:hover{
+    transform: scale(1.1);
+    cursor: pointer;
+  }
+  .gg{
+    position: absolute;
+    top: 395px;
+    right: 35%;
+    width: 30px;
+    height: 30px; 
+    background-size: contain;
+    z-index: 3;
+  }
+    
+  .gg:hover{ 
+    transform: scale(1.1); 
+    cursor: pointer;
+  }
+  
+  
+}
