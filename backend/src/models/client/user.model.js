@@ -21,10 +21,12 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    posts: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Post',
-    },
+    posts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Post',
+      },
+    ],
   },
   { timestamps: true },
 );
@@ -36,5 +38,5 @@ userSchema.set('toJSON', {
   },
 });
 
-const User = mongoose.model('users', userSchema);
+const User = mongoose.model('User', userSchema);
 module.exports = User;

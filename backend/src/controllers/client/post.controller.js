@@ -1,5 +1,6 @@
 const Post = require('../../models/client/post.model');
 const User = require('../../models/client/user.model');
+const Like = require('../../models/client/like.model');
 
 // [GET] /api/v1/forum/
 module.exports.index = async (req, res) => {
@@ -10,10 +11,14 @@ module.exports.index = async (req, res) => {
       deleted: false,
       status: 'public',
     })
-      .populate('likes')
+      .populate({
+        path: 'likes',
+        select: 'userId -_id -postId',
+      })
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: 'desc' });
+
     res.status(200).json(posts);
   } catch (err) {
     res.status(400).json({

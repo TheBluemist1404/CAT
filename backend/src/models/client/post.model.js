@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+
+const opt = { toJSON: { virtuals: true }, timestamps: true, id: false };
+
 const postSchema = new mongoose.Schema(
   {
     title: {
@@ -11,6 +14,7 @@ const postSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
     },
     tags: [
       {
@@ -28,16 +32,17 @@ const postSchema = new mongoose.Schema(
       default: 'public',
     },
   },
-  { timestamps: true },
+  opt,
 );
 
-postSchema.index({ tag: 1 });
+postSchema.index({ tags: 1 });
 postSchema.index({ userId: 1 });
+
 postSchema.virtual('likes', {
   ref: 'Like',
   localField: '_id',
   foreignField: 'postId',
 });
 
-const Post = mongoose.model('posts', postSchema);
+const Post = mongoose.model('Post', postSchema);
 module.exports = Post;
