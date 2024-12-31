@@ -12,8 +12,14 @@ module.exports.index = async (req, res) => {
       status: 'public',
     })
       .populate({
-        path: 'likes',
+        path: 'upvotes',
         select: 'userId -_id -postId',
+        match: { typeLike: 'upvote' },
+      })
+      .populate({
+        path: 'downvotes',
+        select: 'userId -_id -postId',
+        match: { typeLike: 'downvote' },
       })
       .skip(skip)
       .limit(limit)
@@ -31,7 +37,7 @@ module.exports.index = async (req, res) => {
 module.exports.create = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    req.body.userId = user._id;
+    req.body.userCreated = user._id;
     console.log(req.body);
     const post = new Post(req.body);
     const savedPost = await post.save();
@@ -40,6 +46,40 @@ module.exports.create = async (req, res) => {
     await user.save();
 
     res.status(201).json(post);
+  } catch (err) {
+    res.status(400).json({
+      message: err.message,
+    });
+  }
+};
+
+// [GET] /api/v1/forum/detail/:id
+module.exports.detail = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const post = await Post.findById(id)
+      .populate({
+        path: 'upvotes',
+        select: 'userId -_id -postId',
+        match: { typeLike: 'upvote' },
+      })
+      .populate({
+        path: 'downvotes',
+        select: 'userId -_id -postId',
+        match: { typeLike: 'downvote' },
+      })
+      .populate({
+        path: 'userCreated',
+        select: '-password -deleted -createdAt -updatedAt -posts',
+      });
+    if (post.status !== 'public' || post.deleted === true) {
+      res.status(400).json({
+        message: 'Cannot find post!',
+      });
+      return;
+    }
+
+    res.status(200).json(post);
   } catch (err) {
     res.status(400).json({
       message: err.message,

@@ -15,5 +15,6 @@ router.post(
   validate.validateCreate,
   controller.create,
 );
+router.get('/detail/:id', controller.detail);
 
 module.exports = router;
