@@ -32,7 +32,7 @@ module.exports.signup = async (req, res) => {
 
     await user.save();
 
-    res.status(201).json({ user: user });
+    res.status(201).json(user);
   } catch (err) {
     res.status(500).json({
       message: err.message,
