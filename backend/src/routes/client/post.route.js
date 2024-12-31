@@ -6,6 +6,7 @@ const validate = require('../../middlewares/client/validation.middleware');
 const multer = require('../../middlewares/client/multer.middleware');
 const uploadCloud = require('../../middlewares/client/uploadCloud.middleware');
 const voteController = require('../../controllers/client/vote.controller');
+const commentController = require('../../controllers/client/comment.controller');
 
 router.get('/', controller.index);
 router.post(
@@ -18,5 +19,5 @@ router.post(
 );
 router.get('/detail/:id', controller.detail);
 router.patch('/:typeVote/:id', auth.authenticateToken, voteController.vote);
-
+router.post('/comment/:id', auth.authenticateToken, commentController.comment);
 module.exports = router;

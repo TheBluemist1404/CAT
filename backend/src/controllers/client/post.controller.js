@@ -1,6 +1,7 @@
 const Post = require('../../models/client/post.model');
 const User = require('../../models/client/user.model');
 const Like = require('../../models/client/like.model');
+const Comment = require('../../models/client/comment.model');
 
 // [GET] /api/v1/forum/
 module.exports.index = async (req, res) => {
@@ -12,6 +13,10 @@ module.exports.index = async (req, res) => {
       status: 'public',
     })
       .populate({
+        path: 'userCreated',
+        select: '_id fullName avatar',
+      })
+      .populate({
         path: 'upvotes',
         select: 'userId -_id -postId',
         match: { typeVote: 'upvote' },
@@ -20,6 +25,22 @@ module.exports.index = async (req, res) => {
         path: 'downvotes',
         select: 'userId -_id -postId',
         match: { typeVote: 'downvote' },
+      })
+      .populate({
+        path: 'comments',
+        perDocumentLimit: 3,
+        options: { sort: { createdAt: -1 } },
+        select: 'content userId -postId',
+        populate: [
+          {
+            path: 'userId',
+            select: '_id fullName avatar',
+          },
+          {
+            path: 'replies.userId',
+            select: '_id fullName avatar',
+          },
+        ],
       })
       .skip(skip)
       .limit(limit)
@@ -59,6 +80,10 @@ module.exports.detail = async (req, res) => {
     const id = req.params.id;
     const post = await Post.findById(id)
       .populate({
+        path: 'userCreated',
+        select: '_id fullName avatar',
+      })
+      .populate({
         path: 'upvotes',
         select: 'userId -_id -postId',
         match: { typeVote: 'upvote' },
@@ -69,8 +94,19 @@ module.exports.detail = async (req, res) => {
         match: { typeVote: 'downvote' },
       })
       .populate({
-        path: 'userCreated',
-        select: '-password -deleted -createdAt -updatedAt -posts',
+        path: 'comments',
+        options: { sort: { createdAt: -1 } },
+        select: 'content userId -postId',
+        populate: [
+          {
+            path: 'userId',
+            select: '_id fullName avatar',
+          },
+          {
+            path: 'replies.userId',
+            select: '_id fullName avatar',
+          },
+        ],
       });
     if (post.status !== 'public' || post.deleted === true) {
       res.status(404).json({
