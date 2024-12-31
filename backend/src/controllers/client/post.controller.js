@@ -14,12 +14,12 @@ module.exports.index = async (req, res) => {
       .populate({
         path: 'upvotes',
         select: 'userId -_id -postId',
-        match: { typeLike: 'upvote' },
+        match: { typeVote: 'upvote' },
       })
       .populate({
         path: 'downvotes',
         select: 'userId -_id -postId',
-        match: { typeLike: 'downvote' },
+        match: { typeVote: 'downvote' },
       })
       .skip(skip)
       .limit(limit)
@@ -61,19 +61,19 @@ module.exports.detail = async (req, res) => {
       .populate({
         path: 'upvotes',
         select: 'userId -_id -postId',
-        match: { typeLike: 'upvote' },
+        match: { typeVote: 'upvote' },
       })
       .populate({
         path: 'downvotes',
         select: 'userId -_id -postId',
-        match: { typeLike: 'downvote' },
+        match: { typeVote: 'downvote' },
       })
       .populate({
         path: 'userCreated',
         select: '-password -deleted -createdAt -updatedAt -posts',
       });
     if (post.status !== 'public' || post.deleted === true) {
-      res.status(400).json({
+      res.status(404).json({
         message: 'Cannot find post!',
       });
       return;
