@@ -11,7 +11,7 @@ const postSchema = new mongoose.Schema(
     },
     content: String,
     images: [String],
-    userId: {
+    userCreated: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
@@ -38,7 +38,13 @@ const postSchema = new mongoose.Schema(
 postSchema.index({ tags: 1 });
 postSchema.index({ userId: 1 });
 
-postSchema.virtual('likes', {
+postSchema.virtual('upvotes', {
+  ref: 'Like',
+  localField: '_id',
+  foreignField: 'postId',
+});
+
+postSchema.virtual('downvotes', {
   ref: 'Like',
   localField: '_id',
   foreignField: 'postId',

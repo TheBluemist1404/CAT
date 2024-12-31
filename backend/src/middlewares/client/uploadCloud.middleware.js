@@ -16,7 +16,7 @@ module.exports.uploadMulti = async (req, res, next) => {
     return;
   }
 
-  if (req.files.length > 0) {
+  if (req.files && req.files.length > 0) {
     const images = req.files;
     const imageURLs = [];
     for (const image of images) {
