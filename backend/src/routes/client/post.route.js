@@ -7,6 +7,7 @@ const multer = require('../../middlewares/client/multer.middleware');
 const uploadCloud = require('../../middlewares/client/uploadCloud.middleware');
 const voteController = require('../../controllers/client/vote.controller');
 const commentController = require('../../controllers/client/comment.controller');
+const searchController = require('../../controllers/client/search.controller');
 
 router.get('/', controller.index);
 router.post(
@@ -21,5 +22,6 @@ router.get('/detail/:id', controller.detail);
 router.patch('/:typeVote/:id', auth.authenticateToken, voteController.vote);
 router.post('/comment/:id', auth.authenticateToken, commentController.comment);
 router.post('/reply/:id', auth.authenticateToken, commentController.reply);
+router.get('/search', searchController.search);
 
 module.exports = router;

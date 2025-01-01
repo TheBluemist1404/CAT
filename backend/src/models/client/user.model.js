@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
+
 const userSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
       required: 'Your fullname is required',
     },
+    slug: String,
     email: {
       type: String,
       unique: true,
@@ -12,6 +15,8 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
+      default:
+        'https://res.cloudinary.com/cat-project/image/upload/v1735743336/coder-sign-icon-programmer-symbol-vector-2879989_ecvn23.webp',
     },
     password: {
       type: String,
@@ -30,6 +35,16 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+userSchema.pre('save', function (next) {
+  const user = this;
+  if (!user.isModified('fullName')) return next();
+
+  const slug = slugify(user.fullName, { trim: true, lower: true });
+  user.slug = slug;
+
+  next();
+});
 
 userSchema.set('toJSON', {
   transform: (doc, ret) => {
