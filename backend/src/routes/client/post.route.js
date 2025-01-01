@@ -20,4 +20,6 @@ router.post(
 router.get('/detail/:id', controller.detail);
 router.patch('/:typeVote/:id', auth.authenticateToken, voteController.vote);
 router.post('/comment/:id', auth.authenticateToken, commentController.comment);
+router.post('/reply/:id', auth.authenticateToken, commentController.reply);
+
 module.exports = router;
