@@ -23,5 +23,5 @@ router.patch('/:typeVote/:id', auth.authenticateToken, voteController.vote);
 router.post('/comment/:id', auth.authenticateToken, commentController.comment);
 router.post('/reply/:id', auth.authenticateToken, commentController.reply);
 router.get('/search', searchController.search);
-
+router.get('/tags', auth.authenticateToken, controller.tags);
 module.exports = router;

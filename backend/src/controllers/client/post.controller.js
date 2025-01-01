@@ -74,7 +74,7 @@ module.exports.create = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     req.body.userCreated = user._id;
-    
+
     const post = new Post(req.body);
     const savedPost = await post.save();
 
@@ -137,6 +137,18 @@ module.exports.detail = async (req, res) => {
       }
     });
     res.status(200).json(post);
+  } catch (err) {
+    res.status(400).json({
+      message: err.message,
+    });
+  }
+};
+
+// [GET] /api/v1/forum/tags
+module.exports.tags = async (req, res) => {
+  try {
+    const tags = await Tag.find();
+    res.status(200).json(tags);
   } catch (err) {
     res.status(400).json({
       message: err.message,
