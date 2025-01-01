@@ -74,7 +74,7 @@ module.exports.create = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     req.body.userCreated = user._id;
-    console.log(req.body);
+    
     const post = new Post(req.body);
     const savedPost = await post.save();
 
