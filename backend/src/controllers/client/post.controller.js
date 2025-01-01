@@ -3,7 +3,7 @@ const User = require('../../models/client/user.model');
 const Like = require('../../models/client/like.model');
 const Comment = require('../../models/client/comment.model');
 
-// [GET] /api/v1/forum/
+// [GET] /api/v1/forum?offset=...&limit=...
 module.exports.index = async (req, res) => {
   let skip = parseInt(req.query.offset) || 0;
   let limit = parseInt(req.query.limit) || 10;
@@ -45,7 +45,15 @@ module.exports.index = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: 'desc' });
-
+      
+    for (const post of posts) {
+      post.comments.forEach(comment => {
+        if (comment.replies.length > 0) {
+          comment.replies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
+      });
+    }
+    
     res.status(200).json(posts);
   } catch (err) {
     res.status(400).json({
@@ -114,7 +122,11 @@ module.exports.detail = async (req, res) => {
       });
       return;
     }
-
+    post.comments.forEach(comment => {
+      if (comment.replies.length > 0) {
+        comment.replies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      }
+    });
     res.status(200).json(post);
   } catch (err) {
     res.status(400).json({
