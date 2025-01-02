@@ -8,6 +8,12 @@ const userSchema = new mongoose.Schema(
       required: 'Your fullname is required',
     },
     slug: String,
+    description: {
+      type: String,
+      default: "",
+    },
+    schools: [String],
+    companies: [String],
     email: {
       type: String,
       unique: true,
@@ -32,8 +38,14 @@ const userSchema = new mongoose.Schema(
         ref: 'Post',
       },
     ],
+    savedPosts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Post',
+      },
+    ],
   },
-  { timestamps: true },
+  { timestamps: true},
 );
 
 userSchema.pre('save', function (next) {
