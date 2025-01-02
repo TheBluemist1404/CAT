@@ -3,7 +3,7 @@ import { jwtDecode }  from 'jwt-decode';
 
 
 import { useNavigate } from 'react-router-dom';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from './AuthProvider';
 
 import background from '@homepage-assets/coding-on-laptop.jpg'
@@ -18,9 +18,11 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   
-  if (isLoggedIn){
-    navigate('/')
-  }
+  useEffect(()=>{
+    if (isLoggedIn){
+      navigate('/')
+    }
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,9 +31,6 @@ const Login = () => {
       const token = reponse.data;
       localStorage.removeItem('token')
       localStorage.setItem('token', JSON.stringify(token));
-      const userResponse = await axios.get('http://localhost:3000/api/v1/profile/me', {headers: {Authorization: `Bearer ${token.accessToken}`}})
-      const user = userResponse.data
-      setUser(user);
       setIsLoggedIn(true);   
       navigate('/')
     } catch (error) {

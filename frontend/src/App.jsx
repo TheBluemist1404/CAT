@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 import './app.scss'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
@@ -18,10 +19,12 @@ function App() {
     
     const tokenStr = localStorage.getItem('token');
     const token = JSON.parse(tokenStr);
+    const user = token? jwtDecode(token.accessToken): null
+    const userId = user? user.id: null;
 
     const fetch = async () => {
         try {
-            const userResponse = await axios.get('http://localhost:3000/api/v1/profile/me', {headers: {Authorization: `Bearer ${token.accessToken}`}})
+            const userResponse = await axios.get(`http://localhost:3000/api/v1/profile/${userId}`, {headers: {Authorization: `Bearer ${token.accessToken}`}})
             return userResponse.data;
         } catch (error) {
             if (error.response && error.response.status === 403) {
@@ -30,7 +33,7 @@ function App() {
                 token.accessToken = newAccessToken;
                 localStorage.setItem('token', JSON.stringify(token))
 
-                const userResponse = await axios.get('http://localhost:3000/api/v1/profile/me', {headers: {Authorization: `Bearer ${newAccessToken}`}})    
+                const userResponse = await axios.get(`http://localhost:3000/api/v1/profile/${userId}`, {headers: {Authorization: `Bearer ${newAccessToken}`}})    
                 return userResponse.data;            
             }
         }   
