@@ -1,6 +1,8 @@
 const Post = require('../../models/client/post.model');
 const Tag = require('../../models/client/tag.model');
 const User = require('../../models/client/user.model');
+const Comment = require('../../models/client/comment.model');
+const Like = require('../../models/client/like.model');
 
 // [GET] /api/v1/forum/search
 module.exports.search = async (req, res) => {
