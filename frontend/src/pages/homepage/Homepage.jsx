@@ -76,7 +76,7 @@ function Homepage({token}){
                            <div style={{position: 'absolute', top: '70px', right: '0px'}}>
                                <div className='logged-in' onClick={toggleDropdown}>
                                     <div className="avatar"></div>
-                                    <div className='username'>{user}</div>
+                                    <div className='username'>{user.fullName}</div>
                                </div>
                                <div className="action" style={{ display: dropdown ? 'flex' : 'none'}}>
                                     <div className="to-profile" onClick={()=>{navigate('/profile')}}>Profile</div>

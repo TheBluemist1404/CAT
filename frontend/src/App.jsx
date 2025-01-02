@@ -20,11 +20,11 @@ function App() {
         try {
             token = JSON.parse(tokenStr);
             const decoded = jwtDecode(token.accessToken);
-            const user = decoded.fullName;
+            const user = decoded;
             useEffect(()=> {
                 setUser(user);
                 setIsLoggedIn(true); 
-            }, [user]) 
+            }, []) 
             //useEffect to avoid state update during rendering
         } catch (error) {
             console.log(error)

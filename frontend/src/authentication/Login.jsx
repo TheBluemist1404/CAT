@@ -29,8 +29,8 @@ const Login = () => {
       const token = reponse.data;
       localStorage.removeItem('token')
       localStorage.setItem('token', JSON.stringify(token));
-      const decoded = jwtDecode(token.accessToken);
-      const user = decoded.fullName;
+      const userResponse = await axios.get('http://localhost:3000/api/v1/profile/me', {headers: {Authorization: `Bearer ${token.accessToken}`}})
+      const user = userResponse.data
       setUser(user);
       setIsLoggedIn(true);   
       navigate('/')
