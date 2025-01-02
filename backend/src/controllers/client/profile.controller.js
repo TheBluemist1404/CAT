@@ -2,7 +2,7 @@ const User = require('../../models/client/user.model');
 const Post = require('../../models/client/post.model');
 
 // [GET] /api/v1/profile/:id
-module.exports.me = async (req, res) => {
+module.exports.index = async (req, res) => {
   try {
     const id = req.params.id;
     if (req.user && req.user.id === id) {
@@ -24,8 +24,7 @@ module.exports.me = async (req, res) => {
         path: 'posts',
         match: { deleted: false },
         select: '_id title createdAt images',
-      });
-      
+      }).select('-savedPosts');
       res.status(200).json(user);
     }
   } catch (err) {
