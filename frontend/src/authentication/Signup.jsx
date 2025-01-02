@@ -29,7 +29,9 @@ const Signup = () => {
       console.error("Signup failed", error)
     }
   }
-
+const toLogin = () => {
+    navigate('/auth/login')
+  }
   return (    
     <div className="signup">
       <div className="bg" style={{'--backgroundImage': `url(${background})`}}>
@@ -98,7 +100,7 @@ const Signup = () => {
             </div>
             <button type="submit">Sign up</button>
             <div className="reg">
-              Already have an account?<p > Login</p>
+              Already have an account?<p onClick={toLogin} > Login</p>
             </div>
             <a className="fb">
               <img src="/src/assets/facebook-svgrepo-com.svg" alt="" />
