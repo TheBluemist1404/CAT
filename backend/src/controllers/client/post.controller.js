@@ -47,6 +47,10 @@ module.exports.index = async (req, res) => {
         path: 'tags',
         select: '_id title',
       })
+      .populate({
+        path: 'saves',
+        select: '_id -savedPosts',
+      })
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: 'desc' });
@@ -122,6 +126,10 @@ module.exports.detail = async (req, res) => {
             select: '_id fullName avatar',
           },
         ],
+      })
+      .populate({
+        path: 'saves',
+        select: '_id -savedPosts',
       });
     if (post.status !== 'public' || post.deleted === true) {
       res.status(404).json({
@@ -149,6 +157,42 @@ module.exports.tags = async (req, res) => {
   try {
     const tags = await Tag.find();
     res.status(200).json(tags);
+  } catch (err) {
+    res.status(400).json({
+      message: err.message,
+    });
+  }
+};
+
+// [POST] /api/v1/forum/save/:id
+module.exports.save = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const post = await Post.findById(id).select('_id');
+    if (!post) {
+      res.status(404).json({
+        message: 'Cannot find post!',
+      });
+      return;
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (user.savedPosts.includes(id)) {
+      const idx = user.savedPosts.indexOf(id);
+      user.savedPosts.splice(idx, 1);
+      await user.save();
+      res.status(200).json({
+        message: 'Unsave successfully!',
+      });
+      return;
+    }
+
+    user.savedPosts.push(id);
+    await user.save();
+    res.status(200).json({
+      message: 'Save successfully!',
+    });
   } catch (err) {
     res.status(400).json({
       message: err.message,

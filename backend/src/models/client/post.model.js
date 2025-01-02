@@ -60,6 +60,12 @@ postSchema.virtual('comments', {
   foreignField: 'postId',
 });
 
+postSchema.virtual('saves', {
+  ref: 'User',
+  localField: '_id',
+  foreignField: 'savedPosts'
+})
+
 postSchema.pre('save', async function (next) {
   const post = this;
 
