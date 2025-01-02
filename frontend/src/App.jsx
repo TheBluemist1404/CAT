@@ -1,8 +1,9 @@
+import axios from 'axios';
+
 import './app.scss'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import { AuthContext } from './authentication/AuthProvider'
-import { useEffect, useContext } from 'react'
-import { jwtDecode } from 'jwt-decode'
+import { useState, useEffect, useContext } from 'react'
 
 import Homepage from './pages/homepage/Homepage'
 import Login from './authentication/Login'
@@ -12,25 +13,49 @@ import Profile from './pages/Profile/Profile'
 
 function App() {
     const {setIsLoggedIn, setUser} = useContext(AuthContext);
+    const [isLoading, setIsLoading] = useState(true);
+
     
     const tokenStr = localStorage.getItem('token');
-    let token;
+    const token = JSON.parse(tokenStr);
 
-    if (tokenStr) {
+    const fetch = async () => {
         try {
-            token = JSON.parse(tokenStr);
-            const decoded = jwtDecode(token.accessToken);
-            const user = decoded;
-            useEffect(()=> {
-                setUser(user);
-                setIsLoggedIn(true); 
-            }, []) 
-            //useEffect to avoid state update during rendering
+            const userResponse = await axios.get('http://localhost:3000/api/v1/profile/me', {headers: {Authorization: `Bearer ${token.accessToken}`}})
+            return userResponse.data;
         } catch (error) {
-            console.log(error)
-        }  
+            if (error.response && error.response.status === 403) {
+                const getToken = await axios.post('http://localhost:3000/api/v1/token', {refreshToken: token.refreshToken})
+                const newAccessToken = getToken.data.accessToken
+                token.accessToken = newAccessToken;
+                localStorage.setItem('token', JSON.stringify(token))
+
+                const userResponse = await axios.get('http://localhost:3000/api/v1/profile/me', {headers: {Authorization: `Bearer ${newAccessToken}`}})    
+                return userResponse.data;            
+            }
+        }   
+    }
+    
+    const getUser = async () =>{
+        const response = await fetch();
+        setUser(response);
+        setIsLoading(false);
     }
 
+    useEffect(()=>{
+        if (tokenStr) {       
+            getUser().then(()=> {setIsLoggedIn(true)})
+        } else {
+            setIsLoading(false)
+        }
+    }, [])
+
+    if (isLoading) {
+        return(
+            <div>Loading...</div>
+        )
+    }
+    
     return(
     <BrowserRouter>
         <Routes>
