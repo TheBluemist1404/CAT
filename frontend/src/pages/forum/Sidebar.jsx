@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Sidebar = () => {
   const handleCreatePostClick = () => {
     // Show the backdrop and modal
