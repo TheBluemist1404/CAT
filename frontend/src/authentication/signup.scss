@@ -1,4 +1,4 @@
- *{
+*{
   margin: 0;
   padding: 0;
   
@@ -51,7 +51,7 @@
   
   .signup {
     position: absolute; 
-    top: 40px;
+    top: 60px;
     left: 50%; 
     width: 500px;
     transform: translate(-50%, -50%); 
@@ -167,7 +167,7 @@
   }
   .password{
     position: absolute;
-    top: 150px;
+    top: 160px;
     width: 100%;
     text-align: center;
     cursor: pointer;
@@ -186,7 +186,7 @@
     background-color: #2B2B3B;
     border-radius: 10px;
     color: white;
-    margin-top: 150px;
+    margin-top: 180px;
     width: 80%;
     padding: 14px 20px;
     border: none;
@@ -218,7 +218,7 @@
   }
   .fb{
     position: absolute;
-    top: 450px;
+    margin-top: 70%;
     left: 35%;
     width: 40px;
     height: 40px; 
@@ -232,10 +232,10 @@
   }
   .gg{
     position: absolute;
-    top: 445px;
+    margin-top: 70%;
     right: 35%;
-    width: 30px;
-    height: 30px; 
+    width: 40px;
+    height: 40px; 
     background-size: contain;
     z-index: 3;
   }
@@ -245,3 +245,4 @@
     cursor: pointer;
   }  
 }
+
