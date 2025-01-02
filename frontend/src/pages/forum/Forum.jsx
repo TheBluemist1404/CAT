@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Content from './Content';
 import Pagination from './Pagination';
-import './style.scss';
+import './forum.scss';
 
 const Forum = () => {
   return (
