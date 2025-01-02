@@ -1,3 +1,7 @@
+import axios from 'axios';
+import { jwtDecode }  from 'jwt-decode';
+
+
 import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../authentication/AuthProvider'
@@ -36,10 +40,10 @@ function Card({subhead, head}) {
     );
 }
 
-function Homepage(){
+function Homepage({token}){
     const navigate = useNavigate();
 
-    const {isLoggedIn, setIsLoggedIn, user} = useContext(AuthContext);
+    const {isLoggedIn, setIsLoggedIn, user, setUser} = useContext(AuthContext);
 
     const login = () => {
         navigate('/auth/login');
@@ -49,6 +53,17 @@ function Homepage(){
 
     const toggleDropdown = ()=>{
         setDropdown(!dropdown);
+    }
+
+    const logout = async () => {
+        try {
+            const refreshToken = token.refreshToken;
+            await axios.delete('http://localhost:3000/api/v1/auth/logout', {data: {refreshToken: refreshToken}}) //axios.delete is treated different
+            setIsLoggedIn(false)
+            localStorage.removeItem('token')
+        } catch (error) {
+            console.error('logout failed', error)
+        }
     }
     return(
         <div className='homepage'>
@@ -61,11 +76,11 @@ function Homepage(){
                            <div style={{position: 'absolute', top: '70px', right: '0px'}}>
                                <div className='logged-in' onClick={toggleDropdown}>
                                     <div className="avatar"></div>
-                                    <div className='username'>{user.fullName}</div>
+                                    <div className='username'>{user}</div>
                                </div>
                                <div className="action" style={{ display: dropdown ? 'flex' : 'none'}}>
                                     <div className="to-profile" onClick={()=>{navigate('/profile')}}>Profile</div>
-                                    <div className="logout" onClick={()=>{setIsLoggedIn(false)}}>Logout</div>
+                                    <div className="logout" onClick={logout}>Logout</div>
                                </div>
                            </div>
                            )

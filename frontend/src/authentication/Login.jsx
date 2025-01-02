@@ -1,5 +1,7 @@
 import axios from 'axios';
-import React from 'react';
+import { jwtDecode }  from 'jwt-decode';
+
+
 import { useNavigate } from 'react-router-dom';
 import { useState, useContext } from 'react';
 import { AuthContext } from './AuthProvider';
@@ -11,16 +13,24 @@ import Header from "../Header";
 
 
 const Login = () => {
-  const {setUser, setIsLoggedIn} = useContext(AuthContext);
+  const {setUser, isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  
+  if (isLoggedIn){
+    navigate('/')
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const reponse = await axios.post('http://localhost:3000/api/v1/auth/login', {email: email, password: password})
-      const user = reponse.data.user;
+      const token = reponse.data;
+      localStorage.removeItem('token')
+      localStorage.setItem('token', JSON.stringify(token));
+      const decoded = jwtDecode(token.accessToken);
+      const user = decoded.fullName;
       setUser(user);
       setIsLoggedIn(true);   
       navigate('/')
