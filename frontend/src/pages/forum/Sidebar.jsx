@@ -1,36 +1,58 @@
-import React from "react";
+import React from 'react';
 
-const Sidebar = ({ openCreatePostModal }) => {
+const Sidebar = () => {
+  const handleCreatePostClick = () => {
+    // Show the backdrop and modal
+    document.getElementById('createPostBackdrop').style.display = 'block';
+    document.getElementById('createPostModal').style.display = 'block';
+  };
+
   return (
     <aside className="sidebar">
       <button className="sidebar-button">
         <div className="sidebar-icon">
-          <img src="Assets/Home Icon.svg" alt="Home" />
+          <img src="/src/pages/forum/assets/Home Icon.svg" alt="Home" />
         </div>
-        Home
-      </button>
-      <button className="sidebar-button" onClick={openCreatePostModal}>
-        <div className="sidebar-icon">
-          <img src="Assets/All posts Icon.svg" alt="All Posts" />
+        <div>
+          Home
         </div>
-        All Posts
-      </button>
-      <hr className="line" />
-      <button className="create-post-button" style={{ backgroundColor: '#FF4B5C' }}>
-        <div className="sidebar-icon">
-          <img src="Assets/Create Icon.svg" alt="Create" />
-        </div>
-        Create Post
       </button>
       <button className="sidebar-button">
         <div className="sidebar-icon">
-          <img src="Assets/Tags Icon.svg" alt="Tags" />
+          <img src="/src/pages/forum/assets/All posts Icon.svg" alt="All Posts" />
         </div>
-        Tags
+        <div>
+          All Posts
+        </div>
       </button>
       <hr className="line" />
-      <button className="sidebar-button-noicon">About C.A.T</button>
-      <button className="sidebar-button-noicon">Contact Us</button>
+      <button className="create-post-button" style={{ backgroundColor: '#FF4B5C' }} onClick={handleCreatePostClick}>
+        <div className="sidebar-icon">
+          <img src="/src/pages/forum/assets/Create Icon.svg" alt="Create Post" />
+        </div>
+        <div>
+          Create Post
+        </div>
+      </button>
+      <button className="sidebar-button">
+        <div className="sidebar-icon">
+          <img src="/src/pages/forum/assets/Tags Icon.svg" alt="Tags" />
+        </div>
+        <div>
+          Tags
+        </div>
+      </button>
+      <hr className="line" />
+      <button className="sidebar-button-noicon">
+        <div>
+          About C.A.T
+        </div>
+      </button>
+      <button className="sidebar-button-noicon">
+        <div>
+          Contact Us
+        </div>
+      </button>
     </aside>
   );
 };

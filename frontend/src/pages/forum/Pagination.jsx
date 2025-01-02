@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-function Pagination() {
+const Pagination = () => {
   return (
     <div className="pagination">
       <button className="page-button prev">&laquo; Prev</button>
@@ -11,6 +11,6 @@ function Pagination() {
       <button className="page-button next">Next &raquo;</button>
     </div>
   );
-}
+};
 
 export default Pagination;
