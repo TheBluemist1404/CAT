@@ -3,12 +3,13 @@ const Tag = require('../../models/client/tag.model');
 const User = require('../../models/client/user.model');
 const Comment = require('../../models/client/comment.model');
 const Like = require('../../models/client/like.model');
+const unidecode = require('unidecode');
 
 // [GET] /api/v1/forum/search
 module.exports.search = async (req, res) => {
   try {
     let type = req.query.type || 'posts';
-    let q = req.query.q.trim();
+    let q = unidecode(req.query.q.trim());
     const qRegex = q.replace(/\s+/g, '-');
     let skip = parseInt(req.query.offset) || 0;
     let limit = parseInt(req.query.limit) || 10;
