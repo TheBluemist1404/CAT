@@ -13,7 +13,7 @@ import Forum from './pages/forum/Forum'
 import Profile from './pages/Profile/Profile'
 
 function App() {
-    const {setIsLoggedIn, setUser} = useContext(AuthContext);
+    const {isLoggedIn, setIsLoggedIn, setUser} = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState(true);
 
     
@@ -41,6 +41,7 @@ function App() {
     
     const getUser = async () =>{
         const response = await fetch();
+        console.log(response);
         setUser(response);
         setIsLoading(false);
     }
@@ -51,7 +52,7 @@ function App() {
         } else {
             setIsLoading(false)
         }
-    }, [])
+    }, [isLoggedIn])
 
     if (isLoading) {
         return(

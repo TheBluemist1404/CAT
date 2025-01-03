@@ -32,7 +32,7 @@
     
     .login{
         position: relative;
-        margin-right: 80px;
+        margin-right: 40px;
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -59,9 +59,10 @@
         }
 
         .logged-in{
-            height: 40px;
+            height: 50px;
+            min-width: 120px;
             padding: 0 20px 0 0;
-            border-radius: 20px;
+            border-radius: 25px;
             background-color: #ffffff31;
 
             display: flex;
@@ -71,14 +72,21 @@
             cursor: pointer;
 
             .avatar{
-                width: 40px;
-                height: 40px;
+                padding: 0;
+                width: 50px;
+                height: 50px;
                 border-radius: 50%;
-                background-color: #fff;
+                background-color: transparent;
+                overflow: hidden;
+
+                img{
+                    width: 52px;
+                    transform: translate(-1px, -1px);
+                }
             }
     
             .username{
-                line-height: 40px; //Same height as container
+                line-height: 50px; //Same height as container
                 color: var(--text-color);
                 font-family: var(--code);
                 font-size: 20px;
@@ -86,28 +94,32 @@
         }
 
         .action{
-            max-height: 100px;
             overflow: hidden;
-            margin-top: 20px;
-            box-sizing: border-box;
-            padding: 5px 0;
-            flex-direction: column;
-            background-color: #ffffff31;
+            transition: height 400ms ease-in-out;
 
-            div{
+            .container{
+                margin-top: 20px;
                 box-sizing: border-box;
-                padding: 2px 0;
-                height: max-content;
-                text-align: center;
-                font-family: var(--text-font);
-                font-size: 24px;
+                padding: 5px 0;
+                flex-direction: column;
+                background-color: #ffffff31;
 
-                cursor: pointer;
-            }
+                div{
+                    box-sizing: border-box;
+                    padding: 2px 0;
+                    height: max-content;
+                    text-align: center;
+                    font-family: var(--text-font);
+                    font-size: 24px;
 
-            div:hover{
-                background-color: #d9d9d92b;
+                    cursor: pointer;
+                }
+
+                div:hover{
+                    background-color: #d9d9d92b;
+                }
             }
+            
         }
     }
 

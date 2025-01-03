@@ -74,12 +74,14 @@ function Homepage({token}){
                            !isLoggedIn ? (<div className="login-button" onClick={login}>Login</div>): ( 
                            <div style={{position: 'absolute', top: '70px', right: '0px'}}>
                                <div className='logged-in' onClick={toggleDropdown}>
-                                    <div className="avatar"></div>
+                                    <div className="avatar"><img src={user.avatar} alt="" /></div>
                                     <div className='username'>{user.fullName}</div>
                                </div>
-                               <div className="action" style={{ display: dropdown ? 'flex' : 'none'}}>
-                                    <div className="to-profile" onClick={()=>{navigate('/profile')}}>Profile</div>
-                                    <div className="logout" onClick={logout}>Logout</div>
+                               <div className="action" style={{ height: dropdown ? '100px' : '0'}}>
+                                    <div className="container">
+                                        <div className="to-profile" onClick={()=>{navigate('/profile')}}>Profile</div>
+                                        <div className="logout" onClick={logout}>Logout</div>
+                                    </div>
                                </div>
                            </div>
                            )
