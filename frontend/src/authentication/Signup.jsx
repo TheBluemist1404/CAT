@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import {useState, useContext} from 'react';
+import {useState, useEffect, useContext} from 'react';
 import { AuthContext } from './AuthProvider';
 
 import background from '@homepage-assets/coding-on-laptop.jpg'
@@ -10,7 +10,7 @@ import Header from "../Header";
 
 
 const Signup = () => {
-  const {setUser, setIsLoggedIn} = useContext(AuthContext);
+  const {isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,19 +19,23 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const reponse = await axios.post('http://localhost:3000/api/v1/auth/signup', {fullName: fullName, email: email, password: password});
-      const user = reponse.data.user;
-      setUser(user);
-      setIsLoggedIn(true);
-      navigate('/');
-
+      const response = await axios.post('http://localhost:3000/api/v1/auth/signup', {fullName: fullName, email: email, password: password})
+      toLogin();
     } catch (error) {
       console.error("Signup failed", error)
     }
   }
-const toLogin = () => {
+
+  // useEffect(()=>{
+  //     if (isLoggedIn){
+  //       navigate('/')
+  //     }
+  // }, [isLoggedIn])
+
+  const toLogin = () => {
     navigate('/auth/login')
   }
+
   return (    
     <div className="signup">
       <div className="bg" style={{'--backgroundImage': `url(${background})`}}>
