@@ -72,7 +72,7 @@ function Homepage({token}){
                     <div className='login'>
                         {
                            !isLoggedIn ? (<div className="login-button" onClick={login}>Login</div>): ( 
-                           <div style={{position: 'absolute', top: '70px', right: '0px'}}>
+                           <div style={{position: 'absolute', top: '60px', right: '0px'}}>
                                <div className='logged-in' onClick={toggleDropdown}>
                                     <div className="avatar"><img src={user.avatar} alt="" /></div>
                                     <div className='username'>{user.fullName}</div>

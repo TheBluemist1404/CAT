@@ -17,10 +17,10 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
+  //OAuth setup
   const rootURL = 'https://accounts.google.com/o/oauth2/v2/auth';
   const redirectUri = import.meta.env.VITE_REDIRECT_URI;
   const clientId = import.meta.env.VITE_CLIENT_ID;
-  console.log(redirectUri, clientId)
   const options = {
     redirect_uri: redirectUri,
     client_id: clientId,
@@ -33,7 +33,6 @@ const Login = () => {
     ].join(' '),
   };
   const qs = new URLSearchParams(options);
-  console.log(`${rootURL}?${qs.toString()}`);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
