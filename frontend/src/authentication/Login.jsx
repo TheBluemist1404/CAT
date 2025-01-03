@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { jwtDecode }  from 'jwt-decode';
 
 
 import { useNavigate } from 'react-router-dom';
@@ -13,16 +12,10 @@ import Header from "../Header";
 
 
 const Login = () => {
-  const {setUser, isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
+  const {isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  
-  useEffect(()=>{
-    if (isLoggedIn){
-      navigate('/')
-    }
-  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,12 +24,17 @@ const Login = () => {
       const token = reponse.data;
       localStorage.removeItem('token')
       localStorage.setItem('token', JSON.stringify(token));
-      setIsLoggedIn(true);   
-      navigate('/')
+      setIsLoggedIn(true);
     } catch (error) {
       console.error("Login failed",error);
     }
   }
+
+  useEffect(()=>{
+    if (isLoggedIn){
+      navigate('/')
+    }
+  }, [isLoggedIn])
 
   const toLogin = () => {
     navigate('/auth/signup')
