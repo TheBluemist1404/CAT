@@ -49,10 +49,8 @@ module.exports.oauth = async (req, res) => {
     }
 
     const { accessToken, refreshToken } = await generateToken(user);
-    res.status(200).json({
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    });
+    res.redirect(`http://localhost:5173/#access_token=${accessToken}&refresh_token=${refreshToken}`)
+
   } catch (err) {
     console.error(err, 'Failed to fetch Google Auth Token');
     res.status(400).json({
