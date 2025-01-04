@@ -19,11 +19,12 @@ router.post(
   controller.create,
 );
 router.get('/detail/:id', controller.detail);
-router.patch('/:typeVote/:id', auth.authenticateToken, voteController.vote);
+router.patch('/vote/:typeVote/:id', auth.authenticateToken, voteController.vote);
 router.post('/comment/:id', auth.authenticateToken, commentController.comment);
 router.post('/reply/:id', auth.authenticateToken, commentController.reply);
 router.get('/search', searchController.search);
 router.get('/tags', auth.authenticateToken, controller.tags);
 router.post('/save/:id', auth.authenticateToken, controller.save);
+router.patch('/edit/:id', auth.authenticateToken, controller.edit);
 
 module.exports = router;

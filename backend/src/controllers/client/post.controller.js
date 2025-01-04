@@ -3,6 +3,7 @@ const User = require('../../models/client/user.model');
 const Like = require('../../models/client/like.model');
 const Comment = require('../../models/client/comment.model');
 const Tag = require('../../models/client/tag.model');
+const slugify = require('slugify');
 
 // [GET] /api/v1/forum?offset=...&limit=...
 module.exports.index = async (req, res) => {
@@ -192,6 +193,37 @@ module.exports.save = async (req, res) => {
     await user.save();
     res.status(200).json({
       message: 'Save successfully!',
+    });
+  } catch (err) {
+    res.status(400).json({
+      message: err.message,
+    });
+  }
+};
+
+// [PATCH] /api/v1/forum/edit/:id
+module.exports.edit = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const post = await Post.findById(id);
+    if (!post) {
+      res.status(404).json({
+        message: 'Cannot find post!',
+      });
+      return;
+    }
+    if (post.userCreated.toString() !== req.user.id) {
+      res.status(403).json({
+        message: 'Only the author can edit post!',
+      });
+      return;
+    }
+
+    req.body.slug = slugify(req.body.title, { lower: true, trim: true });
+
+    await Post.updateOne({ _id: id }, req.body);
+    res.status(200).json({
+      message: 'Update successfully!',
     });
   } catch (err) {
     res.status(400).json({
