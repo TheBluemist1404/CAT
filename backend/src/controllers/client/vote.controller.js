@@ -2,7 +2,7 @@ const Post = require('../../models/client/post.model');
 const User = require('../../models/client/user.model');
 const Like = require('../../models/client/like.model');
 
-// [PATCH] /api/v1/forum/:typeVote/:id
+// [PATCH] /api/v1/forum/vote/:typeVote/:id
 module.exports.vote = async (req, res) => {
   try {
     const typeVote = req.params.typeVote;
