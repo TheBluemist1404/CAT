@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
+
 
 const Header = () => {
+    const naviagte = useNavigate();
+
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredResults, setFilteredResults] = useState([]);
 
@@ -63,7 +67,7 @@ const Header = () => {
     return (
         <header className="header-guest">
             <div className="logo">
-                <img src="/src/pages/forum/assets/logo.svg" alt="N/A" />
+                <img src="/src/pages/forum/assets/logo.svg" alt="N/A" onClick={()=>naviagte('/')} style={{cursor: 'pointer'}}/>
             </div>
             <div className="searchbar">
                 <div className="search-icon"></div>
@@ -83,8 +87,8 @@ const Header = () => {
                 </div>
             </div>
             <div className="header-button">
-                <button className="login-button">Login</button>
-                <button className="signup-button">Sign up</button>
+                <button className="login-button" onClick={()=>naviagte('/auth/login')}>Login</button>
+                <button className="signup-button" onClick={()=>naviagte('/auth/signup')}>Sign up</button>
             </div>
         </header>
     );
