@@ -45,13 +45,16 @@ const Content = ({isCreatePostOpen, handleCreatePostToggle}) => {
         ...comments,
         { id: comments.length + 1, userName: 'Current User', time: 'Just now', content: commentInput, replies: [] },
       ]);
+      //...comment is spread operator, research for more info
       setCommentInput('');
     }
   };
+  //Also note that we should retrive comments from db, and add comment should make update to db, as well as cause rerender, not adding it manually to fe like this
 
   const toggleCommentBox = () => {
     setIsCommentBoxVisible(!isCommentBoxVisible);
   };
+  //Hmm, actually I actually think the comment box should appear with the comments
 
   const renderVoteButtons = () => (
     <div className="updown-button">
@@ -60,7 +63,7 @@ const Content = ({isCreatePostOpen, handleCreatePostToggle}) => {
         src={`/src/pages/forum/assets/Upvote${isUpvoted ? '-chosen' : ''}.svg`}
         alt="Upvote"
         onClick={handleUpvote}
-        onMouseEnter={(e) => { if (!isUpvoted) e.target.src = '/src/pages/forum/assets/Upvote-hover.svg'; }}
+        onMouseEnter={(e) => { if (!isUpvoted) e.target.src = '/src/pages/forum/assets/Upvote-hover.svg'; }} //mouseEnter is actually better than mouseOver here, research for more info
         onMouseLeave={(e) => { if (!isUpvoted) e.target.src = '/src/pages/forum/assets/Upvote.svg'; }}
       />
       <span className="vote-count" style={{ color: isUpvoted ? '#FF4B5C' : isDownvoted ? '#42C8F5' : '' }}>
@@ -71,7 +74,7 @@ const Content = ({isCreatePostOpen, handleCreatePostToggle}) => {
         src={`/src/pages/forum/assets/Downvote${isDownvoted ? '-chosen' : ''}.svg`}
         alt="Downvote"
         onClick={handleDownvote}
-        onMouseEnter={(e) => { if (!isDownvoted) e.target.src = '/src/pages/forum/assets/Downvote-hover.svg'; }}
+        onMouseEnter={(e) => { if (!isDownvoted) e.target.src = '/src/pages/forum/assets/Downvote-hover.svg'; }} 
         onMouseLeave={(e) => { if (!isDownvoted) e.target.src = '/src/pages/forum/assets/Downvote.svg'; }}
       />
     </div>
@@ -81,13 +84,13 @@ const Content = ({isCreatePostOpen, handleCreatePostToggle}) => {
     <div
       className="post-navigate-dropdown"
       style={{ display: dropdownVisible === index ? 'block' : 'none' }}
-    >
-      <div className="dropdown-item" onClick={() => console.log('Post saved')}>Save</div>
+    > 
+      <div className="dropdown-item" onClick={() => console.log('Post saved')}>Save</div> {/*Placeholder, but replace with some api call later */}
       <hr className="post-navigate-line" />
       <div
         className="dropdown-item"
         style={{ color: '#FF4B5C' }}
-        onClick={() => console.log('Post reported')}
+        onClick={() => console.log('Post reported')} //Placeholder, just ignore it
       >
         Report
       </div>
