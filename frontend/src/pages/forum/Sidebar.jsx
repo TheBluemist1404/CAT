@@ -1,9 +1,4 @@
-const Sidebar = () => {
-  const handleCreatePostClick = () => {
-    // Show the backdrop and modal
-    document.getElementById('createPostBackdrop').style.display = 'block';
-    document.getElementById('createPostModal').style.display = 'block';
-  };
+const Sidebar = ({handleCreatePostToggle}) => {
 
   return (
     <aside className="sidebar">
@@ -24,7 +19,7 @@ const Sidebar = () => {
         </div>
       </button>
       <hr className="line" />
-      <button className="create-post-button" style={{ backgroundColor: '#FF4B5C' }} onClick={handleCreatePostClick}>
+      <button className="create-post-button" style={{ backgroundColor: '#FF4B5C' }} onClick={handleCreatePostToggle}>
         <div className="sidebar-icon">
           <img src="/src/pages/forum/assets/Create Icon.svg" alt="Create Post" />
         </div>
