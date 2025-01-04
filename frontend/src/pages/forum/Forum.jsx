@@ -6,12 +6,18 @@ import Pagination from './Pagination';
 import './forum.scss';
 
 const Forum = () => {
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+
+  const handleCreatePostToggle = () => {
+    console.log("sidebar react")
+    setIsCreatePostOpen(!isCreatePostOpen);
+  };
   return (
     <div className="forum">
       <Header />
       <div className="main-layout">
-        <Sidebar />
-        <Content />
+        <Sidebar handleCreatePostToggle={handleCreatePostToggle}/>
+        <Content isCreatePostOpen={isCreatePostOpen} handleCreatePostToggle={handleCreatePostToggle} />
       </div>
       <Pagination />
     </div>
