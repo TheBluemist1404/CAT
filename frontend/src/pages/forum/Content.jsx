@@ -85,16 +85,17 @@ const Content = () => {
       }
     });
 
-    // Show the create post modal
     document.querySelector('.create-post-button').addEventListener('click', function () {
-      // Show the backdrop and modal
       document.getElementById('createPostBackdrop').style.display = 'block';
       document.getElementById('createPostModal').style.display = 'block';
     });
 
-    // Close the modal when the close button is clicked
     document.querySelector('.close-button').addEventListener('click', function () {
-      // Hide the backdrop and modal
+      document.getElementById('createPostBackdrop').style.display = 'none';
+      document.getElementById('createPostModal').style.display = 'none';
+    });
+
+    document.querySelector('.submit-button').addEventListener('click', function () {
       document.getElementById('createPostBackdrop').style.display = 'none';
       document.getElementById('createPostModal').style.display = 'none';
     });
@@ -204,8 +205,7 @@ const Content = () => {
             <label htmlFor="visibility">Who can see this post?</label>
             <select id="visibility" className="visibility-dropdown">
               <option value="public">Public</option>
-              <option value="friends">Friends</option>
-              <option value="custom">Custom</option>
+              <option value="private">Private</option>
             </select>
           </div>
           <button className="submit-button">Post</button>
