@@ -64,3 +64,13 @@ module.exports.validateCreate = (req, res, next) => {
   }
   next();
 };
+
+module.exports.validateEditProfile = (req, res, next) => {
+  if (!req.body.fullName) {
+    res.status(400).json({
+      message: 'Please enter full name!',
+    });
+    return;
+  }
+  next();
+};
