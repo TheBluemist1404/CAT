@@ -74,3 +74,41 @@ module.exports.validateEditProfile = (req, res, next) => {
   }
   next();
 };
+
+module.exports.validateForgot = (req, res, next) => {
+  if (!req.body.email) {
+    res.status(400).json({
+      message: 'Please enter email!',
+    });
+    return;
+  }
+  next();
+};
+
+module.exports.validateOtp = (req, res, next) => {
+  if (!req.body.email) {
+    res.status(400).json({
+      message: 'Please enter email!',
+    });
+    return;
+  }
+  if (!req.body.otp) {
+    res.status(400).json({
+      message: 'Please enter otp!',
+    });
+    return;
+  }
+  next();
+};
+
+module.exports.validateChangePass = (req, res, next) => {
+  const password = req.body.password;
+  const confirmPassword = req.body.confirmPassword;
+  if (password !== confirmPassword) {
+    res.status(400).json({
+      message: 'Please type the same password!',
+    });
+    return;
+  }
+  next();
+};
