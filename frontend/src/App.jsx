@@ -82,7 +82,7 @@ function App() {
             <Route path='/auth/login' element={<Login />} />
             <Route path='/auth/signup' element={<Signup />} />
             <Route path='/forum' element={<Forum />} />
-            <Route path='/profile' element={<Profile />} />
+            <Route path='/profile/:id/*' element={<Profile />} />
         </Routes>
     );
 };

@@ -42,7 +42,8 @@ function Card({subhead, head}) {
 function Homepage({token}){
     const navigate = useNavigate();
 
-    const {isLoggedIn, setIsLoggedIn, user, setUser} = useContext(AuthContext);
+    const {isLoggedIn, setIsLoggedIn, user} = useContext(AuthContext);
+    console.log(user)
 
     const login = () => {
         navigate('/auth/login');
@@ -79,7 +80,7 @@ function Homepage({token}){
                                </div>
                                <div className="action" style={{ height: dropdown ? '100px' : '0'}}>
                                     <div className="container">
-                                        <div className="to-profile" onClick={()=>{navigate('/profile')}}>Profile</div>
+                                        <div className="to-profile" onClick={()=>{navigate(`/profile/${user._id}`)}}>Profile</div>
                                         <div className="logout" onClick={logout}>Logout</div>
                                     </div>
                                </div>
