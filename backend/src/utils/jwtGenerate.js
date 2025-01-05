@@ -27,3 +27,14 @@ module.exports.generateToken = async user => {
 
   return { accessToken, refreshToken };
 };
+
+module.exports.otpToken = async user => {
+  const payload = {
+    id: user._id,
+    email: user.email,
+  };
+  const otpToken = jwt.sign(payload, process.env.OTP_TOKEN_SECRET, {
+    expiresIn: '5m',
+  });
+  return otpToken;
+};
