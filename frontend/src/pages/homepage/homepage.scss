@@ -38,24 +38,41 @@
         justify-content: center;
         align-items: center;
 
-        .login-button{
-            font-family: var(--text-font);
-            color: #1e1e1e;
-            font-size: 24px;
-            font-weight: bold;
-            background-color: var(--secondary-color);
+        .login-button, .signup-button{
+            font-family: sans-serif;      
+            font-size: 20px;
+            font-weight: normal;
+            
             width: fit-content;
             height: fit-content;
+            min-width: 50px;
+            text-align: center;
     
             box-sizing: content-box;
             padding: 10px 20px;
-            border: solid #1e1e1e 2px;
             border-radius: 40px;
+        }
+
+        .login-button{
+            color: var(--secondary-color);
+            background-color: transparent;
+            border: none;
+        }
+
+        .signup-button{
+            color: #fff;
+            background-color: var(--highlight-red);
         }
     
         .login-button:hover{
             cursor: pointer;
-            background-color: #adadad;
+            text-decoration: underline;
+            text-underline-offset: 10px;
+        }
+
+        .signup-button:hover{
+            cursor: pointer;
+            background-color: #e72c3f;
         }
 
         .logged-in{
@@ -133,9 +150,9 @@
         height: 80vh;
     }
     .box{
-        width: 700px;
+        width: 800px;
         max-height: fit-content;
-        padding: 120px;
+        padding: 80px 120px;
         background-color: #2b2b3b50;
         backdrop-filter: blur(4px);
         display: flex;
@@ -523,11 +540,7 @@
         margin-bottom: 30px;
     }
     
-    .outro .join-box{
-        background-color: #1e1e1e;
-        padding: 20px;
-        border-radius: 20px;
-    }
+    
     
     .outro #join{
         color: var(--highlight-red);
@@ -536,4 +549,39 @@
         font-weight: bold;
         text-transform: uppercase;
     }
+
+    .shimmer-button {
+        position: relative;
+        background: #1e1e1e;
+        overflow: hidden;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      
+      .shimmer-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -150px;
+        width: 100px;
+        height: 100%;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0) 100%);
+        animation: shimmer 4s infinite;
+        transform: skewX(-20deg);
+      }
+      
+      @keyframes shimmer {
+        0% {
+          left: -150px;
+        }
+        50% {
+          left: 110%;
+        }
+        100% {
+          left: 110%;
+        }
+      }
+      
 }
