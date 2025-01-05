@@ -72,7 +72,10 @@ function Homepage({token}){
                     <Header/>
                     <div className='login'>
                         {
-                           !isLoggedIn ? (<div className="login-button" onClick={login}>Login</div>): ( 
+                           !isLoggedIn ? (<div style={{display: 'flex', flexDirection: 'row', gap: '20px'}}>
+                               <div className="login-button" onClick={()=>{navigate('/auth/login')}}>Login</div>
+                               <div className="signup-button" onClick={()=>{navigate('/auth/signup')}}>Join us</div>
+                           </div>): ( 
                            <div style={{position: 'absolute', top: '60px', right: '0px'}}>
                                <div className='logged-in' onClick={toggleDropdown}>
                                     <div className="avatar"><img src={user.avatar} alt="" /></div>
@@ -186,8 +189,8 @@ function Homepage({token}){
                     <div className="box">
                         <p>and we will continue</p>
                         <h1>our passion</h1>
-                        <div className="join-box">
-                            <div id='join'>join us now</div>
+                        <div className="shimmer-button">
+                            <div id='join' onClick={()=>{navigate('/auth/signup')}}>join us now</div>
                         </div>
                     </div>
                 </section>
