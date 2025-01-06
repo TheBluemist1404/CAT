@@ -120,11 +120,15 @@ function Post({post}) {
     </div>
   );
 
+  if (post.userCreated) {
+    console.log(post.userCreated.fullName)
+  }
+
   return (
     <div className="post">
       <div className="post-header">
-        <img src="/src/pages/forum/assets/Post avatar.svg" alt="User Avatar" className="user-avatar" />
-        <div className="user-name">{post._id}</div>
+        <img src={post.userCreated ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" />
+        <div className="user-name">{post.userCreated ? post.userCreated.fullName: "unknown" }</div>
         <div className="post-time">{post.createdAt}</div>
         <div className="post-navigate-button" onClick={() => toggleDropdown(1)}>
           <span className="post-navigate-icon">...</span>
