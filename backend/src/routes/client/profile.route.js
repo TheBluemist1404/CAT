@@ -15,5 +15,11 @@ router.patch(
   validate.validateEditProfile,
   controller.edit,
 );
+router.patch(
+  '/change-password/:id',
+  auth.authenticateToken,
+  validate.validateChangePass,
+  controller.changePass,
+);
 
 module.exports = router;
