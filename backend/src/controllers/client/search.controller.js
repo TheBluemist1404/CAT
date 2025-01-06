@@ -17,7 +17,7 @@ module.exports.search = async (req, res) => {
     switch (type) {
       case 'tags':
         const tag = await Tag.findOne({
-          title: new RegExp(q, 'i'),
+          title: q.toLowerCase(),
         });
         if (!tag) {
           res.status(404).json({
