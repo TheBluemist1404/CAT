@@ -211,7 +211,7 @@ module.exports.otp = async (req, res) => {
   });
 };
 
-// [POST] /api/v1/auth/change-password
+// [POST] /api/v1/auth/reset-password
 module.exports.changePassword = async (req, res) => {
   const password = req.body.password;
   const user = await User.findById(req.user.id);
