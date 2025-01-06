@@ -16,6 +16,24 @@ const Profile = ({token}) => {
             navigate('/auth/login', { replace: true });
         }
     }, [navigate, isLoggedIn])
+    const [dropdown, setDropdown] = useState(false)
+
+    const toggleDropdown = ()=>{
+        setDropdown(!dropdown);
+    }
+    const [schools, setSchools] = useState([]);
+    const [newSchool, setNewSchool] = useState("");
+    const [showInput, setShowInput] = useState(false);
+    const handleAddSchool = () => {
+    if (newSchool.trim() !== "") {
+      setSchools([...schools, newSchool]);
+      setNewSchool(""); 
+      setShowInput(false);
+    }
+    };
+    const toggleInput = () => {
+        setShowInput(prevState => !prevState); 
+      };
 
     const id = useParams(); //we actually access profile through params
     console.log(id.id, user._id)
@@ -51,6 +69,27 @@ const Profile = ({token}) => {
                     <div className='main'>
                         <div className='bio'>
                             <h1>Bio</h1>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <div onClick={(toggleInput) } style={{ cursor: "pointer" }}>
+                                <img src="/src/assets/user.svg" alt="" />
+                            </div>
+                            {schools.length > 0 && (
+                            <div style={{ marginLeft: "10px" }}>
+                            {schools[schools.length - 1]} {/* Hiển thị trường học cuối cùng */}
+                            </div>
+                            )}
+                            </div>
+                            {showInput && (
+                             <div style={{ marginTop: "10px" }}>
+                            <input
+                            type="text"
+                            value={newSchool}
+                            onChange={(e) => setNewSchool(e.target.value)}
+                            placeholder="Nhập tên trường học"
+                            />
+                            <button onClick={handleAddSchool}>Thêm trường học</button>
+                            </div>
+                            )}
                         </div>
                         <div className='about'>
                             <h1>About</h1>
