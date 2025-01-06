@@ -8,8 +8,14 @@ const WINDOW_SIZE_IN_MINUTES = 60;
 const MAX_WINDOW_REQUEST_COUNT = 20;
 const WINDOW_LOG_INTERVAL_IN_MINUTES = 10;
 
+let isConnected = false;
+
 module.exports.redisRateLimiter = async (req, res, next) => {
-  await redisClient.connect();
+  if (!isConnected) {
+    await redisClient.connect();
+    isConnected = true;
+  }
+
   try {
     if (!redisClient) {
       throw new Error('Redis Client does not exist!');
@@ -17,7 +23,7 @@ module.exports.redisRateLimiter = async (req, res, next) => {
     }
     const record = await redisClient.get(`rate-limit:${req.ip}`);
     const currentReqTime = moment();
-    if (!record) {
+    if (record == null) {
       let newRecord = [];
       let reqLog = {
         requestTimestamp: currentReqTime.unix(),
@@ -33,18 +39,19 @@ module.exports.redisRateLimiter = async (req, res, next) => {
       next();
     }
     let data = JSON.parse(record);
-    let windowStartTimestamp = currentReqTime
-      .subtract(WINDOW_LOG_INTERVAL_IN_MINUTES, 'minutes')
+
+    let windowStartTimestamp = moment()
+      .subtract(WINDOW_SIZE_IN_MINUTES, 'minutes')
       .unix();
     let entriesWithinWindow = data.filter(entry => {
       return entry.requestTimestamp > windowStartTimestamp;
     });
 
     let totalReqCount = entriesWithinWindow.reduce((acc, entry) => {
-      acc += entry.requestCount;
+      return acc + entry.requestCount;
     }, 0);
 
-    if (totalReqCount > MAX_WINDOW_REQUEST_COUNT) {
+    if (totalReqCount >= MAX_WINDOW_REQUEST_COUNT) {
       const firstRequestTimestamp = entriesWithinWindow[0].requestTimestamp;
       const retryAfterSeconds = Math.max(
         0,
@@ -59,7 +66,10 @@ module.exports.redisRateLimiter = async (req, res, next) => {
       return;
     } else {
       let lastReqLog = data[data.length - 1];
-      if (lastReqLog.requestTimestamp > windowStartTimestamp) {
+      let potentialStartTimestamp = currentReqTime
+        .subtract(WINDOW_LOG_INTERVAL_IN_MINUTES, 'minutes')
+        .unix();
+      if (lastReqLog.requestTimestamp > potentialStartTimestamp) {
         lastReqLog.requestCount++;
         data[data.length - 1] = lastReqLog;
       } else {
