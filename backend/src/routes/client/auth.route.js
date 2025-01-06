@@ -10,7 +10,7 @@ router.delete('/logout', controller.logout);
 router.post('/forgot', validation.validateForgot, controller.forgot);
 router.post('/otp', validation.validateOtp, controller.otp);
 router.post(
-  '/change-password',
+  '/reset-password',
   auth.authenticateOtpToken,
   validation.validateChangePass,
   controller.changePassword,
