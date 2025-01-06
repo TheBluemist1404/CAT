@@ -2,7 +2,7 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
 import './app.scss'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { AuthContext } from './authentication/AuthProvider'
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom';
@@ -41,7 +41,7 @@ function App() {
 
     const fetch = async () => {
         try {
-            const userResponse = await axios.get(`http://localhost:3000/api/v1/profile/${userId}`, { headers: { Authorization: `Bearer ${token.accessToken}` } })
+            const userResponse = await axios.get(`http://localhost:3000/api/v1/profile/detail/${userId}`, { headers: { Authorization: `Bearer ${token.accessToken}` } })
             return userResponse.data;
         } catch (error) {
             if (error.response && error.response.status === 403) {
@@ -50,7 +50,7 @@ function App() {
                 token.accessToken = newAccessToken;
                 localStorage.setItem('token', JSON.stringify(token))
 
-                const userResponse = await axios.get(`http://localhost:3000/api/v1/profile/${userId}`, { headers: { Authorization: `Bearer ${newAccessToken}` } })
+                const userResponse = await axios.get(`http://localhost:3000/api/v1/profile/detail/${userId}`, { headers: { Authorization: `Bearer ${newAccessToken}` } })
                 return userResponse.data;
             }
         }
@@ -81,8 +81,8 @@ function App() {
             <Route path='/' element={<Homepage token={token} />} />
             <Route path='/auth/login' element={<Login />} />
             <Route path='/auth/signup' element={<Signup />} />
-            <Route path='/forum' element={<Forum />} />
-            <Route path='/profile/:id/*' element={<Profile />} />
+            <Route path='/forum' element={<Forum token={token} />} />
+            <Route path='/profile/:id/*' element={<Profile token={token} />} />
         </Routes>
     );
 };

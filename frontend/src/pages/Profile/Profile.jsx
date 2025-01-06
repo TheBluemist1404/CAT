@@ -7,7 +7,7 @@ import "./profile.scss"
 import Header from "../../Header";
 
 
-const Profile = () => {
+const Profile = ({token}) => {
     const navigate = useNavigate();
     const { isLoggedIn, user } = useContext(AuthContext);
 
@@ -18,16 +18,16 @@ const Profile = () => {
     }, [navigate, isLoggedIn])
 
     const id = useParams(); //we actually access profile through params
+    console.log(id.id, user._id)
     if (id.id === user._id) { //This will return a profile page that can be edited by user (profile owner)
         return (
-            <div className="profile">
-                <div className='header'>
-                    <Header />
-                </div>
-                <form action="action_page.php" method="post">
+            <div className="profile" style={{position: 'relative'}}>
+                <div style={{zIndex: 2, position: 'relative'}}><Header token={token} isAuth={false}/></div>
+
+                <div style={{zIndex: 1, position: 'relative'}}>
                     <div className='image' >
-                        <div className="avatar"><img src={user.avatar} alt="" /></div>
-                        <h1 className='username'>{user.fullName}</h1>
+                        <div className="profile-avatar"><img src={user.avatar} alt="" /></div>
+                        <h1 className='profile-username'>{user.fullName}</h1>
                     </div>
                     <div className='box'>
                         <div className='text'>
@@ -61,11 +61,11 @@ const Profile = () => {
                             <h1>Posts</h1>
                         </div>
                     </div>
-                </form>
+                </div>
                 <Routes>
-                    <Route path='post' element={<></>}/>
-                    <Route path='media' element={<></>}/>
-                    <Route path='saved' element={<></>}/>
+                    <Route path='post' element={<></>} />
+                    <Route path='media' element={<></>} />
+                    <Route path='saved' element={<></>} />
                 </Routes>
             </div>
         );

@@ -59,7 +59,7 @@ const Login = () => {
   return (
     <div className="login">
       <div className="bg" style={{ '--backgroundImage': `url(${background})` }}>
-        <Header />
+        <Header isAuth={true}/>
         <form action="action_page.php" method="post" onSubmit={handleSubmit}>
           <div className="con">
             <div className="signup">Login</div>

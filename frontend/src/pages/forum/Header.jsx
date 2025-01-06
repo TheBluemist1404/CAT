@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from '../../authentication/AuthProvider';
 
 
 const Header = () => {
-    const naviagte = useNavigate();
+    const {isLoggedIn, user} = useContext(AuthContext)
+    const navigate = useNavigate();
 
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredResults, setFilteredResults] = useState([]);
@@ -64,10 +66,27 @@ const Header = () => {
         };
     }, []);
 
+    const [dropdown, setDropdown] = useState(false)
+
+    const toggleDropdown = ()=>{
+        setDropdown(!dropdown);
+    }
+
+    const logout = async () => {
+        try {
+            const refreshToken = token.refreshToken;
+            await axios.delete('http://localhost:3000/api/v1/auth/logout', {data: {refreshToken: refreshToken}}) //axios.delete is treated different
+            setIsLoggedIn(false)
+            localStorage.removeItem('token')
+        } catch (error) {
+            console.error('logout failed', error)
+        }
+    }
+
     return (
         <header className="header-guest">
             <div className="logo">
-                <img src="/src/pages/forum/assets/logo.svg" alt="N/A" onClick={()=>naviagte('/')} style={{cursor: 'pointer'}}/>
+                <img src="/src/pages/forum/assets/logo.svg" alt="N/A" onClick={()=>navigate('/')} style={{cursor: 'pointer'}}/>
             </div>
             <div className="searchbar">
                 <div className="search-icon"></div>
@@ -86,10 +105,12 @@ const Header = () => {
                     ))}
                 </div>
             </div>
-            <div className="header-button">
-                <button className="login-button" onClick={()=>naviagte('/auth/login')}>Login</button>
-                <button className="signup-button" onClick={()=>naviagte('/auth/signup')}>Sign up</button>
-            </div>
+            {!isLoggedIn ? (<div className='header-button'>
+                <button className="login-button" onClick={()=>navigate('/auth/login')}>Login</button>
+                <button className="signup-button" onClick={()=>navigate('/auth/signup')}>Sign up</button>
+            </div>):(<div style={{width: '40px', height:'40px', borderRadius: '50%', overflow: 'hidden', marginRight: '20px'}} onClick={()=> {navigate(`/profile/${user._id}`)}}>
+                <img src={user.avatar} alt="" style={{width: '40px'}}/>
+            </div>)}
         </header>
     );
 };

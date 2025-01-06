@@ -22,125 +22,7 @@
         z-index: -1;
         filter: blur(2px);
     }
-
-    .head{
-        margin: 0 30px;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-    
-    .login{
-        position: relative;
-        margin-right: 40px;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-
-        .login-button, .signup-button{
-            font-family: sans-serif;      
-            font-size: 20px;
-            font-weight: normal;
-            
-            width: fit-content;
-            height: fit-content;
-            min-width: 50px;
-            text-align: center;
-    
-            box-sizing: content-box;
-            padding: 10px 20px;
-            border-radius: 40px;
-        }
-
-        .login-button{
-            color: var(--secondary-color);
-            background-color: transparent;
-            border: none;
-        }
-
-        .signup-button{
-            color: #fff;
-            background-color: var(--highlight-red);
-        }
-    
-        .login-button:hover{
-            cursor: pointer;
-            text-decoration: underline;
-            text-underline-offset: 10px;
-        }
-
-        .signup-button:hover{
-            cursor: pointer;
-            background-color: #e72c3f;
-        }
-
-        .logged-in{
-            height: 50px;
-            min-width: max-content;
-            padding: 0 20px 0 0;
-            border-radius: 25px;
-            background-color: #ffffff31;
-
-            display: flex;
-            flex-direction: row;
-            gap: 10px;
-            user-select: none;
-            cursor: pointer;
-
-            .avatar{
-                padding: 0;
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                background-color: transparent;
-                overflow: hidden;
-
-                img{
-                    width: 52px;
-                    transform: translate(-1px, -1px);
-                }
-            }
-    
-            .username{
-                line-height: 50px; //Same height as container
-                color: var(--text-color);
-                font-family: var(--code);
-                font-size: 20px;
-            }
-        }
-
-        .action{
-            overflow: hidden;
-            transition: height 400ms ease-in-out;
-
-            .container{
-                margin-top: 20px;
-                box-sizing: border-box;
-                padding: 5px 0;
-                flex-direction: column;
-                background-color: #ffffff31;
-
-                div{
-                    box-sizing: border-box;
-                    padding: 2px 0;
-                    height: max-content;
-                    text-align: center;
-                    font-family: var(--text-font);
-                    font-size: 24px;
-
-                    cursor: pointer;
-                }
-
-                div:hover{
-                    background-color: #d9d9d92b;
-                }
-            }
-            
-        }
-    }
-
-    
+        
     /* -------------------------------- */
     /* INTRO */
     .intro{
@@ -539,8 +421,6 @@
         margin-top: 30px;
         margin-bottom: 30px;
     }
-    
-    
     
     .outro #join{
         color: var(--highlight-red);

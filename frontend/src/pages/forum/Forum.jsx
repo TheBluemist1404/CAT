@@ -5,7 +5,7 @@ import Content from './Content';
 import Pagination from './Pagination';
 import './forum.scss';
 
-const Forum = () => {
+const Forum = ({token}) => {
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
 
   const handleCreatePostToggle = () => {
@@ -16,7 +16,7 @@ const Forum = () => {
     <div className="forum">
       <Header />
       <div className="main-layout">
-        <Sidebar handleCreatePostToggle={handleCreatePostToggle}/>
+        <Sidebar handleCreatePostToggle={handleCreatePostToggle} token={token}/>
         <Content isCreatePostOpen={isCreatePostOpen} handleCreatePostToggle={handleCreatePostToggle} />
       </div>
       <Pagination />

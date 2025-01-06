@@ -14,15 +14,15 @@ import background from '@homepage-assets/coding-on-laptop.jpg'
 import about from '@homepage-assets/teamwork.webp'
 import forum from '@homepage-assets/pseudo-forum.png'
 import forum_decor from '@homepage-assets/decor2.png'
-import team from '@homepage-assets/code-team.png' 
+import team from '@homepage-assets/code-team.png'
 
 import Header from '../../Header';
 import Footer from '../../Footer';
 import TypingEffect from './TypingEffect'
 
 
-function Title({subhead, head}){
-    return(
+function Title({ subhead, head }) {
+    return (
         <div className="title">
             <div className="subhead">{subhead}</div>
             <div className="head">{head}</div>
@@ -30,8 +30,8 @@ function Title({subhead, head}){
     );
 }
 
-function Card({subhead, head}) {
-    return(
+function Card({ subhead, head }) {
+    return (
         <div className="card">
             <div className="head">{head}</div>
             <div className="subhead">{subhead}</div>
@@ -39,59 +39,32 @@ function Card({subhead, head}) {
     );
 }
 
-function Homepage({token}){
+function Homepage({ token }) {
     const navigate = useNavigate();
 
-    const {isLoggedIn, setIsLoggedIn, user} = useContext(AuthContext);
-    console.log(user)
-
-    const login = () => {
-        navigate('/auth/login');
-    }
+    const { isLoggedIn, setIsLoggedIn, user } = useContext(AuthContext);
+    console.log(user.avatar)
 
     const [dropdown, setDropdown] = useState(false)
 
-    const toggleDropdown = ()=>{
+    const toggleDropdown = () => {
         setDropdown(!dropdown);
     }
 
     const logout = async () => {
         try {
             const refreshToken = token.refreshToken;
-            await axios.delete('http://localhost:3000/api/v1/auth/logout', {data: {refreshToken: refreshToken}}) //axios.delete is treated different
+            await axios.delete('http://localhost:3000/api/v1/auth/logout', { data: { refreshToken: refreshToken } }) //axios.delete is treated different
             setIsLoggedIn(false)
             localStorage.removeItem('token')
         } catch (error) {
             console.error('logout failed', error)
         }
     }
-    return(
+    return (
         <div className='homepage'>
-            <div className='container' style={{'--backgroundImage': `url(${background})`}}>
-                <div className="head">
-                    <Header/>
-                    <div className='login'>
-                        {
-                           !isLoggedIn ? (<div style={{display: 'flex', flexDirection: 'row', gap: '20px'}}>
-                               <div className="login-button" onClick={()=>{navigate('/auth/login')}}>Login</div>
-                               <div className="signup-button" onClick={()=>{navigate('/auth/signup')}}>Join us</div>
-                           </div>): ( 
-                           <div style={{position: 'absolute', top: '60px', right: '0px'}}>
-                               <div className='logged-in' onClick={toggleDropdown}>
-                                    <div className="avatar"><img src={user.avatar} alt="" /></div>
-                                    <div className='username'>{user.fullName}</div>
-                               </div>
-                               <div className="action" style={{ height: dropdown ? '100px' : '0'}}>
-                                    <div className="container">
-                                        <div className="to-profile" onClick={()=>{navigate(`/profile/${user._id}`)}}>Profile</div>
-                                        <div className="logout" onClick={logout}>Logout</div>
-                                    </div>
-                               </div>
-                           </div>
-                           )
-                        }
-                    </div>
-                </div>
+            <div className='container' style={{ '--backgroundImage': `url(${background})` }}>
+                <Header token={token} isAuth={false} />
                 <section className="intro">
                     <div className="box">
                         <p>welcome to</p>
@@ -102,22 +75,22 @@ function Homepage({token}){
                         </div>
                     </div>
                 </section>
-                <section className="about" style={{position: 'relative', overflow: 'hidden'}}>
+                <section className="about" style={{ position: 'relative', overflow: 'hidden' }}>
                     <div className="decor1"></div>
                     <Title
-                      subhead={"who we are"}
-                      head={"DevTeam 1"}
+                        subhead={"who we are"}
+                        head={"DevTeam 1"}
                     />
                     <div className='about-content'>
                         <div className="about-img"><img src={about} alt="" /></div>
-                        <div style={{marginTop: 20}}>
+                        <div style={{ marginTop: 20 }}>
                             <div className="about-intro">a team of enthusiastic developers</div>
                             <div className="about-desc">with a passion to bring the joy of coding to all the curious minds</div>
                         </div>
                     </div>
                 </section>
                 <section className="forum">
-                    <Title subhead={'Join our'} head={'Forum    '}/>
+                    <Title subhead={'Join our'} head={'Forum    '} />
                     <div className='forum-content'>
                         <div className="forum-intro">
                             <div>A journey is no fun without</div>
@@ -132,7 +105,7 @@ function Homepage({token}){
                     <div className="forum-desc">
                         <div className={`bubble bub1`}>
                             <div>
-                                A <span style={{textDecoration: 'underline', fontWeight: 'bold' }}>large community</span> of developers, varies on all fields.
+                                A <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>large community</span> of developers, varies on all fields.
                             </div>
                             <div>
                                 The best place to step out and learn new things!
@@ -140,10 +113,10 @@ function Homepage({token}){
                         </div>
                         <div className={`bubble bub2`}>
                             <div>
-                                Stuck on a <span style={{textDecoration: 'underline', fontWeight: 'bold' }}>problem</span>?
+                                Stuck on a <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>problem</span>?
                             </div>
                             <div>
-                            <span style={{textDecoration: 'underline', fontWeight: 'bold' }}>Share</span> and the community is here to help!
+                                <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>Share</span> and the community is here to help!
                             </div>
                         </div>
                         <div className={`bubble bub3`}>
@@ -151,18 +124,18 @@ function Homepage({token}){
                                 Find the topics your are interested in with ease
                             </div>
                             <div>
-                                Search with <span style={{textDecoration: 'underline', fontWeight: 'bold' }}>#TAG</span> available
+                                Search with <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>#TAG</span> available
                             </div>
                         </div>
                         <svg width="506" height="1632" viewBox="0 0 506 1632" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M44.4994 0.50107C1080 299.501 47 586.5 44.5 796.5C42 1006.5 521.499 868.502 492 1141C462.5 1413.5 1.00001 1631.5 1.00001 1631.5" stroke="black" stroke-dasharray="10.1 10.1"/>
+                            <path d="M44.4994 0.50107C1080 299.501 47 586.5 44.5 796.5C42 1006.5 521.499 868.502 492 1141C462.5 1413.5 1.00001 1631.5 1.00001 1631.5" stroke="black" stroke-dasharray="10.1 10.1" />
                         </svg>
                     </div>
                 </section>
                 <section className="live-code">
-                    <Title subhead={'work with team'} head={'Live Code'}/>
+                    <Title subhead={'work with team'} head={'Live Code'} />
                     <div className="code-img"><img src={team} alt="" /></div>
-                    <div className="bento-container">                        
+                    <div className="bento-container">
                         <div className="item box1">
                             <Card subhead={'languages supported'} head={'N'}></Card>
                         </div>
@@ -190,14 +163,14 @@ function Homepage({token}){
                         <p>and we will continue</p>
                         <h1>our passion</h1>
                         <div className="shimmer-button">
-                            <div id='join' onClick={()=>{navigate('/auth/signup')}}>join us now</div>
+                            <div id='join' onClick={() => { navigate('/auth/signup') }}>join us now</div>
                         </div>
                     </div>
                 </section>
             </div>
-            <Footer/>
+            <Footer />
         </div>
-        
+
     )
 }
 
