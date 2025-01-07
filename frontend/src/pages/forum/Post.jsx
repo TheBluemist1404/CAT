@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../authentication/AuthProvider";
 import { useNavigate } from 'react-router-dom'
 
@@ -8,7 +8,7 @@ function Post({ post, token, update }) {
   const { isLoggedIn, user } = useContext(AuthContext)
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [isDownvoted, setIsDownvoted] = useState(false);
-  const [voteCount, setVoteCount] = useState(12);
+  const [voteCount, setVoteCount] = useState(post.upvotes.length - post.downvotes.length)
 
   const [commentInput, setCommentInput] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(null);
@@ -17,44 +17,6 @@ function Post({ post, token, update }) {
     { id: 2, userName: 'Jane Smith', time: '1 hour ago', content: 'This is another sample comment.', replies: [] },
   ]);
   const [isCommentBoxVisible, setIsCommentBoxVisible] = useState(false);
-
-  const handleUpvote = async () => {
-    if (!isLoggedIn) {
-      navigate('/auth/login')
-    } else {
-      if (isDownvoted) {
-        setIsDownvoted(false);
-        setVoteCount(voteCount + 1);
-      }
-      setIsUpvoted(!isUpvoted);
-      setVoteCount(isUpvoted ? voteCount - 1 : voteCount + 1);
-      try {
-        const vote = await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
-        update();
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  };
-
-  const handleDownvote = async () => {
-    if (!isLoggedIn) {
-      navigate('/auth/login')
-    } else {
-      if (isUpvoted) {
-        setIsUpvoted(false);
-        setVoteCount(voteCount - 1);
-      }
-      setIsDownvoted(!isDownvoted);
-      setVoteCount(isDownvoted ? voteCount + 1 : voteCount - 1);
-      try {
-        const vote = await axios.patch(`http://localhost:3000/api/v1/forum/vote/downvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
-        update();
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  };
 
   const toggleDropdown = (index) => {
     setDropdownVisible(dropdownVisible === index ? null : index);
@@ -81,6 +43,81 @@ function Post({ post, token, update }) {
   };
   //Hmm, actually I actually think the comment box should appear with the comments
 
+  //Handle vote
+  useEffect(() => {
+    const upvote = post.upvotes;
+    const userUpvote = upvote.find((voter) => voter.userId === user._id)
+    if (userUpvote) {
+      setIsUpvoted(true)
+    }
+
+    const downvote = post.downvotes;
+    const userDownvote = downvote.find((voter) => voter.userId === user._id)
+    if (userDownvote) {
+      setIsDownvoted(true)
+    }
+  }, [])
+
+  const updateUpvote = async () => {
+    try {
+      await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
+      update();
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const updateDownvote = async () => {
+    try {
+      await axios.patch(`http://localhost:3000/api/v1/forum/vote/downvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
+      update();
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleUpvote = async () => {
+    if (!isLoggedIn) {
+      navigate('/auth/login')
+    } else {
+      if (isDownvoted) {
+        setIsDownvoted(false);
+        setVoteCount((count) => count + 1)
+        updateDownvote();
+      }
+      if (!isUpvoted) {
+        setIsUpvoted(!isUpvoted);
+        setVoteCount((count) => !isUpvoted ? count + 1 : count)
+        updateUpvote();
+      } else {
+        setIsUpvoted(!isUpvoted);
+        setVoteCount((count) => isUpvoted ? count - 1 : count)
+        updateUpvote();
+      }
+    }
+  };
+
+  const handleDownvote = async () => {
+    if (!isLoggedIn) {
+      navigate('/auth/login')
+    } else {
+      if (isUpvoted) {
+        setIsUpvoted(false);
+        setVoteCount((count) => count - 1)
+        updateUpvote();
+      }
+      if (!isDownvoted) {
+        setIsDownvoted(!isDownvoted);
+        setVoteCount((count) => !isDownvoted ? count - 1 : count)
+        updateDownvote();
+      } else {
+        setIsDownvoted(!isDownvoted);
+        setVoteCount((count) => isDownvoted ? count + 1 : count)
+        updateDownvote();
+      }
+    }
+  };
+
   const renderVoteButtons = () => (
     <div className="updown-button">
       <img
@@ -92,7 +129,7 @@ function Post({ post, token, update }) {
         onMouseLeave={(e) => { if (!isUpvoted) e.target.src = '/src/pages/forum/assets/Upvote.svg'; }}
       />
       <span className="vote-count" style={{ color: isUpvoted ? '#FF4B5C' : isDownvoted ? '#42C8F5' : '' }}>
-        {post.upvotes.length - post.downvotes.length}
+        {voteCount}
       </span>
       <img
         className="downvote"
@@ -105,6 +142,7 @@ function Post({ post, token, update }) {
     </div>
   );
 
+  //
   const renderDropdown = (index) => (
     <div
       className="post-navigate-dropdown"
