@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../authentication/AuthProvider";
 import { useNavigate } from 'react-router-dom'
 
@@ -17,6 +17,46 @@ function Post({ post, token, update }) {
     { id: 2, userName: 'Jane Smith', time: '1 hour ago', content: 'This is another sample comment.', replies: [] },
   ]);
   const [isCommentBoxVisible, setIsCommentBoxVisible] = useState(false);
+
+  const toggleDropdown = (index) => {
+    setDropdownVisible(dropdownVisible === index ? null : index);
+  };
+
+  const handleCommentInput = (e) => {
+    setCommentInput(e.target.value);
+  };
+
+  const handleAddComment = () => {
+    if (commentInput.trim()) {
+      setComments([
+        ...comments,
+        { id: comments.length + 1, userName: 'Current User', time: 'Just now', content: commentInput, replies: [] },
+      ]);
+      //...comment is spread operator, research for more info
+      setCommentInput('');
+    }
+  };
+  //Also note that we should retrive comments from db, and add comment should make update to db, as well as cause rerender, not adding it manually to fe like this
+
+  const toggleCommentBox = () => {
+    setIsCommentBoxVisible(!isCommentBoxVisible);
+  };
+  //Hmm, actually I actually think the comment box should appear with the comments
+
+  //Handle vote
+  useEffect(() => {
+    const upvote = post.upvotes;
+    const userUpvote = upvote.find((voter) => voter.userId === user._id)
+    if (userUpvote) {
+      setIsUpvoted(true)
+    } 
+
+    const downvote = post.downvotes;
+    const userDownvote = downvote.find((voter) => voter.userId === user._id)
+    if (userDownvote) {
+      setIsDownvoted(true)
+    } 
+  }, [])
 
   const handleUpvote = async () => {
     if (!isLoggedIn) {
@@ -55,32 +95,7 @@ function Post({ post, token, update }) {
       }
     }
   };
-
-  const toggleDropdown = (index) => {
-    setDropdownVisible(dropdownVisible === index ? null : index);
-  };
-
-  const handleCommentInput = (e) => {
-    setCommentInput(e.target.value);
-  };
-
-  const handleAddComment = () => {
-    if (commentInput.trim()) {
-      setComments([
-        ...comments,
-        { id: comments.length + 1, userName: 'Current User', time: 'Just now', content: commentInput, replies: [] },
-      ]);
-      //...comment is spread operator, research for more info
-      setCommentInput('');
-    }
-  };
-  //Also note that we should retrive comments from db, and add comment should make update to db, as well as cause rerender, not adding it manually to fe like this
-
-  const toggleCommentBox = () => {
-    setIsCommentBoxVisible(!isCommentBoxVisible);
-  };
-  //Hmm, actually I actually think the comment box should appear with the comments
-
+  
   const renderVoteButtons = () => (
     <div className="updown-button">
       <img
@@ -105,6 +120,7 @@ function Post({ post, token, update }) {
     </div>
   );
 
+  //
   const renderDropdown = (index) => (
     <div
       className="post-navigate-dropdown"
