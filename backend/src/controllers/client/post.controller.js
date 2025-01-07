@@ -4,6 +4,8 @@ const Like = require('../../models/client/like.model');
 const Comment = require('../../models/client/comment.model');
 const Tag = require('../../models/client/tag.model');
 const slugify = require('slugify');
+const { getDetail } = require('../../services/client/getDetail.service');
+const { initializeRedisClient } = require('../../utils/redis');
 
 // [GET] /api/v1/forum?offset=...&limit=...
 module.exports.index = async (req, res) => {
@@ -97,47 +99,17 @@ module.exports.create = async (req, res) => {
 // [GET] /api/v1/forum/detail/:id
 module.exports.detail = async (req, res) => {
   try {
+    const redisClient = await initializeRedisClient();
     const id = req.params.id;
-    const post = await Post.findById(id)
-      .populate({
-        path: 'userCreated',
-        select: '_id fullName avatar',
-      })
-      .populate({
-        path: 'upvotes',
-        select: 'userId -_id -postId',
-        match: { typeVote: 'upvote' },
-      })
-      .populate({
-        path: 'downvotes',
-        select: 'userId -_id -postId',
-        match: { typeVote: 'downvote' },
-      })
-      .populate({
-        path: 'comments',
-        options: { sort: { createdAt: -1 } },
-        select: 'content userId -postId',
-        populate: [
-          {
-            path: 'userId',
-            select: '_id fullName avatar',
-          },
-          {
-            path: 'replies.userId',
-            select: '_id fullName avatar',
-          },
-        ],
-      })
-      .populate({
-        path: 'saves',
-        select: '_id -savedPosts',
-      });
-    if (post.status !== 'public' || post.deleted === true) {
+    const [post, cacheHit] = await getDetail(id); 
+    
+    if (!post || post.status !== 'public' || post.deleted === true) {
       res.status(404).json({
         message: 'Cannot find post!',
       });
       return;
     }
+
     post.comments.forEach(comment => {
       if (comment.replies.length > 0) {
         comment.replies.sort(
@@ -145,6 +117,11 @@ module.exports.detail = async (req, res) => {
         );
       }
     });
+
+    if (!cacheHit) {
+      await redisClient.setEx(`${process.env.CACHE_PREFIX}:post:${id}`, 600, JSON.stringify(post));
+    }
+
     res.status(200).json(post);
   } catch (err) {
     res.status(400).json({
