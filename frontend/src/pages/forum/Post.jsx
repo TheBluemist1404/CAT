@@ -8,7 +8,7 @@ function Post({ post, token, update }) {
   const { isLoggedIn, user } = useContext(AuthContext)
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [isDownvoted, setIsDownvoted] = useState(false);
-  const [voteCount, setVoteCount] = useState(12);
+  const [voteCount, setVoteCount] = useState(post.upvotes.length - post.downvotes.length)
 
   const [commentInput, setCommentInput] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(null);
@@ -49,14 +49,32 @@ function Post({ post, token, update }) {
     const userUpvote = upvote.find((voter) => voter.userId === user._id)
     if (userUpvote) {
       setIsUpvoted(true)
-    } 
+    }
 
     const downvote = post.downvotes;
     const userDownvote = downvote.find((voter) => voter.userId === user._id)
     if (userDownvote) {
       setIsDownvoted(true)
-    } 
+    }
   }, [])
+
+  const updateUpvote = async () => {
+    try {
+      await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
+      update();
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const updateDownvote = async () => {
+    try {
+      await axios.patch(`http://localhost:3000/api/v1/forum/vote/downvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
+      update();
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const handleUpvote = async () => {
     if (!isLoggedIn) {
@@ -64,15 +82,17 @@ function Post({ post, token, update }) {
     } else {
       if (isDownvoted) {
         setIsDownvoted(false);
-        setVoteCount(voteCount + 1);
+        setVoteCount((count) => count + 1)
+        updateDownvote();
       }
-      setIsUpvoted(!isUpvoted);
-      setVoteCount(isUpvoted ? voteCount - 1 : voteCount + 1);
-      try {
-        const vote = await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
-        update();
-      } catch (error) {
-        console.log(error)
+      if (!isUpvoted) {
+        setIsUpvoted(!isUpvoted);
+        setVoteCount((count) => !isUpvoted ? count + 1 : count)
+        updateUpvote();
+      } else {
+        setIsUpvoted(!isUpvoted);
+        setVoteCount((count) => isUpvoted ? count - 1 : count)
+        updateUpvote();
       }
     }
   };
@@ -83,19 +103,21 @@ function Post({ post, token, update }) {
     } else {
       if (isUpvoted) {
         setIsUpvoted(false);
-        setVoteCount(voteCount - 1);
+        setVoteCount((count) => count - 1)
+        updateUpvote();
       }
-      setIsDownvoted(!isDownvoted);
-      setVoteCount(isDownvoted ? voteCount + 1 : voteCount - 1);
-      try {
-        const vote = await axios.patch(`http://localhost:3000/api/v1/forum/vote/downvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
-        update();
-      } catch (error) {
-        console.log(error)
+      if (!isDownvoted) {
+        setIsDownvoted(!isDownvoted);
+        setVoteCount((count) => !isDownvoted ? count - 1 : count)
+        updateDownvote();
+      } else {
+        setIsDownvoted(!isDownvoted);
+        setVoteCount((count) => isDownvoted ? count + 1 : count)
+        updateDownvote();
       }
     }
   };
-  
+
   const renderVoteButtons = () => (
     <div className="updown-button">
       <img
@@ -107,7 +129,7 @@ function Post({ post, token, update }) {
         onMouseLeave={(e) => { if (!isUpvoted) e.target.src = '/src/pages/forum/assets/Upvote.svg'; }}
       />
       <span className="vote-count" style={{ color: isUpvoted ? '#FF4B5C' : isDownvoted ? '#42C8F5' : '' }}>
-        {post.upvotes.length - post.downvotes.length}
+        {voteCount}
       </span>
       <img
         className="downvote"
