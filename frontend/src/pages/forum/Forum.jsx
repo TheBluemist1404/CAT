@@ -17,7 +17,7 @@ const Forum = ({token}) => {
       <Header />
       <div className="main-layout">
         <Sidebar handleCreatePostToggle={handleCreatePostToggle} token={token}/>
-        <Content isCreatePostOpen={isCreatePostOpen} handleCreatePostToggle={handleCreatePostToggle} />
+        <Content isCreatePostOpen={isCreatePostOpen} handleCreatePostToggle={handleCreatePostToggle} token={token}/>
       </div>
       <Pagination />
     </div>
