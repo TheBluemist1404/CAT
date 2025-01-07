@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Post from './Post';
 import { useEffect, useState } from 'react';
 
-const Content = ({ isCreatePostOpen, handleCreatePostToggle, page }) => {
+const Content = ({ isCreatePostOpen, handleCreatePostToggle, page, token }) => {
   const [postFeed, setPostFeed] = useState([])
   //get query
   const location = useLocation();
@@ -24,7 +24,6 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, page }) => {
         const posts = await axios.get(`http://localhost:3000/api/v1/forum?offset=${queryParams.offset}&limit=${queryParams.limit}`)
         if (posts){
           setPostFeed(posts.data)
-          console.log(posts.data)
         } else {
           console.log("not posts")
         }
@@ -65,7 +64,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, page }) => {
 
       <section className="post-feed" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', gap: '50px'}}>
         {postFeed.map((post, index) => (
-          <Post post={post}/>
+          <Post post={post} token={token} update={fetchPosts}/>
         ))}
       </section>
     </main>

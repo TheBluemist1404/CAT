@@ -1,6 +1,11 @@
-import { useState } from "react";
+import axios from "axios";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../authentication/AuthProvider";
+import { useNavigate } from 'react-router-dom'
 
-function Post({post}) {
+function Post({ post, token, update }) {
+  const navigate = useNavigate();
+  const { isLoggedIn, user } = useContext(AuthContext)
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [isDownvoted, setIsDownvoted] = useState(false);
   const [voteCount, setVoteCount] = useState(12);
@@ -13,22 +18,42 @@ function Post({post}) {
   ]);
   const [isCommentBoxVisible, setIsCommentBoxVisible] = useState(false);
 
-  const handleUpvote = () => {
-    if (isDownvoted) {
-      setIsDownvoted(false);
-      setVoteCount(voteCount + 1);
+  const handleUpvote = async () => {
+    if (!isLoggedIn) {
+      navigate('/auth/login')
+    } else {
+      if (isDownvoted) {
+        setIsDownvoted(false);
+        setVoteCount(voteCount + 1);
+      }
+      setIsUpvoted(!isUpvoted);
+      setVoteCount(isUpvoted ? voteCount - 1 : voteCount + 1);
+      try {
+        const vote = await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
+        update();
+      } catch (error) {
+        console.log(error)
+      }
     }
-    setIsUpvoted(!isUpvoted);
-    setVoteCount(isUpvoted ? voteCount - 1 : voteCount + 1);
   };
 
-  const handleDownvote = () => {
-    if (isUpvoted) {
-      setIsUpvoted(false);
-      setVoteCount(voteCount - 1);
+  const handleDownvote = async () => {
+    if (!isLoggedIn) {
+      navigate('/auth/login')
+    } else {
+      if (isUpvoted) {
+        setIsUpvoted(false);
+        setVoteCount(voteCount - 1);
+      }
+      setIsDownvoted(!isDownvoted);
+      setVoteCount(isDownvoted ? voteCount + 1 : voteCount - 1);
+      try {
+        const vote = await axios.patch(`http://localhost:3000/api/v1/forum/vote/downvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
+        update();
+      } catch (error) {
+        console.log(error)
+      }
     }
-    setIsDownvoted(!isDownvoted);
-    setVoteCount(isDownvoted ? voteCount + 1 : voteCount - 1);
   };
 
   const toggleDropdown = (index) => {
@@ -67,7 +92,7 @@ function Post({post}) {
         onMouseLeave={(e) => { if (!isUpvoted) e.target.src = '/src/pages/forum/assets/Upvote.svg'; }}
       />
       <span className="vote-count" style={{ color: isUpvoted ? '#FF4B5C' : isDownvoted ? '#42C8F5' : '' }}>
-        {voteCount}
+        {post.upvotes.length - post.downvotes.length}
       </span>
       <img
         className="downvote"
@@ -120,15 +145,11 @@ function Post({post}) {
     </div>
   );
 
-  if (post.userCreated) {
-    console.log(post.userCreated.fullName)
-  }
-
   return (
     <div className="post">
       <div className="post-header">
         <img src={post.userCreated ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" />
-        <div className="user-name">{post.userCreated ? post.userCreated.fullName: "unknown" }</div>
+        <div className="user-name">{post.userCreated ? post.userCreated.fullName : "unknown"}</div>
         <div className="post-time">{post.createdAt}</div>
         <div className="post-navigate-button" onClick={() => toggleDropdown(1)}>
           <span className="post-navigate-icon">...</span>
