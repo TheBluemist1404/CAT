@@ -1,55 +1,53 @@
 const moment = require('moment');
-const redis = require('redis');
-
-const redisClient = redis.createClient();
-redisClient.on('error', err => console.log('Redis Client Error', err));
+const { initializeRedisClient } = require('../../utils/redis');
 
 const WINDOW_SIZE_IN_MINUTES = 60;
 const MAX_WINDOW_REQUEST_COUNT = 20;
 const WINDOW_LOG_INTERVAL_IN_MINUTES = 10;
 
-let isConnected = false;
-
 module.exports.redisRateLimiter = async (req, res, next) => {
-  if (!isConnected) {
-    await redisClient.connect();
-    isConnected = true;
-  }
-
   try {
+    const redisClient = await initializeRedisClient();
     if (!redisClient) {
-      throw new Error('Redis Client does not exist!');
-      process.exit(1);
+      return res.status(500).json({
+        message: 'Redis Client does not exist!',
+      });
     }
-    const record = await redisClient.get(`rate-limit:${req.ip}`);
+    const record = await redisClient.get(
+      `${process.env.CACHE_PREFIX}:rate-limit:${req.ip}`,
+    );
     const currentReqTime = moment();
+
     if (record == null) {
-      let newRecord = [];
-      let reqLog = {
-        requestTimestamp: currentReqTime.unix(),
-        requestCount: 1,
-      };
-      newRecord.push(reqLog);
+      const newRecord = [
+        {
+          requestTimestamp: currentReqTime.unix(),
+          requestCount: 1,
+        },
+      ];
 
       await redisClient.setEx(
-        `rate-limit:${req.ip}`,
-        7200,
+        `${process.env.CACHE_PREFIX}:rate-limit:${req.ip}`,
+        WINDOW_SIZE_IN_MINUTES * 60,
         JSON.stringify(newRecord),
       );
       next();
     }
+
     let data = JSON.parse(record);
 
-    let windowStartTimestamp = moment()
+    const windowStartTimestamp = moment()
       .subtract(WINDOW_SIZE_IN_MINUTES, 'minutes')
       .unix();
-    let entriesWithinWindow = data.filter(entry => {
-      return entry.requestTimestamp > windowStartTimestamp;
-    });
 
-    let totalReqCount = entriesWithinWindow.reduce((acc, entry) => {
-      return acc + entry.requestCount;
-    }, 0);
+    const entriesWithinWindow = data.filter(
+      entry => entry.requestTimestamp > windowStartTimestamp,
+    );
+
+    const totalReqCount = entriesWithinWindow.reduce(
+      (acc, entry) => acc + entry.requestCount,
+      0,
+    );
 
     if (totalReqCount >= MAX_WINDOW_REQUEST_COUNT) {
       const firstRequestTimestamp = entriesWithinWindow[0].requestTimestamp;
@@ -64,23 +62,28 @@ module.exports.redisRateLimiter = async (req, res, next) => {
         message: `You have exceeded the ${MAX_WINDOW_REQUEST_COUNT} requests in ${WINDOW_SIZE_IN_MINUTES} minutes limit!`,
       });
       return;
-    } else {
-      let lastReqLog = data[data.length - 1];
-      let potentialStartTimestamp = currentReqTime
-        .subtract(WINDOW_LOG_INTERVAL_IN_MINUTES, 'minutes')
-        .unix();
-      if (lastReqLog.requestTimestamp > potentialStartTimestamp) {
-        lastReqLog.requestCount++;
-        data[data.length - 1] = lastReqLog;
-      } else {
-        data.push({
-          requestTimestamp: currentReqTime.unix(),
-          requestCount: 1,
-        });
-      }
     }
 
-    await redisClient.setEx(`rate-limit:${req.ip}`, 7200, JSON.stringify(data));
+    const lastReqLog = entriesWithinWindow[entriesWithinWindow.length - 1];
+    const potentialStartTimestamp = currentReqTime
+      .subtract(WINDOW_LOG_INTERVAL_IN_MINUTES, 'minutes')
+      .unix();
+
+    if (lastReqLog && lastReqLog.requestTimestamp > potentialStartTimestamp) {
+      lastReqLog.requestCount++;
+    } else {
+      entriesWithinWindow.push({
+        requestTimestamp: currentReqTime.unix(),
+        requestCount: 1,
+      });
+    }
+
+    await redisClient.setEx(
+      `${process.env.CACHE_PREFIX}:rate-limit:${req.ip}`,
+      WINDOW_SIZE_IN_MINUTES * 60,
+      JSON.stringify(entriesWithinWindow),
+    );
+
     next();
   } catch (err) {
     res.status(500).json({
