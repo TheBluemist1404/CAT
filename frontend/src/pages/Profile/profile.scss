@@ -49,6 +49,20 @@
        
         margin-top: 50px;
     }
+    .social {
+        display: flex; 
+        gap: 15px; 
+        margin-top: 150px; 
+      }
+      
+      .social img {
+        cursor: pointer; 
+        transition: transform 0.2s; 
+      }
+      
+      .social img:hover {
+        transform: scale(1.1); 
+      }
     .box{
         position: absolute;
         background-color: rgb(255, 255, 255);
@@ -65,10 +79,10 @@
         backdrop-filter: blur(9px);
         -webkit-backdrop-filter: blur(9px);
         border: 1px solid rgba(255, 255, 255, 0.45);
-        display: flex; /* Đặt các phần tử con theo chiều ngang */
-        justify-content: space-around; /* Căn đều các phần tử trong box */
-        align-items: center; /* Căn giữa theo chiều dọc */
-        gap: 20px; /* Khoảng cách giữa các thẻ .text */
+        display: flex; 
+        justify-content: space-around; 
+        align-items: center; 
+        gap: 20px; 
     }
     .tabs{
         
@@ -111,7 +125,7 @@
         row-gap: 20px;
         margin-top: 0px;
         width: 100%;
-        height: 300px;
+        
         grid-template-rows: 1fr;
         padding-top: 20px;
         padding-bottom: 10px;
@@ -194,7 +208,27 @@
         transition: 0.3s;
        }
    
-
+       .flex-container {
+        display: flex;
+        flex-wrap: wrap; 
+        gap: 20px; 
+        justify-content: center; 
+        
+        margin: 20px auto;
+      }
+      
+      .flex-item {
+        width: 100px;
+        height: 100px; 
+        background-color: #ffffff;
+        color: rgb(0, 0, 0);
+        display: flex;
+        align-items: center; 
+        justify-content: center; 
+        border-radius: 5px;
+        font-size: 18px;
+        font-weight: bold;
+      }
     
     
 }
