@@ -2,35 +2,31 @@ const User = require('../../models/client/user.model');
 const Post = require('../../models/client/post.model');
 const slugify = require('slugify');
 const hashPassword = require('../../utils/hashPassword');
+const { getProfile } = require('../../services/client/getProfile.service');
+const { initializeRedisClient } = require('../../utils/redis');
 
 // [GET] /api/v1/profile/detail/:id
 module.exports.index = async (req, res) => {
   try {
-    const id = req.params.id;
-    if (req.user && req.user.id === id) {
-      const user = await User.findById(id)
-        .populate({
-          path: 'posts',
-          match: { deleted: false },
-          select: '_id title createdAt images',
-        })
-        .populate({
-          path: 'savedPosts',
-          match: { deleted: false },
-          select: '_id title createdAt',
-        });
+    const redisClient = await initializeRedisClient();
 
-      res.status(200).json(user);
-    } else {
-      const user = await User.findById(id)
-        .populate({
-          path: 'posts',
-          match: { deleted: false },
-          select: '_id title createdAt images',
-        })
-        .select('-savedPosts');
-      res.status(200).json(user);
+    const id = req.params.id;
+
+    const [user, cacheHit] = await getProfile(id);
+
+    if (!cacheHit) {
+      await redisClient.setEx(
+        `${process.env.CACHE_PREFIX}:profile:${id}`,
+        600,
+        JSON.stringify(user),
+      );
     }
+
+    if (req.user && req.user.id !== id) {
+      delete user['savedPosts'];
+    }
+
+    res.status(200).json(user);
   } catch (err) {
     res.status(400).json({
       message: err.message,

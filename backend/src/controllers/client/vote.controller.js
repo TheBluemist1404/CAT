@@ -16,20 +16,20 @@ module.exports.vote = async (req, res) => {
       });
       return;
     }
-    const checkUpvoteExist = await Like.findOne({
+    const checkVoteExist = await Like.findOne({
       postId: post._id,
       userId: user._id,
     });
 
     switch (typeVote) {
       case 'upvote':
-        if (!checkUpvoteExist) {
-          const upvote = new Like({
+        if (!checkVoteExist) {
+          const vote = new Like({
             postId: post._id,
             userId: user._id,
             typeVote: 'upvote',
           });
-          await upvote.save();
+          await vote.save();
         } else {
           await Like.deleteOne({
             postId: post._id,
@@ -39,13 +39,13 @@ module.exports.vote = async (req, res) => {
         break;
 
       case 'downvote':
-        if (!checkUpvoteExist) {
-          const upvote = new Like({
+        if (!checkVoteExist) {
+          const vote = new Like({
             postId: post._id,
             userId: user._id,
             typeVote: 'downvote',
           });
-          await upvote.save();
+          await vote.save();
         } else {
           await Like.deleteOne({
             postId: post._id,
@@ -69,7 +69,7 @@ module.exports.vote = async (req, res) => {
         postId: post._id,
         typeVote: 'downvote',
       }),
-    });
+    checkVoteExist});
   } catch (err) {
     res.status(400).json({
       message: err.message,
