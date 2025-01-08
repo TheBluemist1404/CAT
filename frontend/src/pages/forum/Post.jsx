@@ -27,13 +27,13 @@ function Post({ post, token, update }) {
   const timeDiff = (now - createdDate); //in miliseconds
 
   let timeDisplay;
-  if (timeDiff < 60*1000) {
+  if (timeDiff < 60 * 1000) {
     const seconds = Math.floor(timeDiff / 1000);
     timeDisplay = `${seconds} seconds ago`;
-  } else if (timeDiff < 60*60*1000) {
+  } else if (timeDiff < 60 * 60 * 1000) {
     const minutes = Math.floor(timeDiff / (1000 * 60));
     timeDisplay = `${minutes} minutes ago`
-  } else if (timeDiff < 24*60*60*1000) {
+  } else if (timeDiff < 24 * 60 * 60 * 1000) {
     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
     timeDisplay = `${hours} hours ago`
   } else {
@@ -41,9 +41,9 @@ function Post({ post, token, update }) {
     timeDisplay = `${days} days ago`
   }
 
-    const toggleDropdown = (index) => {
-      setDropdownVisible(dropdownVisible === index ? null : index);
-    };
+  const toggleDropdown = (index) => {
+    setDropdownVisible(dropdownVisible === index ? null : index);
+  };
 
   const handleCommentInput = (e) => {
     setCommentInput(e.target.value);
@@ -60,7 +60,17 @@ function Post({ post, token, update }) {
             { headers: { "Authorization": `Bearer ${token.accessToken}` } },)
           console.log(response)
         } catch (error) {
-          console.error("comment failed", error)
+          if (error.response && error.response.status === 403) {
+            const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
+            const newAccessToken = getToken.data.accessToken
+            token.accessToken = newAccessToken;
+            localStorage.setItem('token', JSON.stringify(token))
+
+            const response = await axios.post(`http://localhost:3000/api/v1/forum/comment/${post._id}`,
+              { content: commentInput, user: { id: user._id } },
+              { headers: { "Authorization": `Bearer ${newAccessToken}` } },)
+            console.log(response)
+          }
         }
         setCommentInput('');
         update();
@@ -91,10 +101,21 @@ function Post({ post, token, update }) {
 
   const updateUpvote = async () => {
     try {
-      await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
+      await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`,
+        { user: { id: user._id } },
+        { headers: { "Authorization": `Bearer ${token.accessToken}` } })
       update();
     } catch (error) {
-      console.log(error)
+      if (error.response && error.response.status === 403) {
+        const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
+        const newAccessToken = getToken.data.accessToken
+        token.accessToken = newAccessToken;
+        localStorage.setItem('token', JSON.stringify(token))
+
+        await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`,
+          { user: { id: user._id } },
+          { headers: { "Authorization": `Bearer ${newAccessToken}` } })
+      }
     }
   }
 
@@ -103,7 +124,16 @@ function Post({ post, token, update }) {
       await axios.patch(`http://localhost:3000/api/v1/forum/vote/downvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
       update();
     } catch (error) {
-      console.log(error)
+      if (error.response && error.response.status === 403) {
+        const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
+        const newAccessToken = getToken.data.accessToken
+        token.accessToken = newAccessToken;
+        localStorage.setItem('token', JSON.stringify(token))
+
+        await axios.patch(`http://localhost:3000/api/v1/forum/vote/downvote/${post._id}`,
+          { user: { id: user._id } },
+          { headers: { "Authorization": `Bearer ${newAccessToken}` } })
+      }
     }
   }
 
@@ -252,7 +282,7 @@ function Post({ post, token, update }) {
                 value={commentInput}
                 onChange={handleCommentInput}
                 style={{ height: 'auto', maxHeight: '200px' }}
-                onFocus={()=>{!isLoggedIn ? (navigate('/auth/login')): ({})}}
+                onFocus={() => { !isLoggedIn ? (navigate('/auth/login')) : ({}) }}
               />
               <button className="submit-comment" onClick={handleAddComment}>Post</button>
             </div>
