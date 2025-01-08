@@ -12,11 +12,8 @@ function Post({ post, token, update }) {
 
   const [commentInput, setCommentInput] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(null);
-
-  const sampleComment = [
-    { id: 1, userName: 'Jane Smith', time: '1 hour ago', content: 'This is a sample comment.', replies: [] },
-    { id: 2, userName: 'Jane Smith', time: '1 hour ago', content: 'This is another sample comment.', replies: [] },
-  ]
+  const [isSaved, setIsSaved] = useState(false);
+  
   const comments = post.comments;
   const [isCommentBoxVisible, setIsCommentBoxVisible] = useState(false);
 
@@ -203,13 +200,17 @@ function Post({ post, token, update }) {
     </div>
   );
 
-  //
+  // Save post
+  const handleSavePost = () => {
+    setIsSaved(!isSaved);
+  }
+
   const renderDropdown = (index) => (
     <div
       className="post-navigate-dropdown"
       style={{ display: dropdownVisible === index ? 'block' : 'none' }}
     >
-      <div className="dropdown-item" onClick={() => console.log('Post saved')}>Save</div> {/*Placeholder, but replace with some api call later */}
+      <div className="dropdown-item" onClick={handleSavePost}>{isSaved ? "Unsave" : "Save"}</div> {/*Placeholder, but replace with some api call later */}
       <hr className="post-navigate-line" />
       <div
         className="dropdown-item"
