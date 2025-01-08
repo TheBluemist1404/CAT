@@ -9,70 +9,108 @@ const { initializeRedisClient } = require('../../utils/redis');
 
 // [GET] /api/v1/forum?offset=...&limit=...
 module.exports.index = async (req, res) => {
-  let skip = parseInt(req.query.offset) || 0;
-  let limit = parseInt(req.query.limit) || 10;
-  try {
-    const posts = await Post.find({
-      deleted: false,
-      status: 'public',
-    })
-      .populate({
-        path: 'userCreated',
-        select: '_id fullName avatar',
-      })
-      .populate({
-        path: 'upvotes',
-        select: 'userId -_id -postId',
-        match: { typeVote: 'upvote' },
-      })
-      .populate({
-        path: 'downvotes',
-        select: 'userId -_id -postId',
-        match: { typeVote: 'downvote' },
-      })
-      .populate({
-        path: 'comments',
-        perDocumentLimit: 3,
-        options: { sort: { createdAt: -1 } },
-        select: 'content userId -postId',
-        populate: [
-          {
-            path: 'userId',
-            select: '_id fullName avatar',
-          },
-          {
-            path: 'replies.userId',
-            select: '_id fullName avatar',
-          },
-        ],
-      })
-      .populate({
-        path: 'tags',
-        select: '_id title',
-      })
-      .populate({
-        path: 'saves',
-        select: '_id -savedPosts',
-      })
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: 'desc' });
+  const skip = parseInt(req.query.offset) || 0;
+  const limit = parseInt(req.query.limit) || 10;
 
-    for (const post of posts) {
-      post.comments.forEach(comment => {
-        if (comment.replies.length > 0) {
-          comment.replies.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-          );
-        }
-      });
-    }
+  try {
+    const posts = await Post.aggregate([
+      { $match: { deleted: false, status: 'public' } },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userCreated',
+          foreignField: '_id',
+          as: 'userCreated',
+        },
+      },
+      { $unwind: '$userCreated' },
+      {
+        $lookup: {
+          from: 'votes',
+          localField: '_id',
+          foreignField: 'postId',
+          as: 'upvotes',
+          pipeline: [
+            { $match: { typeVote: 'upvote' } },
+            { $project: { userId: 1, _id: 0 } },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'votes',
+          localField: '_id',
+          foreignField: 'postId',
+          as: 'downvotes',
+          pipeline: [
+            { $match: { typeVote: 'downvote' } },
+            { $project: { userId: 1, _id: 0 } },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'postId',
+          as: 'comments',
+          pipeline: [
+            { $sort: { createdAt: -1 } },
+            { $limit: 3 },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'userDetails',
+              },
+            },
+            { $unwind: '$userDetails' },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'tags',
+          localField: 'tags',
+          foreignField: '_id',
+          as: 'tags',
+        },
+      },
+      {
+        $lookup: {
+          from: 'saves',
+          localField: '_id',
+          foreignField: 'savedPosts',
+          as: 'saves',
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          content: 1,
+          createdAt: 1,
+          userCreated: { _id: 1, fullName: 1, avatar: 1 },
+          upvotes: 1,
+          downvotes: 1,
+          comments: {
+            content: 1,
+            createdAt: 1,
+            userDetails: { _id: 1, fullName: 1, avatar: 1 },
+          },
+          tags: { _id: 1, title: 1 },
+          saves: { _id: 1 },
+        },
+      },
+    ]);
 
     res.status(200).json(posts);
   } catch (err) {
-    res.status(400).json({
-      message: err.message,
-    });
+    res.status(400).json({ message: err.message });
   }
 };
 
@@ -101,8 +139,8 @@ module.exports.detail = async (req, res) => {
   try {
     const redisClient = await initializeRedisClient();
     const id = req.params.id;
-    const [post, cacheHit] = await getDetail(id); 
-    
+    const [post, cacheHit] = await getDetail(id);
+
     if (!post || post.status !== 'public' || post.deleted === true) {
       res.status(404).json({
         message: 'Cannot find post!',
@@ -119,7 +157,11 @@ module.exports.detail = async (req, res) => {
     });
 
     if (!cacheHit) {
-      await redisClient.setEx(`${process.env.CACHE_PREFIX}:post:${id}`, 600, JSON.stringify(post));
+      await redisClient.setEx(
+        `${process.env.CACHE_PREFIX}:post:${id}`,
+        600,
+        JSON.stringify(post),
+      );
     }
 
     res.status(200).json(post);
