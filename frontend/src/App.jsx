@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 import Homepage from './pages/homepage/Homepage'
 import Login from './authentication/Login'
+import Forgot from './authentication/Forgot';
 import Signup from './authentication/Signup'
 import Forum from './pages/forum/Forum'
 import Profile from './pages/Profile/Profile'
@@ -80,6 +81,7 @@ function App() {
         <Routes>
             <Route path='/' element={<Homepage token={token} />} />
             <Route path='/auth/login' element={<Login />} />
+            <Route path='/auth/forgot' element={<Forgot/>}/>
             <Route path='/auth/signup' element={<Signup />} />
             <Route path='/forum' element={<Forum token={token} />} />
             <Route path='/profile/:id/*' element={<Profile token={token} />} />
