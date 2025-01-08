@@ -29,7 +29,7 @@ module.exports.index = async (req, res) => {
       { $unwind: '$userCreated' },
       {
         $lookup: {
-          from: 'votes',
+          from: 'likes',
           localField: '_id',
           foreignField: 'postId',
           as: 'upvotes',
@@ -41,7 +41,7 @@ module.exports.index = async (req, res) => {
       },
       {
         $lookup: {
-          from: 'votes',
+          from: 'likes',
           localField: '_id',
           foreignField: 'postId',
           as: 'downvotes',
@@ -107,8 +107,7 @@ module.exports.index = async (req, res) => {
         },
       },
     ]);
-
-  res.status(200).json({ posts, total: totalPosts });
+  res.status(200).json(posts);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
