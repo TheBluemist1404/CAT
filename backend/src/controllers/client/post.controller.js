@@ -108,7 +108,7 @@ module.exports.index = async (req, res) => {
       },
     ]);
 
-    res.status(200).json(posts);
+  res.status(200).json({ posts, total: totalPosts });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

@@ -17,22 +17,16 @@
     z-index: -1;
     filter: blur(2px);
   }
-  
-  
-  .con {
+
+  .con{
     position: relative; 
     top: 0px;
     height: 520px;
     width: 35%;
     color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     left: 50%;
     transform: translateX(-50%);
-    padding: 10px 20px;
-    background-color: #2b2b3b; 
-    border-radius: 10%;
+    padding: 10px 20px; 
     z-index: 0;
     background: rgba(43, 43, 59, 0.43); 
     border-radius: 16px;
@@ -42,22 +36,24 @@
     text-align: center; 
     display: flex; 
     flex-direction: column; 
+    justify-content: space-between; 
+    align-items: center; 
+  }
+  
+  
+  .auth-con {
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
     justify-content: center; 
     align-items: center; 
   }
   
-  .signup {
-    position: absolute; 
-    top: 60px;
-    left: 50%; 
-    transform: translate(-50%, -50%); 
-    z-index: 2; 
+  .heading { 
+    margin-top: 20px;
     font-size: 35px;
     font-weight: bolder; 
     color: #ffffff; 
-    padding: 20px; 
-    border-radius: 10px; 
-    text-align: center;
     font-family: 'Roboto Serif';
   }
   
@@ -68,9 +64,6 @@
     width: 80%;
     z-index: 2;
     text-align: center;
-    
-   
-    
   }
   
   .wave-group .input {
@@ -85,7 +78,6 @@
   }
   
   .wave-group .input:focus {
-    
     outline: none;
   }
   
@@ -113,7 +105,7 @@
   }
   
   .wave-group .bar {
-    position: absolute;
+    position: relative;
     display: block;
     width: 100%;
     text-align: center;
@@ -159,7 +151,6 @@
     width: 100%;
     text-align: center;
     cursor: pointer;
-    background-color: blue;
   }
   
   .lock {
@@ -167,8 +158,19 @@
     bottom: 0; 
     right: 0; 
   }
+
+  .forget{
+    color: var(--secondary-color);
+    transform: translateY(190px);
+    cursor: pointer;
+  }
+  .forget:hover{
+    text-decoration: underline;
+  }
+
   button {
     position: absolute;
+    bottom: 170px;
     background-color: #2B2B3B;
     border-radius: 10px;
     color: white;
@@ -184,46 +186,33 @@
   button:hover {
     opacity: 0.8;
   }
-  p{
+  .reg p{
     color: #ffffff;
     display: inline;
     font-weight: bold;
   }
   
   
-  p:hover {
+  .reg p:hover {
     color: #606083; 
     
   }
   .reg{
     position: absolute;
-    top: 350px;
+    bottom: 130px;
     font-size: 20px;
     z-index: 3;
     text-align: center;
   }
   .fb{
-    position: absolute;
-    margin-top: 60%;
-    left: 35%;
-    width: 40px;
-    height: 40px; 
-    background-size: contain;
-    
-    z-index: 3;
+    width: 50px;
   }
   .fb:hover{
     transform: scale(1.1);
     cursor: pointer;
   }
   .gg{
-    position: absolute;
-    margin-top: 60%;
-    right: 35%;
-    width: 40px;
-    height: 40px; 
-    background-size: contain;
-    z-index: 3;
+    width: 50px;
   }
     
   .gg:hover{ 

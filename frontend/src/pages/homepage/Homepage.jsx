@@ -42,8 +42,7 @@ function Card({ subhead, head }) {
 function Homepage({ token }) {
     const navigate = useNavigate();
 
-    const { isLoggedIn, setIsLoggedIn, user } = useContext(AuthContext);
-    console.log(user.avatar)
+    const { setIsLoggedIn } = useContext(AuthContext);
 
     const [dropdown, setDropdown] = useState(false)
 
@@ -51,16 +50,6 @@ function Homepage({ token }) {
         setDropdown(!dropdown);
     }
 
-    const logout = async () => {
-        try {
-            const refreshToken = token.refreshToken;
-            await axios.delete('http://localhost:3000/api/v1/auth/logout', { data: { refreshToken: refreshToken } }) //axios.delete is treated different
-            setIsLoggedIn(false)
-            localStorage.removeItem('token')
-        } catch (error) {
-            console.error('logout failed', error)
-        }
-    }
     return (
         <div className='homepage'>
             <div className='container' style={{ '--backgroundImage': `url(${background})` }}>

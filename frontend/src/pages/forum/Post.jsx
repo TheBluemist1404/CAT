@@ -12,11 +12,31 @@ function Post({ post, token, update }) {
 
   const [commentInput, setCommentInput] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(null);
-  const [comments, setComments] = useState([
-    { id: 1, userName: 'Jane Smith', time: '1 hour ago', content: 'This is a sample comment.', replies: [] },
-    { id: 2, userName: 'Jane Smith', time: '1 hour ago', content: 'This is another sample comment.', replies: [] },
-  ]);
+  const [isSaved, setIsSaved] = useState(false);
+  
+  const comments = post.comments;
   const [isCommentBoxVisible, setIsCommentBoxVisible] = useState(false);
+
+  //Handle time display
+  const timestamp = post.createdAt;
+  const createdDate = new Date(timestamp);
+  const now = new Date();
+  const timeDiff = (now - createdDate); //in miliseconds
+
+  let timeDisplay;
+  if (timeDiff < 60 * 1000) {
+    const seconds = Math.floor(timeDiff / 1000);
+    timeDisplay = `${seconds} seconds ago`;
+  } else if (timeDiff < 60 * 60 * 1000) {
+    const minutes = Math.floor(timeDiff / (1000 * 60));
+    timeDisplay = `${minutes} minutes ago`
+  } else if (timeDiff < 24 * 60 * 60 * 1000) {
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    timeDisplay = `${hours} hours ago`
+  } else {
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    timeDisplay = `${days} days ago`
+  }
 
   const toggleDropdown = (index) => {
     setDropdownVisible(dropdownVisible === index ? null : index);
@@ -26,14 +46,32 @@ function Post({ post, token, update }) {
     setCommentInput(e.target.value);
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (commentInput.trim()) {
-      setComments([
-        ...comments,
-        { id: comments.length + 1, userName: 'Current User', time: 'Just now', content: commentInput, replies: [] },
-      ]);
-      //...comment is spread operator, research for more info
-      setCommentInput('');
+      if (!isLoggedIn) {
+        navigate('/auth/login')
+      } else {
+        try {
+          const response = await axios.post(`http://localhost:3000/api/v1/forum/comment/${post._id}`,
+            { content: commentInput, user: { id: user._id } },
+            { headers: { "Authorization": `Bearer ${token.accessToken}` } },)
+          console.log(response)
+        } catch (error) {
+          if (error.response && error.response.status === 403) {
+            const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
+            const newAccessToken = getToken.data.accessToken
+            token.accessToken = newAccessToken;
+            localStorage.setItem('token', JSON.stringify(token))
+
+            const response = await axios.post(`http://localhost:3000/api/v1/forum/comment/${post._id}`,
+              { content: commentInput, user: { id: user._id } },
+              { headers: { "Authorization": `Bearer ${newAccessToken}` } },)
+            console.log(response)
+          }
+        }
+        setCommentInput('');
+        update();
+      }
     }
   };
   //Also note that we should retrive comments from db, and add comment should make update to db, as well as cause rerender, not adding it manually to fe like this
@@ -60,10 +98,21 @@ function Post({ post, token, update }) {
 
   const updateUpvote = async () => {
     try {
-      await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
+      await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`,
+        { user: { id: user._id } },
+        { headers: { "Authorization": `Bearer ${token.accessToken}` } })
       update();
     } catch (error) {
-      console.log(error)
+      if (error.response && error.response.status === 403) {
+        const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
+        const newAccessToken = getToken.data.accessToken
+        token.accessToken = newAccessToken;
+        localStorage.setItem('token', JSON.stringify(token))
+
+        await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`,
+          { user: { id: user._id } },
+          { headers: { "Authorization": `Bearer ${newAccessToken}` } })
+      }
     }
   }
 
@@ -72,7 +121,16 @@ function Post({ post, token, update }) {
       await axios.patch(`http://localhost:3000/api/v1/forum/vote/downvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
       update();
     } catch (error) {
-      console.log(error)
+      if (error.response && error.response.status === 403) {
+        const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
+        const newAccessToken = getToken.data.accessToken
+        token.accessToken = newAccessToken;
+        localStorage.setItem('token', JSON.stringify(token))
+
+        await axios.patch(`http://localhost:3000/api/v1/forum/vote/downvote/${post._id}`,
+          { user: { id: user._id } },
+          { headers: { "Authorization": `Bearer ${newAccessToken}` } })
+      }
     }
   }
 
@@ -142,13 +200,17 @@ function Post({ post, token, update }) {
     </div>
   );
 
-  //
+  // Save post
+  const handleSavePost = () => {
+    setIsSaved(!isSaved);
+  }
+
   const renderDropdown = (index) => (
     <div
       className="post-navigate-dropdown"
       style={{ display: dropdownVisible === index ? 'block' : 'none' }}
     >
-      <div className="dropdown-item" onClick={() => console.log('Post saved')}>Save</div> {/*Placeholder, but replace with some api call later */}
+      <div className="dropdown-item" onClick={handleSavePost}>{isSaved ? "Unsave" : "Save"}</div> {/*Placeholder, but replace with some api call later */}
       <hr className="post-navigate-line" />
       <div
         className="dropdown-item"
@@ -165,9 +227,9 @@ function Post({ post, token, update }) {
       {comments.map((comment) => (
         <div key={comment.id} className="comment">
           <div className="comment-header">
-            <img src="/src/pages/forum/assets/Comment avatar.svg" className="comment-avatar" alt="Avatar" />
-            <span className="comment-user-name">{comment.userName}</span>
-            <span className="comment-time">{comment.time}</span>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden' }}><img src={comment.userId.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
+            <span className="comment-user-name">{comment.userId.fullName}</span>
+            {/* <span className="comment-time">{comment.time}</span> */}
           </div>
           <div className="comment-body">{comment.content}</div>
           <div className="comment-footer">
@@ -188,7 +250,7 @@ function Post({ post, token, update }) {
       <div className="post-header">
         <img src={post.userCreated ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" />
         <div className="user-name">{post.userCreated ? post.userCreated.fullName : "unknown"}</div>
-        <div className="post-time">{post.createdAt}</div>
+        <div className="post-time">{timeDisplay}</div>
         <div className="post-navigate-button" onClick={() => toggleDropdown(1)}>
           <span className="post-navigate-icon">...</span>
         </div>
@@ -196,7 +258,7 @@ function Post({ post, token, update }) {
       </div>
       <div className="post-body">
         <h1 className="post-title">{post.title}</h1>
-        <p className="post-content">Post content</p>
+        <p className="post-content">{post.content}</p>
       </div>
       <hr className="post-line" />
       <div className="post-footer">
@@ -221,6 +283,7 @@ function Post({ post, token, update }) {
                 value={commentInput}
                 onChange={handleCommentInput}
                 style={{ height: 'auto', maxHeight: '200px' }}
+                onFocus={() => { !isLoggedIn ? (navigate('/auth/login')) : ({}) }}
               />
               <button className="submit-comment" onClick={handleAddComment}>Post</button>
             </div>
