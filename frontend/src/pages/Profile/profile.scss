@@ -229,6 +229,66 @@
         font-size: 18px;
         font-weight: bold;
       }
+    /* Container chính */
+.posts-container {
+    display: flex;
+    flex-wrap: wrap; /* Cho phép xuống dòng khi không đủ chỗ */
+    gap: 20px; /* Khoảng cách giữa các ô vuông */
+    justify-content: center; /* Căn giữa các ô vuông */
+    padding: 20px;
+    background-color: #f9f9f9; /* Màu nền container */
+  }
+  
+  /* Container chính */
+.posts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px; /* Khoảng cách giữa các ô vuông */
+    justify-content: flex-start; /* Căn trái các ô vuông */
+    padding: 20px;
+    background-color: #000000; /* Màu nền container */
+    width: 100%;
+  }
+  
+  /* Ô vuông (post card) */
+  .post-card {
     
+    display: flex;
+    flex-direction: row; /* Sắp xếp icon và title theo chiều dọc */
+    align-items: center; /* Căn trái */
+    justify-content: space-between; /* Căn trái nội dung */
+    border: 1px solid rgb(255, 255, 255);
+    box-shadow: 0 4px 8px rgba(235, 232, 232, 0.1); /* Đổ bóng */
+    border-radius: 10px; /* Góc bo tròn */
+    padding: 10px;
+    transition: transform 0.2s, box-shadow 0.2s; /* Hiệu ứng hover */
+  }
+  
+  .post-card:hover {
+    transform: translateY(-5px); /* Di chuyển nhẹ lên khi hover */
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.2); /* Tăng độ đổ bóng khi hover */
+  }
+  
+  /* Icon */
+  
+  .post-icon-title {
+    display: flex; /* Sắp xếp icon và title nằm ngang */
+    align-items: center; /* Canh giữa theo chiều dọc */
+  }
+  .post-icon {
+    
+    margin-right: 20px; /* Khoảng cách giữa icon và title */
+  }
+  /* Title */
+  .post-title {
+    margin-left: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff; /* Màu chữ */
+  }
+  .post-title:hover {
+    color: #007bff; /* Màu chữ khi hover */
+    text-decoration: underline; /* Gạch chân khi hover */
+  }
     
 }

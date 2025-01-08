@@ -10,9 +10,10 @@ import Header from "../../Header";
 
 const Profile = ({token}) => {
     const navigate = useNavigate();
-    const { isLoggedIn, user,  } = useContext(AuthContext);
+    const { isLoggedIn, user } = useContext(AuthContext);
     
-    
+    console.log(user);
+    const posts = user.posts
 
     useEffect(() => {
         if (!isLoggedIn) {
@@ -45,26 +46,13 @@ const Profile = ({token}) => {
         setText(event.target.value); 
       };
      
-        
-      const [posts, setPosts] = useState([]); 
-      
-        
-        const fetchPosts = async () => {
-          try {
-            const response = await axios.get(`http://localhost:3000/api/v1/profile/detail/${id}`); 
-            setPosts(response.data); 
-          } catch (error) {
-            console.error('Failed to fetch posts:', error);
-          }
-        };
       
       
-        useEffect(() => {
-          fetchPosts();
-        }, []); 
+     
 
     const id = useParams(); 
     console.log(id.id, user._id)
+    
     if (id.id === user._id) { 
         return (
             <div className="profile" style={{position: 'relative'}}>
@@ -166,11 +154,24 @@ const Profile = ({token}) => {
                             <h1>Posts</h1>
                             <div>
                             
-                            <ul>
-                            {posts.map((post) => (
-                            <li key={post._id}>{post.title}</li> 
-                            ))}
-                            </ul>
+                            <div className="posts-container">
+                            {user.posts.slice().reverse().map((post, index) => {
+    
+                                const date = new Date(post.createdAt);
+                                const formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}, ${date.getFullYear()}`;
+
+                                return (
+                                <div className='post-card' key={index}>
+                                    <div className='post-icon-title'>
+                                        <img src="/src/assets/qa.svg" alt="" width={30} height={30} />
+                                        <div className='post-title'>{post.title}</div>
+                                    </div>
+                                
+                                <div className='post-date'>{formattedDate}</div> {/* Hiển thị ngày đã chuyển đổi */}
+                                </div>
+                                );
+                                })}
+                            </div>
                             </div>
                         </div>
                     </div>)}
