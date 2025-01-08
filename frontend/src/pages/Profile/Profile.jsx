@@ -1,6 +1,6 @@
 import './profile.scss'
 import { useNavigate, useParams, Routes, Route } from 'react-router-dom';
-import { useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../authentication/AuthProvider';
 
 import "./profile.scss"
