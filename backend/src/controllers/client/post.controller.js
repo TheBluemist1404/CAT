@@ -107,7 +107,11 @@ module.exports.index = async (req, res) => {
         },
       },
     ]);
-  res.status(200).json(posts);
+    const totalPosts = await Post.countDocuments({
+      deleted: false,
+      status: 'public',
+    });
+    res.status(200).json({ posts: posts, totalPosts: totalPosts });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
