@@ -16,102 +16,105 @@ module.exports.index = async (req, res) => {
     const posts = await Post.aggregate([
       { $match: { deleted: false, status: 'public' } },
       { $sort: { createdAt: -1 } },
-      { $skip: skip },
-      { $limit: limit },
       {
-        $lookup: {
-          from: 'users',
-          localField: 'userCreated',
-          foreignField: '_id',
-          as: 'userCreated',
-        },
-      },
-      { $unwind: '$userCreated' },
-      {
-        $lookup: {
-          from: 'likes',
-          localField: '_id',
-          foreignField: 'postId',
-          as: 'upvotes',
-          pipeline: [
-            { $match: { typeVote: 'upvote' } },
-            { $project: { userId: 1, _id: 0 } },
-          ],
-        },
-      },
-      {
-        $lookup: {
-          from: 'likes',
-          localField: '_id',
-          foreignField: 'postId',
-          as: 'downvotes',
-          pipeline: [
-            { $match: { typeVote: 'downvote' } },
-            { $project: { userId: 1, _id: 0 } },
-          ],
-        },
-      },
-      {
-        $lookup: {
-          from: 'comments',
-          localField: '_id',
-          foreignField: 'postId',
-          as: 'comments',
-          pipeline: [
-            { $sort: { createdAt: -1 } },
-            { $limit: 3 },
+        $facet: {
+          metadata: [{ $count: 'total' }],
+          posts: [
+            { $skip: skip },
+            { $limit: limit },
             {
               $lookup: {
                 from: 'users',
-                localField: 'userId',
+                localField: 'userCreated',
                 foreignField: '_id',
-                as: 'userDetails',
+                as: 'userCreated',
               },
             },
-            { $unwind: '$userDetails' },
+            { $unwind: '$userCreated' },
+            {
+              $lookup: {
+                from: 'likes',
+                localField: '_id',
+                foreignField: 'postId',
+                as: 'upvotes',
+                pipeline: [
+                  { $match: { typeVote: 'upvote' } },
+                  { $project: { userId: 1, _id: 0 } },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: 'likes',
+                localField: '_id',
+                foreignField: 'postId',
+                as: 'downvotes',
+                pipeline: [
+                  { $match: { typeVote: 'downvote' } },
+                  { $project: { userId: 1, _id: 0 } },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: 'comments',
+                localField: '_id',
+                foreignField: 'postId',
+                as: 'comments',
+                pipeline: [
+                  { $sort: { createdAt: -1 } },
+                  { $limit: 3 },
+                  {
+                    $lookup: {
+                      from: 'users',
+                      localField: 'userId',
+                      foreignField: '_id',
+                      as: 'userDetails',
+                    },
+                  },
+                  { $unwind: '$userDetails' },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: 'tags',
+                localField: 'tags',
+                foreignField: '_id',
+                as: 'tags',
+              },
+            },
+            {
+              $lookup: {
+                from: 'users',
+                localField: '_id',
+                foreignField: 'savedPosts',
+                as: 'saves',
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                title: 1,
+                content: 1,
+                createdAt: 1,
+                userCreated: { _id: 1, fullName: 1, avatar: 1 },
+                upvotes: 1,
+                downvotes: 1,
+                comments: {
+                  content: 1,
+                  createdAt: 1,
+                  userDetails: { _id: 1, fullName: 1, avatar: 1 },
+                },
+                tags: { _id: 1, title: 1 },
+                saves: { _id: 1 },
+              },
+            },
           ],
         },
       },
-      {
-        $lookup: {
-          from: 'tags',
-          localField: 'tags',
-          foreignField: '_id',
-          as: 'tags',
-        },
-      },
-      {
-        $lookup: {
-          from: 'saves',
-          localField: '_id',
-          foreignField: 'savedPosts',
-          as: 'saves',
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-          title: 1,
-          content: 1,
-          createdAt: 1,
-          userCreated: { _id: 1, fullName: 1, avatar: 1 },
-          upvotes: 1,
-          downvotes: 1,
-          comments: {
-            content: 1,
-            createdAt: 1,
-            userDetails: { _id: 1, fullName: 1, avatar: 1 },
-          },
-          tags: { _id: 1, title: 1 },
-          saves: { _id: 1 },
-        },
-      },
     ]);
-    const totalPosts = await Post.countDocuments({
-      deleted: false,
-      status: 'public',
-    });
-    res.status(200).json({ posts: posts, totalPosts: totalPosts });
+    res.status(200).json(posts);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
