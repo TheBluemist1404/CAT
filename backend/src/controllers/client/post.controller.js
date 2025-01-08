@@ -12,6 +12,10 @@ module.exports.index = async (req, res) => {
   let skip = parseInt(req.query.offset) || 0;
   let limit = parseInt(req.query.limit) || 10;
   try {
+    const totalPosts = await Post.countDocuments({
+        deleted: false,
+        status: 'public',
+    })
     const posts = await Post.find({
       deleted: false,
       status: 'public',
@@ -68,7 +72,7 @@ module.exports.index = async (req, res) => {
       });
     }
 
-    res.status(200).json(posts);
+  res.status(200).json({ posts, total: totalPosts });
   } catch (err) {
     res.status(400).json({
       message: err.message,
