@@ -11,7 +11,7 @@ import Header from "../../Header";
 
 const Profile = ({token}) => {
     const navigate = useNavigate();
-    const { isLoggedIn, user } = useContext(AuthContext);
+    const { isLoggedIn, user,  } = useContext(AuthContext);
     
     
 
@@ -45,7 +45,24 @@ const Profile = ({token}) => {
       const handleChange = (event) => {
         setText(event.target.value); 
       };
-   
+     
+        
+      const [posts, setPosts] = useState([]); 
+      
+        
+        const fetchPosts = async () => {
+          try {
+            const response = await axios.get(`http://localhost:3000/api/v1/profile/detail/${id}`); 
+            setPosts(response.data); 
+          } catch (error) {
+            console.error('Failed to fetch posts:', error);
+          }
+        };
+      
+      
+        useEffect(() => {
+          fetchPosts();
+        }, []); 
 
     const id = useParams(); 
     console.log(id.id, user._id)
@@ -58,8 +75,12 @@ const Profile = ({token}) => {
                     <div className='image' >
                         <div className="profile-avatar"><img src={user.avatar} alt="" /></div>
                         <h1 className='profile-username'>{user.fullName}</h1>
-                    </div>
-                    <div className='box' style={{top:'43%'}}>
+                        <div className='social'>
+                        <img src="/src/assets/facebook.svg" alt="" width={30} height={30}/>
+                        <img src="/src/assets/github.svg" alt="" width={30} height={30}/>
+                        <img src="/src/assets/twitter.svg" alt="" width={30} height={30}/>
+                        </div>
+                        <div className='box' style={{top:'85%'}}>
                         <div className='text'>
                             <span>150</span>
                             <span>posts</span>
@@ -73,6 +94,8 @@ const Profile = ({token}) => {
                             <span>Followers</span>
                         </div>
                     </div>
+                    </div>
+                    
                     <div className='tabs'>
                         <button type='button' className='p' onClick={() =>setView("posts")}>post</button>
                         <button type='button' className='i' onClick={() =>setView("images")}>Image</button>
@@ -84,11 +107,11 @@ const Profile = ({token}) => {
                             <h1>Bio</h1>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                             <div onClick={(toggleInput1) } style={{ cursor: "pointer" }}>
-                                <img src="/src/assets/school.svg" alt="" width={50} height={50}/>
+                                <img src="/src/assets/school.svg" alt="" width={30} height={30}/>
                             </div>
                             {schools.length > 0 && (
                             <div style={{ marginLeft: "10px" }}>
-                            {schools[schools.length - 1]} {/* Hiển thị trường học cuối cùng */}
+                            {schools[schools.length - 1]} 
                             </div>
                             )}
                             </div >
@@ -99,9 +122,11 @@ const Profile = ({token}) => {
                             className='input'
                             value={newSchool}
                             onChange={(e) => setNewSchool(e.target.value)}
-                            placeholder="Nhập tên trường học"
+                            placeholder="type..."
                             />
                             <button onClick={handleAddSchool} >+</button>
+
+                            
                             </div>
                             )}
                         </div>
@@ -110,7 +135,7 @@ const Profile = ({token}) => {
                             <h1 style={{ margin: "0 20px 0 0" }}>About</h1>
                             
                             <div onClick={(toggleInput2) } style={{ cursor: "pointer" }}>
-                                <img src="/src/assets/school.svg" alt="" width={30} height={30}/>
+                                <img src="/src/assets/pen.svg" alt="" width={15} height={15}/>
                             </div>
                             </div>
                             {showInput2 && (
@@ -119,20 +144,35 @@ const Profile = ({token}) => {
                             style={{ margin: "0", padding: "5px" }}
                             value={text} 
                             onChange={handleChange} 
-                            placeholder="Nhập nội dung ở đây..."
+                            placeholder="type here ..."
                             rows="10"
                             cols="50"
                             />)}
                             
-                            <div style={{ width: "100%", maxWidth: "300px", wordWrap: "break-word", overflowWrap: "break-word", marginTop: "5px" }} >
-                            {text || "Chưa có nội dung"}
+                            <div style={{ width: "100%", maxWidth: "900px", wordWrap: "break-word", overflowWrap: "break-word", marginTop: "5px" }} >
+                            {text }
                             </div>
                         </div>
                         <div className='im'>
                             <h1>Image</h1>
+                            <div className="flex-container">
+                            {Array.from({ length: 9 }).map((_, index) => (
+                            <div className="flex-item" key={index}>
+                            {index + 1}
+                            </div>
+                            ))}
+                            </div>
                         </div>
                         <div className='Post'>
                             <h1>Posts</h1>
+                            <div>
+                            
+                            <ul>
+                            {posts.map((post) => (
+                            <li key={post._id}>{post.title}</li> 
+                            ))}
+                            </ul>
+                            </div>
                         </div>
                     </div>)}
                     
