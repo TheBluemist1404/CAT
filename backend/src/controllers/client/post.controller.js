@@ -112,6 +112,7 @@ module.exports.index = async (req, res) => {
                 _id: 1,
                 title: 1,
                 content: 1,
+                slug: 1,
                 createdAt: 1,
                 userCreated: { _id: 1, fullName: 1, avatar: 1 },
                 upvotes: 1,
@@ -324,11 +325,16 @@ module.exports.edit = async (req, res) => {
 
     await Post.updateOne({ _id: id }, req.body);
 
-    const updatedPost = await Post.findById(id);
+    const cachedValue = await redisClient.get(`${process.env.CACHE_PREFIX}:post:${id}`);
+    const cachedPost = JSON.parse(cachedValue);
+    cachedPost.title = req.body.title;
+    cachedPost.tags = req.body.tags;
+    cachedPost.slug = req.body.slug;
+
     await redisClient.setEx(
       `${process.env.CACHE_PREFIX}:post:${id}`,
       600,
-      JSON.stringify(updatedPost),
+      JSON.stringify(cachedPost),
     );
 
     res.status(200).json({

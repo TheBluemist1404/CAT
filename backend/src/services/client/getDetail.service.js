@@ -116,6 +116,7 @@ module.exports.getDetail = async id => {
           title: 1,
           content: 1,
           createdAt: 1,
+          slug: 1,
           userCreated: { _id: 1, fullName: 1, avatar: 1 },
           upvotes: 1,
           downvotes: 1,
