@@ -147,20 +147,12 @@ module.exports.detail = async (req, res) => {
     const id = req.params.id;
     const [post, cacheHit] = await getDetail(id);
 
-    if (!post || post.status !== 'public' || post.deleted === true) {
+    if (!post) {
       res.status(404).json({
         message: 'Cannot find post!',
       });
       return;
     }
-
-    post.comments.forEach(comment => {
-      if (comment.replies.length > 0) {
-        comment.replies.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-        );
-      }
-    });
 
     if (!cacheHit) {
       await redisClient.setEx(
