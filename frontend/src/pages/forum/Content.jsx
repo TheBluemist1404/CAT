@@ -17,8 +17,10 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     const offset = (page - 1) * limit;
     try {
       const response = await axios.get(`http://localhost:3000/api/v1/forum?offset=${offset}&limit=${limit}`);
-      setPostFeed(response.data.posts);
-      setTotalPages(Math.ceil(response.data.total / limit));
+      const posts = response.data[0].posts
+      console.log(posts)
+      setPostFeed(posts);
+      setTotalPages(posts.length);
     } catch (error) {
       console.error("Failed to fetch posts:", error);
     }

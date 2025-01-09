@@ -9,6 +9,7 @@ import Header from "../../Header";
 
 
 const Profile = ({token}) => {
+    
     const navigate = useNavigate();
     const { isLoggedIn, user } = useContext(AuthContext);
     
