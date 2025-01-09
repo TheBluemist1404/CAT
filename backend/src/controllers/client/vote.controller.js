@@ -23,34 +23,50 @@ module.exports.vote = async (req, res) => {
 
     switch (typeVote) {
       case 'upvote':
-        if (!checkVoteExist) {
+        if (checkVoteExist) {
+          await Like.deleteOne({
+            postId: post._id,
+            userId: user._id,
+          });
+          if (checkVoteExist.typeVote === 'downvote') {
+            const vote = new Like({
+              postId: post._id,
+              userId: user._id,
+              typeVote: 'upvote',
+            });
+            await vote.save();
+          }
+        } else {
           const vote = new Like({
             postId: post._id,
             userId: user._id,
             typeVote: 'upvote',
           });
           await vote.save();
-        } else {
-          await Like.deleteOne({
-            postId: post._id,
-            userId: user._id,
-          });
         }
         break;
 
       case 'downvote':
-        if (!checkVoteExist) {
+        if (checkVoteExist) {
+          await Like.deleteOne({
+            postId: post._id,
+            userId: user._id,
+          });
+          if (checkVoteExist.typeVote === 'upvote') {
+            const vote = new Like({
+              postId: post._id,
+              userId: user._id,
+              typeVote: 'downvote',
+            });
+            await vote.save();
+          }
+        } else {
           const vote = new Like({
             postId: post._id,
             userId: user._id,
             typeVote: 'downvote',
           });
           await vote.save();
-        } else {
-          await Like.deleteOne({
-            postId: post._id,
-            userId: user._id,
-          });
         }
         break;
 
@@ -69,7 +85,8 @@ module.exports.vote = async (req, res) => {
         postId: post._id,
         typeVote: 'downvote',
       }),
-    checkVoteExist});
+      checkVoteExist,
+    });
   } catch (err) {
     res.status(400).json({
       message: err.message,

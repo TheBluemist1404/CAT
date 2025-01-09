@@ -17,7 +17,7 @@ module.exports.getDetail = async id => {
       return [JSON.parse(cachedPost), true];
     }
 
-    let postId = "" + id;
+    let postId = '' + id;
     const post = await Post.aggregate([
       {
         $match: {
@@ -76,6 +76,21 @@ module.exports.getDetail = async id => {
               },
             },
             { $unwind: '$userDetails' },
+            {
+              $addFields: {
+                replies: {
+                  $map: {
+                    input: '$replies',
+                    as: 'reply',
+                    in: {
+                      userId: '$$reply.userId',
+                      content: '$$reply.content',
+                      createdAt: '$$reply.createdAt',
+                    },
+                  },
+                },
+              },
+            },
           ],
         },
       },
@@ -108,6 +123,7 @@ module.exports.getDetail = async id => {
             content: 1,
             createdAt: 1,
             userDetails: { _id: 1, fullName: 1, avatar: 1 },
+            replies: 1,
           },
           tags: { _id: 1, title: 1 },
           saves: { _id: 1 },
