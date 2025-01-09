@@ -1,6 +1,7 @@
 const Post = require('../../models/client/post.model');
 const User = require('../../models/client/user.model');
 const Like = require('../../models/client/like.model');
+const { initializeRedisClient } = require('../../utils/redis');
 
 // [PATCH] /api/v1/forum/vote/:typeVote/:id
 module.exports.vote = async (req, res) => {
@@ -24,7 +25,7 @@ module.exports.vote = async (req, res) => {
     switch (typeVote) {
       case 'upvote':
         if (checkVoteExist) {
-          await Like.deleteOne({
+          await Like.deleteMany({
             postId: post._id,
             userId: user._id,
           });
@@ -48,7 +49,7 @@ module.exports.vote = async (req, res) => {
 
       case 'downvote':
         if (checkVoteExist) {
-          await Like.deleteOne({
+          await Like.deleteMany({
             postId: post._id,
             userId: user._id,
           });
@@ -76,15 +77,67 @@ module.exports.vote = async (req, res) => {
         });
         return;
     }
+
+    const totalVotes = await Like.aggregate([
+      {
+        $facet: {
+          upvotesCount: [
+            { $match: { typeVote: 'upvote', postId: post._id } },
+            { $count: 'upvotes' },
+          ],
+          downvotesCount: [
+            { $match: { typeVote: 'downvote', postId: post._id } },
+            { $count: 'downvotes' },
+          ],
+        },
+      },
+    ]);
+
+    const redisClient = await initializeRedisClient();
+    const cachedPost = await redisClient.get(
+      `${process.env.CACHE_PREFIX}:post:${id}`,
+    );
+    if (cachedPost) {
+      const cachedData = JSON.parse(cachedPost);
+      if (!checkVoteExist) {
+        if (typeVote === 'upvote') {
+          cachedData.upvotes.push({ userId: req.user.id });
+        } else {
+          cachedData.downvotes.push({ userId: req.user.id });
+        }
+      } else {
+        if (checkVoteExist.typeVote === 'upvote') {
+          cachedData.upvotes = cachedData.upvotes.filter(
+            data => data.userId !== req.user.id,
+          );
+          if (typeVote === 'downvote') {
+            cachedData.downvotes.push({ userId: req.user.id });
+          }
+        } else {
+          cachedData.downvotes = cachedData.downvotes.filter(
+            data => data.userId !== req.user.id,
+          );
+          if (typeVote === 'upvote') {
+            cachedData.upvotes.push({ userId: req.user.id });
+          }
+        }
+      }
+      await redisClient.setEx(
+        `${process.env.CACHE_PREFIX}:post:${id}`,
+        600,
+        JSON.stringify(cachedData),
+      );
+    }
+
     res.status(200).json({
-      upvote: await Like.countDocuments({
-        postId: post._id,
-        typeVote: 'upvote',
-      }),
-      downvote: await Like.countDocuments({
-        postId: post._id,
-        typeVote: 'downvote',
-      }),
+      upvote:
+        totalVotes[0].upvotesCount.length > 0
+          ? totalVotes[0].upvotesCount[0].upvotes
+          : 0,
+      downvote:
+        totalVotes[0].downvotesCount.length > 0
+          ? totalVotes[0].downvotesCount[0].downvotes
+          : 0,
       checkVoteExist,
     });
   } catch (err) {
