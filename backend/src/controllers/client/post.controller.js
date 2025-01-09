@@ -229,7 +229,7 @@ module.exports.save = async (req, res) => {
     const redisClient = await initializeRedisClient();
 
     const id = req.params.id;
-    const post = await Post.findById(id).select('_id');
+    const post = await Post.findById(id).select('_id title createdAt');
     if (!post) {
       res.status(404).json({
         message: 'Cannot find post!',
@@ -263,7 +263,7 @@ module.exports.save = async (req, res) => {
       const userCache = await redisClient.get(userKey);
       if (userCache) {
         const cachedData = JSON.parse(userCache);
-        const cacheIdx = cachedData.savedPosts.indexOf(id);
+        const cacheIdx = cachedData.savedPosts.findIndex(post => post._id === id);
         if (cacheIdx > -1) {
           cachedData.savedPosts.splice(cacheIdx, 1);
           await redisClient.setEx(userKey, 600, JSON.stringify(cachedData));
@@ -283,7 +283,11 @@ module.exports.save = async (req, res) => {
     const userCache = await redisClient.get(userKey);
     if (userCache) {
       const cachedData = JSON.parse(userCache);
-      cachedData.savedPosts.push(id);
+      cachedData.savedPosts.push({
+        _id: id,
+        title: post.title,
+        createdAt: post.createdAt,
+      });
       await redisClient.setEx(userKey, 600, JSON.stringify(cachedData));
     }
 
