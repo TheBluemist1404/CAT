@@ -13,7 +13,7 @@ const Profile = ({token}) => {
     const navigate = useNavigate();
     const { isLoggedIn, user } = useContext(AuthContext);
     
-    console.log(user);
+    console.log(user.post);
     const posts = user.posts
 
     useEffect(() => {
@@ -153,6 +153,7 @@ const Profile = ({token}) => {
                         </div>
                         <div className='Post'>
                             <h1>Posts</h1>
+                            
                             <div>
                             
                             <div className="posts-container">
