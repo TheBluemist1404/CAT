@@ -181,6 +181,11 @@ body {
     gap: 10px;
   }
 
+  .social-media img{
+    width: 40px;
+    fill: var(--primary-color);
+  }
+
   .right {
     margin-right: 200px;
     width: min(20vw, 200px);

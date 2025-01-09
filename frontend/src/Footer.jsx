@@ -3,13 +3,13 @@ function Footer() {
         <>
             <div className="footer">
                 <div className="left">
-                    <img src="./src/assets/bg-logo.svg" alt="" />
+                    <img src="./src/assets/bg-logo.svg" alt="" style={{transform: 'translateY(-25px)'}}/>
                     <div>
                         <h1 className="team">DevTeam 1</h1>
                         <p>We create a platform for all the curious minds</p>
                         <div className="social-media">
-                            <img src="./src/assets/facebook.svg" alt="" />
-                            <img src="./src/assets/github.svg" alt="" />
+                            <img src="./src/assets/facebook.svg" alt="facebook" />
+                            <img src="./src/assets/github.svg" alt="github" />
                         </div>
                     </div>
                 </div>

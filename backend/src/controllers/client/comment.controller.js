@@ -4,7 +4,6 @@ const Post = require('../../models/client/post.model');
 
 // [POST] /api/v1/forum/comment/:id
 module.exports.comment = async (req, res) => {
-  // const user = await User.findById(req.user.id);
   const id = req.params.id;
   try {
     const post = await Post.findById(id);

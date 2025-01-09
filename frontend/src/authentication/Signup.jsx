@@ -20,7 +20,7 @@ const Signup = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:3000/api/v1/auth/signup', { fullName: fullName, email: email, password: password })
-      toLogin();
+      navigate('/auth/login') 
     } catch (error) {
       console.error("Signup failed", error)
     }

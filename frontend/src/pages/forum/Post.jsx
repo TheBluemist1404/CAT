@@ -227,8 +227,8 @@ function Post({ post, token, update }) {
       {comments.map((comment) => (
         <div key={comment.id} className="comment">
           <div className="comment-header">
-            <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden' }}><img src={comment.userId.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
-            <span className="comment-user-name">{comment.userId.fullName}</span>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden' }}><img src={comment.userDetails.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
+            <span className="comment-user-name">{comment.userDetails.fullName}</span>
             {/* <span className="comment-time">{comment.time}</span> */}
           </div>
           <div className="comment-body">{comment.content}</div>

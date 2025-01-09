@@ -59,17 +59,19 @@ function App() {
 
     const getUser = async () => {
         const response = await fetch();
+        console.log(response)
         setUser(response);
         setIsLoading(false);
     }
 
     useEffect(() => {
         if (tokenStr) {
+            console.log("rerender")
             getUser().then(() => { setIsLoggedIn(true) })
         } else {
             setIsLoading(false)
         }
-    }, [isLoggedIn])
+    }, [isLoggedIn, navigate])
 
     if (isLoading) {
         return (
