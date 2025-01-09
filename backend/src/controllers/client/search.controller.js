@@ -94,6 +94,21 @@ module.exports.search = async (req, res) => {
                         },
                       },
                       { $unwind: '$userDetails' },
+                      {
+                        $addFields: {
+                          replies: {
+                            $map: {
+                              input: '$replies',
+                              as: 'reply',
+                              in: {
+                                userId: '$$reply.userId',
+                                content: '$$reply.content',
+                                createdAt: '$$reply.createdAt',
+                              },
+                            },
+                          },
+                        },
+                      },
                     ],
                   },
                 },
@@ -126,6 +141,7 @@ module.exports.search = async (req, res) => {
                       content: 1,
                       createdAt: 1,
                       userDetails: { _id: 1, fullName: 1, avatar: 1 },
+                      replies: 1,
                     },
                     tags: { _id: 1, title: 1 },
                     saves: { _id: 1 },
@@ -215,6 +231,21 @@ module.exports.search = async (req, res) => {
                         },
                       },
                       { $unwind: '$userDetails' },
+                      {
+                        $addFields: {
+                          replies: {
+                            $map: {
+                              input: '$replies',
+                              as: 'reply',
+                              in: {
+                                userId: '$$reply.userId',
+                                content: '$$reply.content',
+                                createdAt: '$$reply.createdAt',
+                              },
+                            },
+                          },
+                        },
+                      },
                     ],
                   },
                 },
@@ -247,6 +278,7 @@ module.exports.search = async (req, res) => {
                       content: 1,
                       createdAt: 1,
                       userDetails: { _id: 1, fullName: 1, avatar: 1 },
+                      replies: 1,
                     },
                     tags: { _id: 1, title: 1 },
                     saves: { _id: 1 },
@@ -256,7 +288,7 @@ module.exports.search = async (req, res) => {
             },
           },
         ]);
-        
+
         res.status(200).json(searchPosts);
         break;
 
