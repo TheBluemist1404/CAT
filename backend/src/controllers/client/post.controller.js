@@ -123,6 +123,8 @@ module.exports.index = async (req, res) => {
 // [POST] /api/v1/forum/create
 module.exports.create = async (req, res) => {
   try {
+    const redisClient = await initializeRedisClient();
+
     const user = await User.findById(req.user.id);
     req.body.userCreated = user._id;
 
@@ -131,6 +133,16 @@ module.exports.create = async (req, res) => {
 
     user.posts = user.posts.concat(savedPost._id);
     await user.save();
+
+    //update cache
+    const key = `${process.env.CACHE_PREFIX}:profile:${req.user.id}`;
+    const checkCacheExist = await redisClient.exists(key);
+    if (checkCacheExist) {
+      const value = await redisClient.get(key);
+      const data = JSON.parse(value);
+      data.posts.push(savedPost._id);
+      await redisClient.setEx(key, 600, JSON.stringify(data));
+    }
 
     res.status(201).json(post);
   } catch (err) {
@@ -185,6 +197,8 @@ module.exports.tags = async (req, res) => {
 // [POST] /api/v1/forum/save/:id
 module.exports.save = async (req, res) => {
   try {
+    const redisClient = await initializeRedisClient();
+
     const id = req.params.id;
     const post = await Post.findById(id).select('_id');
     if (!post) {
@@ -196,10 +210,37 @@ module.exports.save = async (req, res) => {
 
     const user = await User.findById(req.user.id);
 
+    const postKey = `${process.env.CACHE_PREFIX}:post:${id}`;
+    const userKey = `${process.env.CACHE_PREFIX}:profile:${req.user.id}`;
+
+    // Update post cache
+    const postCache = await redisClient.get(postKey);
+    if (postCache) {
+      const cachedData = JSON.parse(postCache);
+      const idx = cachedData.saves.findIndex(save => save._id === req.user.id);
+      if (idx !== -1) {
+        cachedData.saves.splice(idx, 1);
+      } else {
+        cachedData.saves.push({ _id: req.user.id });
+      }
+      await redisClient.setEx(postKey, 600, JSON.stringify(cachedData));
+    }
+
     if (user.savedPosts.includes(id)) {
       const idx = user.savedPosts.indexOf(id);
       user.savedPosts.splice(idx, 1);
       await user.save();
+
+      const userCache = await redisClient.get(userKey);
+      if (userCache) {
+        const cachedData = JSON.parse(userCache);
+        const cacheIdx = cachedData.savedPosts.indexOf(id);
+        if (cacheIdx > -1) {
+          cachedData.savedPosts.splice(cacheIdx, 1);
+          await redisClient.setEx(userKey, 600, JSON.stringify(cachedData));
+        }
+      }
+
       res.status(200).json({
         message: 'Unsave successfully!',
       });
@@ -208,6 +249,15 @@ module.exports.save = async (req, res) => {
 
     user.savedPosts.push(id);
     await user.save();
+
+    // Update user cache
+    const userCache = await redisClient.get(userKey);
+    if (userCache) {
+      const cachedData = JSON.parse(userCache);
+      cachedData.savedPosts.push(id);
+      await redisClient.setEx(userKey, 600, JSON.stringify(cachedData));
+    }
+
     res.status(200).json({
       message: 'Save successfully!',
     });

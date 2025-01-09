@@ -114,7 +114,6 @@ module.exports.getDetail = async id => {
         },
       },
     ]);
-    console.log(post[0]);
     if (post.length > 0) return [post[0], false];
     return [null, false];
   } catch (err) {
