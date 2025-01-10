@@ -44,7 +44,7 @@ const Profile = ({token, post}) => {
                 const response = await axios.patch(
                     `http://localhost:3000/api/v1/profile/edit/${user._id}`,
                     {
-                        content: updatedSchools,
+                        schools: updatedSchools,
                         user: { id: user._id },
                         fullName: user.fullName,
                     },
