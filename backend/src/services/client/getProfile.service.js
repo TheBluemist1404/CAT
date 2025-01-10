@@ -18,11 +18,14 @@ module.exports.getProfile = async id => {
       .populate({
         path: 'posts',
         match: { deleted: false },
-        select: '_id title createdAt',
+        select: '_id title createdAt status',
       })
       .populate({
         path: 'savedPosts',
-        match: { deleted: false },
+        match: {
+          deleted: false,
+          status: 'public',
+        },
         select: '_id title createdAt',
       })
       .lean();
