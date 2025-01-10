@@ -2,19 +2,20 @@ import './profile.scss'
 import { useNavigate, useParams, Routes, Route } from 'react-router-dom';
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../authentication/AuthProvider';
+import axios from "axios";
 
 
 import "./profile.scss"
 import Header from "../../Header";
 
 
-const Profile = ({token}) => {
+const Profile = ({token, post}) => {
     
     const navigate = useNavigate();
     const { isLoggedIn, user } = useContext(AuthContext);
     
     console.log(user.post);
-    const posts = user.posts
+    
 
     useEffect(() => {
         if (!isLoggedIn) {
@@ -27,13 +28,69 @@ const Profile = ({token}) => {
     const [newSchool, setNewSchool] = useState("");
     const [showInput1, setShowInput1] = useState(false);
     const [showInput2, setShowInput2] = useState(false);
-    const handleAddSchool = () => {
-    if (newSchool.trim() !== "") {
-      setSchools([...schools, newSchool]);
-      setNewSchool(""); 
-      setShowInput(false);
-    }
+
+    
+    
+    const handleAddSchool = async () => {
+        if (newSchool.trim() !== "") {
+            const updatedSchools = [...schools, newSchool];
+            setSchools(updatedSchools); 
+            setNewSchool(""); 
+            setShowInput1(false);
+            setShowInput2(false);
+    
+            try {
+                
+                const response = await axios.patch(
+                    `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+                    {
+                        content: updatedSchools,
+                        user: { id: user._id },
+                        fullName: user.fullName,
+                    },
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token.accessToken}`,
+                        },
+                    }
+                );
+    
+                if (response.status === 200) {
+                    
+                    if (Array.isArray(response.data.schools)) {
+                        setSchools(response.data.schools);
+                    }
+                }
+            } catch (err) {
+                console.error("Error:", err.response?.data?.message || err.message);
+            }
+        }
     };
+    
+    
+    useEffect(() => {
+        const fetchSchools = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:3000/api/v1/profile/detail/${user._id}`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token.accessToken}`, 
+                        },
+                    }
+                );
+                console.log(response.data);
+                if (response.status === 200 && Array.isArray(response.data.schools)) {
+                    setSchools(response.data.schools); 
+                }
+            } catch (err) {
+                console.error("Error fetching schools:", err.response?.data?.message || err.message);
+            }
+        };
+    
+        fetchSchools();
+    }, [user, token]); 
+    
     
     const toggleInput1 = () => {
         setShowInput1(prevState => !prevState); 
@@ -48,9 +105,14 @@ const Profile = ({token}) => {
       };
      
       
-      
-     
+      const [dropdown, setDropdown] = useState(false)
 
+      const toggleDropdown = () => {
+        setDropdown((prevState) => !prevState); 
+    };
+     
+    
+    
     const id = useParams(); 
     console.log(id.id, user._id)
     
@@ -68,26 +130,45 @@ const Profile = ({token}) => {
                         <img src="/src/assets/github.svg" alt="" width={30} height={30}/>
                         <img src="/src/assets/twitter.svg" alt="" width={30} height={30}/>
                         </div>
-                        <div className='box' style={{top:'85%'}}>
-                        <div className='text'>
-                            <span>150</span>
-                            <span>posts</span>
+                        <div className="box" style={{top: '85%'}}>
+                            <div className="box-item">
+                                <span className="number">150</span>
+                                <span className="label">Posts</span>
+                            </div>
+                            <div className="divider"></div>
+                            <div className="box-item">
+                                <span className="number">15h</span>
+                                <span className="label">Coding</span>
+                            </div>
+                            <div className="divider"></div>
+                            <div className="box-item">
+                                <span className="number">150</span>
+                                <span className="label">Followers</span>
+                            </div>
                         </div>
-                        <div className='text'>
-                            <span>15h</span>
-                            <span>coding</span>
-                        </div>
-                        <div className='text'>
-                            <span>150</span>
-                            <span>Followers</span>
-                        </div>
-                    </div>
+
                     </div>
                     
                     <div className='tabs'>
-                        <button type='button' className='p' onClick={() =>setView("posts")}>post</button>
-                        <button type='button' className='i' onClick={() =>setView("images")}>Image</button>
-                        <button type='button' className='v' onClick={() =>setView("videos")}>video</button>
+                        <div>
+                        <button type='button' className='p' onClick={() =>setView("posts")}>Posts</button>
+                        <button type='button' className='i' onClick={() =>setView("images")}>Images</button>
+                        <button type='button' className='v' onClick={() =>setView("videos")}>Videos</button>
+                        </div>
+                        <div>
+                        <div className="settings" onClick={toggleDropdown} style={{ marginRight: "20px" }}>
+                            <img src="/src/assets/setting.svg" alt="" width={30} height={30} />
+                        </div>
+
+                        {dropdown && (
+                            <div className="option">
+                                <div className="set">Settings</div>
+                                <div className="adjusts">Adjust</div>
+                                <div className="close" onClick={toggleDropdown}>Close</div>
+                            </div>
+                        )}
+
+                        </div>
                     </div>
                     {view ==="posts"&&(
                     <div className='main'>

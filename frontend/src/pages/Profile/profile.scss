@@ -63,13 +63,15 @@
       .social img:hover {
         transform: scale(1.1); 
       }
-    .box{
+      .box {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         position: absolute;
-        background-color: rgb(255, 255, 255);
-        width: 50%;
-        left: 25%;
+        width: 100%;
+        max-width: 900px;
         height: 100px;
-        top: 29%;
+        margin: 0 auto;
         z-index: 2;
         background: rgba(255, 255, 255, 0.89);
         border-radius: 50px;
@@ -79,11 +81,33 @@
         backdrop-filter: blur(9px);
         -webkit-backdrop-filter: blur(9px);
         border: 1px solid rgba(255, 255, 255, 0.45);
-        display: flex; 
-        justify-content: space-around; 
-        align-items: center; 
-        gap: 20px; 
     }
+    
+    .box-item {
+        text-align: center;
+        flex: 1;
+    }
+    
+    .number {
+        display: block;
+        font-weight: bold;
+        font-size: 1.8em; /* Độ lớn của số */
+        color: #000;
+    }
+    
+    .label {
+        display: block;
+        margin-top: 5px;
+        font-size: 1.5em; /* Độ lớn của chữ mô tả */
+        color: #000;
+    }
+    
+    .divider {
+        width: 1px;
+        background-color: #ccc; /* Màu sắc của line dọc */
+        height: 50px; /* Chiều cao của line */
+    }
+    
     .tabs{
         
         background-color: rgb(0, 0, 0);
@@ -94,6 +118,7 @@
         gap: 0px; 
         align-items: center; 
         z-index: 1;
+        justify-content: space-between;
         
     }
     
@@ -113,7 +138,7 @@
     }
     .p:hover, .i:hover, .v:hover{
         background-color: rgb(0, 0, 0);
-        border-bottom: 5px solid red;
+        
         color: red;
     }
     .main{
@@ -229,66 +254,66 @@
         font-size: 18px;
         font-weight: bold;
       }
-    /* Container chính */
+    
 .posts-container {
     display: flex;
-    flex-wrap: wrap; /* Cho phép xuống dòng khi không đủ chỗ */
-    gap: 20px; /* Khoảng cách giữa các ô vuông */
-    justify-content: center; /* Căn giữa các ô vuông */
+    flex-wrap: wrap; 
+    gap: 20px; 
+    justify-content: center; 
     padding: 20px;
-    background-color: #f9f9f9; /* Màu nền container */
+    background-color: #f9f9f9; 
   }
   
-  /* Container chính */
+  
 .posts-container {
     display: flex;
     flex-direction: column;
-    gap: 30px; /* Khoảng cách giữa các ô vuông */
-    justify-content: flex-start; /* Căn trái các ô vuông */
+    gap: 30px; 
+    justify-content: flex-start; 
     padding: 20px;
-    background-color: #000000; /* Màu nền container */
+    background-color: #000000; 
     width: 100%;
   }
   
-  /* Ô vuông (post card) */
+  
   .post-card {
     
     display: flex;
-    flex-direction: row; /* Sắp xếp icon và title theo chiều dọc */
-    align-items: center; /* Căn trái */
-    justify-content: space-between; /* Căn trái nội dung */
-    border: 1px solid rgb(255, 255, 255);
-    box-shadow: 0 4px 8px rgba(235, 232, 232, 0.1); /* Đổ bóng */
-    border-radius: 10px; /* Góc bo tròn */
+    flex-direction: row; 
+    align-items: center; 
+    justify-content: space-between; 
+    border: 2px solid rgb(133, 1, 120);
+    box-shadow: 0 4px 8px rgba(255, 34, 97, 0.1); 
+    border-radius: 10px; 
     padding: 10px;
-    transition: transform 0.2s, box-shadow 0.2s; /* Hiệu ứng hover */
+    transition: transform 0.2s, box-shadow 0.2s; 
   }
   
   .post-card:hover {
-    transform: translateY(-5px); /* Di chuyển nhẹ lên khi hover */
-    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.2); /* Tăng độ đổ bóng khi hover */
+    transform: translateY(-5px); 
+    box-shadow: 0 8px 16px rgba(164, 0, 88, 0.2); 
   }
   
   /* Icon */
   
   .post-icon-title {
-    display: flex; /* Sắp xếp icon và title nằm ngang */
-    align-items: center; /* Canh giữa theo chiều dọc */
+    display: flex; 
+    align-items: center; 
   }
   .post-icon {
     
-    margin-right: 20px; /* Khoảng cách giữa icon và title */
+    margin-right: 20px; 
   }
   /* Title */
   .post-title {
     margin-left: 10px;
     font-size: 20px;
     font-weight: bold;
-    color: #ffffff; /* Màu chữ */
+    color: #ffffff; 
   }
   .post-title:hover {
-    color: #007bff; /* Màu chữ khi hover */
-    text-decoration: underline; /* Gạch chân khi hover */
+    color: #ff00a6; 
+    text-decoration: underline; 
   }
-    
+  
 }

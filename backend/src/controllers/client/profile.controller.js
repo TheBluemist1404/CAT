@@ -51,7 +51,9 @@ module.exports.edit = async (req, res) => {
       });
       return;
     }
-
+    if (req.body.schools) {
+      user.schools = req.body.schools; // Cập nhật danh sách trường học
+    }
     req.body.slug = slugify(req.body.fullName, { trim: true, lower: true });
     req.body.password = user.password;
     await User.updateOne({ _id: id }, req.body);
