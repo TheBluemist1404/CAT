@@ -243,7 +243,7 @@ function Detail({ token }) {
   const comments = post ? post.comments : []
   console.log(comments);
   const renderComments = () => (
-    <div className="comments-list">
+    <div className="comments-list" >
       {comments.map((comment) => (
         <div key={comment.id} className="comment">
           <div className="comment-header">
@@ -267,7 +267,7 @@ function Detail({ token }) {
   );
 
   return (
-    <div className="post">
+    <div className="post" style={{height: 'calc(100vh - 60px)'}}>
       <div className="post-header">
         <img src={post ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" />
         <div className="user-name">{post ? post.userCreated.fullName : "unknown"}</div>
