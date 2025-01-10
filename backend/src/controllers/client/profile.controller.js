@@ -55,6 +55,43 @@ module.exports.edit = async (req, res) => {
     req.body.slug = slugify(req.body.fullName, { trim: true, lower: true });
     req.body.password = user.password;
     await User.updateOne({ _id: id }, req.body);
+
+    const redisClient = await initializeRedisClient();
+    const cachedUser = await redisClient.get(
+      `${process.env.CACHE_PREFIX}:profile:${id}`,
+    );
+    if (cachedUser) {
+      const cachedData = JSON.parse(cachedUser);
+      cachedData.fullName = req.body.fullName;
+      cachedData.description = req.body.description;
+      cachedData.schools = req.body.schools;
+      cachedData.companies = req.body.companies;
+      cachedData.avatar = req.body.avatar;
+
+      await redisClient.setEx(
+        `${process.env.CACHE_PREFIX}:profile:${id}`,
+        600,
+        JSON.stringify(cachedData),
+      );
+    }
+
+    user.posts.forEach(async post => {
+      const cachedPost = await redisClient.get(
+        `${process.env.CACHE_PREFIX}:post:${post._id.toString()}`,
+      );
+      if (cachedPost) {
+        const cachedData = JSON.parse(cachedPost);
+        cachedData.userCreated.fullName = req.body.fullName;
+        cachedData.userCreated.avatar = req.body.avatar;
+
+        await redisClient.setEx(
+          `${process.env.CACHE_PREFIX}:post:${post._id.toString()}`,
+          600,
+          JSON.stringify(cachedData),
+        );
+      }
+    });
+
     res.status(200).json({
       message: 'Update successfully!',
     });

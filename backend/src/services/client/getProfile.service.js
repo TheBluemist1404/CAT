@@ -10,11 +10,11 @@ module.exports.getProfile = async id => {
     );
 
     if (cachedProfile) {
-
       return [JSON.parse(cachedProfile), true];
     }
 
     const user = await User.findById(id)
+      .select('-password')
       .populate({
         path: 'posts',
         match: { deleted: false },
