@@ -133,6 +133,7 @@ module.exports.index = async (req, res) => {
                 _id: 1,
                 title: 1,
                 content: 1,
+                images: 1,
                 slug: 1,
                 createdAt: 1,
                 userCreated: { _id: 1, fullName: 1, avatar: 1 },
@@ -349,6 +350,7 @@ module.exports.edit = async (req, res) => {
       return;
     }
 
+    let isTitleUpdated = post.title !== req.body.title ? true : false;
     req.body.slug = slugify(req.body.title, { lower: true, trim: true });
 
     await Post.updateOne({ _id: id }, req.body);
@@ -358,14 +360,50 @@ module.exports.edit = async (req, res) => {
     );
     const cachedPost = JSON.parse(cachedValue);
     cachedPost.title = req.body.title;
+    cachedPost.content = req.body.content;
     cachedPost.tags = req.body.tags;
     cachedPost.slug = req.body.slug;
+    cachedPost.images = req.body.images;
 
     await redisClient.setEx(
       `${process.env.CACHE_PREFIX}:post:${id}`,
       600,
       JSON.stringify(cachedPost),
     );
+
+    if (isTitleUpdated) {
+      const cachedAuthor = await redisClient.get(
+        `${process.env.CACHE_PREFIX}:profile:${req.user.id}`,
+      );
+      if (cachedAuthor) {
+        const cachedData = JSON.parse(cachedAuthor);
+        const idx = cachedData.posts.findIndex(post => post._id === id);
+        cachedData.posts[idx].title = req.body.title;
+
+        await redisClient.setEx(
+          `${process.env.CACHE_PREFIX}:profile:${req.user.id}`,
+          600,
+          JSON.stringify(cachedData),
+        );
+      }
+
+      cachedPost.saves.forEach(async user => {
+        const cachedSavedUser = await redisClient.get(
+          `${process.env.CACHE_PREFIX}:profile:${user._id}`,
+        );
+        if (cachedSavedUser) {
+          const cachedData = JSON.parse(cachedSavedUser);
+          const idx = cachedData1.savedPosts.findIndex(post => post._id === id);
+          cachedData.savedPosts[idx].title = req.body.title;
+
+          await redisClient.setEx(
+            `${process.env.CACHE_PREFIX}:profile:${user._id}`,
+            600,
+            JSON.stringify(cachedData),
+          );
+        }
+      });
+    }
 
     res.status(200).json({
       message: 'Update successfully!',

@@ -18,7 +18,7 @@ module.exports.getProfile = async id => {
       .populate({
         path: 'posts',
         match: { deleted: false },
-        select: '_id title createdAt images',
+        select: '_id title createdAt',
       })
       .populate({
         path: 'savedPosts',

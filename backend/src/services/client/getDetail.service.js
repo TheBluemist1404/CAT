@@ -136,6 +136,7 @@ module.exports.getDetail = async id => {
           _id: 1,
           title: 1,
           content: 1,
+          images: 1,
           createdAt: 1,
           slug: 1,
           userCreated: { _id: 1, fullName: 1, avatar: 1 },
