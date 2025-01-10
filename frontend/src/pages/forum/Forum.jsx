@@ -6,7 +6,7 @@ import Pagination from './Pagination';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './forum.scss';
 
-const Forum = ({ token }) => {
+const Forum = ({ token, render }) => {
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const location = useLocation();
@@ -47,13 +47,14 @@ const Forum = ({ token }) => {
           token={token}
           currentPage={currentPage}
           setTotalPages={setTotalPages}
+          render={render}
         />
       </div>
-      <Pagination
+      {render === "forum" ? (<Pagination
         totalPages={totalPages}
         currentPage={currentPage}
         onPageChange={handlePageChange}
-      />
+      />): (<></>)}
     </div>
   );
 };
