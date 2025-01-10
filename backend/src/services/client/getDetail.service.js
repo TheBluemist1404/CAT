@@ -77,15 +77,36 @@ module.exports.getDetail = async id => {
             },
             { $unwind: '$userDetails' },
             {
+              $lookup: {
+                from: 'users',
+                localField: 'replies.userId',
+                foreignField: '_id',
+                as: 'replyUsers',
+              },
+            },
+            {
               $addFields: {
                 replies: {
                   $map: {
                     input: '$replies',
                     as: 'reply',
                     in: {
-                      userId: '$$reply.userId',
                       content: '$$reply.content',
                       createdAt: '$$reply.createdAt',
+                      userDetails: {
+                        $arrayElemAt: [
+                          {
+                            $filter: {
+                              input: '$replyUsers',
+                              as: 'user',
+                              cond: {
+                                $eq: ['$$user._id', '$$reply.userId'],
+                              },
+                            },
+                          },
+                          0,
+                        ],
+                      },
                     },
                   },
                 },
@@ -116,14 +137,20 @@ module.exports.getDetail = async id => {
           title: 1,
           content: 1,
           createdAt: 1,
+          slug: 1,
           userCreated: { _id: 1, fullName: 1, avatar: 1 },
           upvotes: 1,
           downvotes: 1,
           comments: {
+            _id: 1,
             content: 1,
             createdAt: 1,
             userDetails: { _id: 1, fullName: 1, avatar: 1 },
-            replies: 1,
+            replies: {
+              content: 1,
+              createdAt: 1,
+              userDetails: { _id: 1, fullName: 1, avatar: 1 },
+            },
           },
           tags: { _id: 1, title: 1 },
           saves: { _id: 1 },
