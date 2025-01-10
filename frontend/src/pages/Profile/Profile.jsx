@@ -262,10 +262,6 @@ const Profile = ({token, post}) => {
                     
                 </div>
                 <Routes>
-                    <Route path='post' element={<></>} />
-                    <Route path='media' element={<></>} />
-                    <Route path='saved' element={<></>} />
-                    <Route path='/image' element={<Image/>}/>
                 </Routes>
             </div>
         );

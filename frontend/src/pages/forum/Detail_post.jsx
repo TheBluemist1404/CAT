@@ -1,24 +1,50 @@
 import axios from "axios";
-import { useState, useContext, useEffect } from "react";
+import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../authentication/AuthProvider";
-import { useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from "react-router-dom";
 
-function Post({ post, token, update }) {
+function Detail({ token }) {
   const navigate = useNavigate();
   const { isLoggedIn, user } = useContext(AuthContext)
+  const [post, setPost] = useState();
+
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [isDownvoted, setIsDownvoted] = useState(false);
-  const [voteCount, setVoteCount] = useState(post.upvotes.length - post.downvotes.length)
+  const [voteCount, setVoteCount] = useState(post ? post.upvotes.length - post.downvotes.length : 0)
 
   const [commentInput, setCommentInput] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
 
-  const comments = post.comments;
-  const [isCommentBoxVisible, setIsCommentBoxVisible] = useState(false);
 
+  const { id } = useParams();
+  const fetchData = async () => {
+    const response = await axios.get(`http://localhost:3000/api/v1/forum/detail/${id}`)
+    const postDetail = response.data
+    console.log(postDetail)
+    if (postDetail) {
+      setPost(postDetail)
+      const upvote = postDetail.upvotes;
+      const userUpvote = upvote.find((voter) => voter.userId === user._id)
+      if (userUpvote) {
+        setIsUpvoted(true)
+      }
+
+      const downvote = postDetail.downvotes;
+      const userDownvote = downvote.find((voter) => voter.userId === user._id)
+      if (userDownvote) {
+        setIsDownvoted(true)
+      }
+      setVoteCount(upvote.length - downvote.length)
+    }
+
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
   //Handle time display
-  const timestamp = post.createdAt;
+  const timestamp = post ? post.createdAt : new Date();
   const createdDate = new Date(timestamp);
   const now = new Date();
   const timeDiff = (now - createdDate); //in miliseconds
@@ -71,31 +97,11 @@ function Post({ post, token, update }) {
         }
         setCommentInput('');
         console.log(comments)
-        update();
+        fetchData();
       }
     }
   };
-  //Also note that we should retrive comments from db, and add comment should make update to db, as well as cause rerender, not adding it manually to fe like this
 
-  const toggleCommentBox = () => {
-    setIsCommentBoxVisible(!isCommentBoxVisible);
-  };
-  //Hmm, actually I actually think the comment box should appear with the comments
-
-  //Handle vote
-  useEffect(() => {
-    const upvote = post.upvotes;
-    const userUpvote = upvote.find((voter) => voter.userId === user._id)
-    if (userUpvote) {
-      setIsUpvoted(true)
-    }
-
-    const downvote = post.downvotes;
-    const userDownvote = downvote.find((voter) => voter.userId === user._id)
-    if (userDownvote) {
-      setIsDownvoted(true)
-    }
-  }, [])
 
   const updateUpvote = async () => {
     try {
@@ -221,20 +227,23 @@ function Post({ post, token, update }) {
       className="post-navigate-dropdown"
       style={{ display: dropdownVisible === index ? 'block' : 'none' }}
     >
-      <div className="dropdown-item" onClick={handleSavePost}>{isSaved ? "Unsave" : "Save"}</div> {/*Placeholder, but replace with some api call later */}
+      <div className="dropdown-item" onClick={handleSavePost}>{isSaved ? "Unsave" : "Save"}</div>
       <hr className="post-navigate-line" />
       <div
         className="dropdown-item"
         style={{ color: '#FF4B5C' }}
-        onClick={() => console.log('Post reported')} //Placeholder, just ignore it
+        onClick={() => console.log('Post reported')}
       >
         Report
       </div>
     </div>
   );
 
+  //Render comments ---------------------------
+  const comments = post ? post.comments : []
+  console.log(comments);
   const renderComments = () => (
-    <div className="comments-list">
+    <div className="comments-list" >
       {comments.map((comment) => (
         <div key={comment.id} className="comment">
           <div className="comment-header">
@@ -258,10 +267,10 @@ function Post({ post, token, update }) {
   );
 
   return (
-    <div className="post">
+    <div className="post" style={{height: 'calc(100vh - 60px)'}}>
       <div className="post-header">
-        <img src={post.userCreated ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" />
-        <div className="user-name">{post.userCreated ? post.userCreated.fullName : "unknown"}</div>
+        <img src={post ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" />
+        <div className="user-name">{post ? post.userCreated.fullName : "unknown"}</div>
         <div className="post-time">{timeDisplay}</div>
         <div className="post-navigate-button" onClick={() => toggleDropdown(1)}>
           <span className="post-navigate-icon">...</span>
@@ -269,13 +278,13 @@ function Post({ post, token, update }) {
         {renderDropdown(1)}
       </div>
       <div className="post-body">
-        <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post.title}</h1>
-        <p className="post-content">{post.content}</p>
+        <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post ? post.title : ""}</h1>
+        <p className="post-content">{post ? post.content : ""}</p>
       </div>
       <hr className="post-line" />
       <div className="post-footer">
         {renderVoteButtons()}
-        <button className="comment-button" onClick={toggleCommentBox}>
+        <button className="comment-button">
           <img src="/src/pages/forum/assets/Comment Icon.svg" className="post-action" alt="Comment" /> Comment
         </button>
         <button className="share-button">
@@ -283,27 +292,25 @@ function Post({ post, token, update }) {
         </button>
       </div>
       <hr className="post-line" />
-      {isCommentBoxVisible && (
-        <div className="comment-section" style={{ padding: '10px' }}>
-          {renderComments()}
-          <div className="create-comment">
-            <div className="create-comment-header">
-              <div style={{ width: '40px', height: '40px', borderRadius: '20px', overflow: 'hidden' }}><img src={user.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
-              <textarea
-                className="create-comment-input"
-                placeholder="Write a comment..."
-                value={commentInput}
-                onChange={handleCommentInput}
-                style={{ height: 'auto', maxHeight: '200px', width: '90%' }}
-                onFocus={() => { !isLoggedIn ? (navigate('/auth/login')) : ({}) }}
-              />
-              <button className="submit-comment" onClick={handleAddComment}>Post</button>
-            </div>
-          </div>
+      <div className="create-comment">
+        <div className="create-comment-header">
+          <div style={{ width: '40px', height: '40px', borderRadius: '20px', overflow: 'hidden' }}><img src={user.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
+          <textarea
+            className="create-comment-input"
+            placeholder="Write a comment..."
+            value={commentInput}
+            onChange={handleCommentInput}
+            style={{ height: 'auto', maxHeight: '200px', width: '90%' }}
+            onFocus={() => { !isLoggedIn ? (navigate('/auth/login')) : ({}) }}
+          />
+          <button className="submit-comment" onClick={handleAddComment}>Post</button>
         </div>
-      )}
+      </div>
+      <div className="comment-section" style={{ padding: '10px' }}>
+        {renderComments()}
+      </div>
     </div>
   )
 }
 
-export default Post
+export default Detail;
