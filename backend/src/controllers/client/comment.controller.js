@@ -24,27 +24,29 @@ module.exports.comment = async (req, res) => {
     const savedComment = await comment.save();
 
     const redisClient = await initializeRedisClient();
-    redisClient.get(
+    const cachedPost = await redisClient.get(
       `${process.env.CACHE_PREFIX}:post:${savedComment.postId.toString()}`,
-      async (err, cachedPost) => {
-        if (err) throw new Error(err.message);
-        if (cachedPost) {
-          const cachedData = JSON.parse(cachedPost);
-          cachedData.comments.push({
-            content: savedComment.content,
-            replies: [],
-            createdAt: new Date(savedComment.createdAt),
-            userDetails: {
-              _id: req.user.id,
-              fullName: user.fullName,
-              avatar: user.avatar,
-            },
-          });
-
-          await redisClient.setEx(`${process.env.CACHE_PREFIX}:post:${savedComment.postId.toString()}`, 600, JSON.stringify(cachedData));
-        }
-      },
     );
+
+    if (cachedPost) {
+      const cachedData = JSON.parse(cachedPost);
+      cachedData.comments.push({
+        content: savedComment.content,
+        replies: [],
+        createdAt: new Date(savedComment.createdAt),
+        userDetails: {
+          _id: req.user.id,
+          fullName: user.fullName,
+          avatar: user.avatar,
+        },
+      });
+
+      await redisClient.setEx(
+        `${process.env.CACHE_PREFIX}:post:${savedComment.postId.toString()}`,
+        600,
+        JSON.stringify(cachedData),
+      );
+    }
 
     res.status(201).json(savedComment);
   } catch (err) {
@@ -70,8 +72,27 @@ module.exports.reply = async (req, res) => {
       userId: req.user.id,
       content: req.body.content,
     });
-
     const savedComment = await comment.save();
+
+    const redisClient = await initializeRedisClient();
+    const cachedPost = await redisClient.get(
+      `${process.env.CACHE_PREFIX}:post:${savedComment.postId.toString()}`,
+    );
+    if (cachedPost) {
+      const cachedData = JSON.parse(cachedPost);
+      const idx = cachedData.comments.findIndex(comment => comment._id === id);
+      cachedData.comments[idx].replies.push({
+        content: req.body.content,
+        createdAt: new Date(savedComment.replies[savedComment.replies.length - 1].createdAt),
+        userDetails: {
+          _id: req.user.id,
+          fullName: req.user.fullName,
+          avatar: req.user.avatar,
+        },
+      });
+      await redisClient.setEx(`${process.env.CACHE_PREFIX}:post:${savedComment.postId.toString()}`, 600, JSON.stringify(cachedData));
+    }
+
     res.status(201).json(savedComment);
   } catch (err) {
     res.status(400).json({

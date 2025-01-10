@@ -74,15 +74,36 @@ module.exports.index = async (req, res) => {
                   },
                   { $unwind: '$userDetails' },
                   {
+                    $lookup: {
+                      from: 'users',
+                      localField: 'replies.userId',
+                      foreignField: '_id',
+                      as: 'replyUsers',
+                    },
+                  },
+                  {
                     $addFields: {
                       replies: {
                         $map: {
                           input: '$replies',
                           as: 'reply',
                           in: {
-                            userId: '$$reply.userId',
                             content: '$$reply.content',
                             createdAt: '$$reply.createdAt',
+                            userDetails: {
+                              $arrayElemAt: [
+                                {
+                                  $filter: {
+                                    input: '$replyUsers',
+                                    as: 'user',
+                                    cond: {
+                                      $eq: ['$$user._id', '$$reply.userId'],
+                                    },
+                                  },
+                                },
+                                0,
+                              ],
+                            },
                           },
                         },
                       },
@@ -118,10 +139,15 @@ module.exports.index = async (req, res) => {
                 upvotes: 1,
                 downvotes: 1,
                 comments: {
+                  _id: 1,
                   content: 1,
                   createdAt: 1,
                   userDetails: { _id: 1, fullName: 1, avatar: 1 },
-                  replies: 1,
+                  replies: {
+                    content: 1,
+                    createdAt: 1,
+                    userDetails: { _id: 1, fullName: 1, avatar: 1 },
+                  },
                 },
                 tags: { _id: 1, title: 1 },
                 saves: { _id: 1 },
@@ -264,7 +290,9 @@ module.exports.save = async (req, res) => {
       const userCache = await redisClient.get(userKey);
       if (userCache) {
         const cachedData = JSON.parse(userCache);
-        const cacheIdx = cachedData.savedPosts.findIndex(post => post._id === id);
+        const cacheIdx = cachedData.savedPosts.findIndex(
+          post => post._id === id,
+        );
         if (cacheIdx > -1) {
           cachedData.savedPosts.splice(cacheIdx, 1);
           await redisClient.setEx(userKey, 600, JSON.stringify(cachedData));
@@ -325,7 +353,9 @@ module.exports.edit = async (req, res) => {
 
     await Post.updateOne({ _id: id }, req.body);
 
-    const cachedValue = await redisClient.get(`${process.env.CACHE_PREFIX}:post:${id}`);
+    const cachedValue = await redisClient.get(
+      `${process.env.CACHE_PREFIX}:post:${id}`,
+    );
     const cachedPost = JSON.parse(cachedValue);
     cachedPost.title = req.body.title;
     cachedPost.tags = req.body.tags;
