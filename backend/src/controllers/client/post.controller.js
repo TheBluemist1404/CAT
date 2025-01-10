@@ -180,11 +180,15 @@ module.exports.create = async (req, res) => {
 
     //update cache
     const key = `${process.env.CACHE_PREFIX}:profile:${req.user.id}`;
-    const checkCacheExist = await redisClient.exists(key);
+    const checkCacheExist = await redisClient.get(key);
     if (checkCacheExist) {
-      const value = await redisClient.get(key);
-      const data = JSON.parse(value);
-      data.posts.push(savedPost._id);
+      const data = JSON.parse(checkCacheExist);
+      data.posts.push({
+        _id: savedPost._id.toString(),
+        title: savedPost.title,
+        status: savedPost.status,
+        createdAt: new Date(savedPost.createdAt),
+      });
       await redisClient.setEx(key, 600, JSON.stringify(data));
     }
 
