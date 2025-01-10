@@ -24,8 +24,9 @@ module.exports.index = async (req, res) => {
 
     if (req.user && req.user.id !== id) {
       delete user['savedPosts'];
+      user.posts = user.posts.filter(post => post.status === 'public');
     }
-
+    
     res.status(200).json(user);
   } catch (err) {
     res.status(400).json({
