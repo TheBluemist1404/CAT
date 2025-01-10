@@ -5,12 +5,30 @@ import Content from './Content';
 import Pagination from './Pagination';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './forum.scss';
+import axios from 'axios';
 
 const Forum = ({ token, render }) => {
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const fetchTotalPosts = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/v1/forum?offset=0&limit=0`);
+      const posts = response.data[0].metadata[0].total;
+      console.log(posts)
+      setTotalPages(posts/10 + 1);
+      console.log(totalPages);
+    } catch (error) {
+      console.error("Failed to fetch posts:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalPosts();
+  }, []);
+
 
   const getPageFromURL = () => {
     const params = new URLSearchParams(location.search);
@@ -46,7 +64,6 @@ const Forum = ({ token, render }) => {
           handleCreatePostToggle={handleCreatePostToggle}
           token={token}
           currentPage={currentPage}
-          setTotalPages={setTotalPages}
           render={render}
         />
       </div>
