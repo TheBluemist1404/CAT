@@ -3,7 +3,8 @@ import { useNavigate, useParams, Routes, Route } from 'react-router-dom';
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../authentication/AuthProvider';
 import axios from "axios";
-
+import ReactQuill from "react-quill"; // Import ReactQuill
+import "react-quill/dist/quill.snow.css"; // Import style của Quill
 
 import "./profile.scss"
 import Header from "../../Header";
@@ -28,7 +29,8 @@ const Profile = ({token,post}) => {
     const [newSchool, setNewSchool] = useState("");
     const [showInput1, setShowInput1] = useState(false);
     const [showInput2, setShowInput2] = useState(false);
-
+    const [showSchoolInput, setShowSchoolInput] = useState(false); 
+    const [showCompanyInput, setShowCompanyInput] = useState(false);
     
     
     const handleAddSchool = async () => {
@@ -36,8 +38,8 @@ const Profile = ({token,post}) => {
             const updatedSchools = [...schools, newSchool];
             setSchools(updatedSchools); 
             setNewSchool(""); 
-            setShowInput1(false);
-            setShowInput2(false);
+            setShowSchoolInput(false);
+            
     
             try {
                 
@@ -47,6 +49,8 @@ const Profile = ({token,post}) => {
                         schools: updatedSchools,
                         user: { id: user._id },
                         fullName: user.fullName,
+                        companies,
+                        description,
                     },
                     {
                         headers: {
@@ -90,6 +94,68 @@ const Profile = ({token,post}) => {
     
         fetchSchools();
     }, [user, token]); 
+
+    const [companies, setCompanies] = useState([]);
+const [newCompany, setNewCompany] = useState("");
+
+
+const handleAddCompany = async () => {
+    if (newCompany.trim() !== "") {
+        const updatedCompanies = [...companies, newCompany];
+        setCompanies(updatedCompanies); 
+        setNewCompany(""); 
+        setShowCompanyInput(false);
+
+        try {
+            const response = await axios.patch(
+                `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+                {
+                    companies: updatedCompanies,
+                    user: { id: user._id },
+                    fullName: user.fullName,
+                    schools,
+                    description,
+                },
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token.accessToken}`,
+                    },
+                }
+            );
+
+            if (response.status === 200) {
+                if (Array.isArray(response.data.companies)) {
+                    setCompanies(response.data.companies);
+                }
+            }
+        } catch (err) {
+            console.error("Error:", err.response?.data?.message || err.message);
+        }
+    }
+};
+
+useEffect(() => {
+    const fetchCompanies = async () => {
+        try {
+            const response = await axios.get(
+                `http://localhost:3000/api/v1/profile/detail/${user._id}`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token.accessToken}`, 
+                    },
+                }
+            );
+            console.log(response.data);
+            if (response.status === 200 && Array.isArray(response.data.companies)) {
+                setCompanies(response.data.companies); 
+            }
+        } catch (err) {
+            console.error("Error fetching companies:", err.response?.data?.message || err.message);
+        }
+    };
+
+    fetchCompanies();
+}, [user, token]); 
     
     
     const toggleInput1 = () => {
@@ -100,9 +166,7 @@ const Profile = ({token,post}) => {
       };
       const [text, setText] = useState(''); 
 
-      const handleChange = (event) => {
-        setText(event.target.value); 
-      };
+      
      
       
       const [dropdown, setDropdown] = useState(false)
@@ -111,8 +175,80 @@ const Profile = ({token,post}) => {
         setDropdown((prevState) => !prevState); 
     };
      
+    const [description, setDescription] = useState(""); 
+    const [newDescription, setNewDescription] = useState(""); 
+    const [editMode, setEditMode] = useState(false); 
+
     
+    const handleUpdateDescription = async () => {
+        if (newDescription.trim() !== "") {
+            try {
+                const response = await axios.patch(
+                    `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+                    {
+                        description: newDescription,
+                        user: { id: user._id },
+                    fullName: user.fullName,
+                    schools,
+                    companies
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token.accessToken}`,
+                        },
+                    }
+                );
+
+                if (response.status === 200) {
+                    setDescription(response.data.description || newDescription); 
+                    setEditMode(false); 
+                    setNewDescription(""); 
+                }
+            } catch (err) {
+                console.error("Error updating description:", err.response?.data?.message || err.message);
+            }
+        }
+    };
+
     
+    useEffect(() => {
+        const fetchDescription = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:3000/api/v1/profile/detail/${user._id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token.accessToken}`,
+                        },
+                    }
+                );
+
+                if (response.status === 200 && response.data.description) {
+                    setDescription(response.data.description); 
+                }
+            } catch (err) {
+                console.error("Error fetching description:", err.response?.data?.message || err.message);
+            }
+        };
+
+        fetchDescription();
+    }, [user, token]);
+    
+    const modules = {
+        toolbar: [
+          [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'align': [] }],
+          ['link'],
+          [{ 'color': [] }, { 'background': [] }],
+          ['blockquote', 'code-block'],
+          ['clean'],
+        ],
+      };
+      const handlePostClick = (postId) => {
+        navigate(`/forum/${postId}`);
+      };
     const id = useParams(); 
     console.log(id.id, user._id)
     
@@ -174,8 +310,10 @@ const Profile = ({token,post}) => {
                     <div className='main'>
                         <div className='bio'>
                             <h1>Bio</h1>
+                            {/* school */}
+                            <div style={{marginLeft:'10px',marginTop:'10px'}}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <div onClick={(toggleInput1) } style={{ cursor: "pointer" }}>
+                            <div onClick={() =>setShowSchoolInput(!showSchoolInput) } style={{ cursor: "pointer" }}>
                                 <img src="/src/assets/school.svg" alt="" width={30} height={30}/>
                             </div>
                             {schools.length > 0 && (
@@ -184,7 +322,7 @@ const Profile = ({token,post}) => {
                             </div>
                             )}
                             </div >
-                            {showInput1 && (
+                            {showSchoolInput && (
                              <div style={{ marginLeft: "10px" }}>
                             <input
                             type="text"
@@ -194,33 +332,91 @@ const Profile = ({token,post}) => {
                             placeholder="type..."
                             />
                             <button onClick={handleAddSchool} >+</button>
-
-                            
                             </div>
                             )}
+                            </div>
+                            {/* companies */}
+                            <div style={{marginLeft:'10px',marginTop:'10px'}}>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <div onClick={()=>setShowCompanyInput(!showCompanyInput)} style={{ cursor: "pointer" }}>
+                                        <img src="/src/assets/company.svg" alt="" width={30} height={30} />
+                                    </div>
+                                    {companies.length > 0 && (
+                                        <div style={{ marginLeft: "10px" }}>
+                                            {companies[companies.length - 1]}
+                                        </div>
+                                    )}
+                                </div>
+                                {showCompanyInput  && (
+                                    <div style={{ marginLeft: "10px" }}>
+                                        <input
+                                            type="text"
+                                            className='input'
+                                            value={newCompany}
+                                            onChange={(e) => setNewCompany(e.target.value)}
+                                            placeholder="type..."
+                                        />
+                                        <button onClick={handleAddCompany}>+</button>
+                                    </div>
+                                )}
+                            </div>
+
+
                         </div>
                         <div className='about' >
-                            <div style={{display: "flex", alignItems: "center", marginBottom: "10px", }}>
+                        <div style={{ margin: "20px" }}>
+                        <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
                             <h1 style={{ margin: "0 20px 0 0" }}>About</h1>
-                            
-                            <div onClick={(toggleInput2) } style={{ cursor: "pointer" }}>
-                                <img src="/src/assets/pen.svg" alt="" width={15} height={15}/>
+                            <div
+                                onClick={() => setEditMode(true)} 
+                                style={{ cursor: "pointer" }}
+                            >
+                                <img src="/src/assets/pen.svg" alt="Edit" width={15} height={15} />
                             </div>
-                            </div>
-                            {showInput2 && (
-                            <textarea
-                            className='input'
-                            style={{ margin: "0", padding: "5px" }}
-                            value={text} 
-                            onChange={handleChange} 
-                            placeholder="type here ..."
-                            rows="10"
-                            cols="50"
-                            />)}
-                            
-                            <div style={{ width: "100%", maxWidth: "900px", wordWrap: "break-word", overflowWrap: "break-word", marginTop: "5px" }} >
-                            {text }
-                            </div>
+                        </div>
+
+                            {editMode ? (
+                                <div>
+                                    <ReactQuill
+                                        className="input"
+                                        style={{
+                                            margin: "0",
+                                            padding: "5px",
+                                            width: "100%",
+                                            maxWidth: "900px",
+                                        }}
+                                        value={newDescription}
+                                        modules={modules}
+                                        onChange={(e) => setNewDescription(e.target.value)} 
+                                        placeholder="Type here ..."
+                                        rows="10"
+                                        cols="50"
+                                    />
+                                    <div style={{ marginTop: "10px" }}>
+                                        <button onClick={handleUpdateDescription}>Save</button>
+                                        <button
+                                            onClick={() =>{ setEditMode(false);setNewDescription("");}}
+                                            style={{ marginLeft: "10px" }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div
+                                    style={{
+                                        width: "100%",
+                                        maxWidth: "900px",
+                                        wordWrap: "break-word",
+                                        overflowWrap: "break-word",
+                                        marginTop: "5px",
+                                    }}
+                                >
+                                    {description || "No description available. Click the edit button to add one!"}
+                                </div>
+                            )}
+                        </div>
+    
                         </div>
                         <div className='im'>
                             <h1>Image</h1>
@@ -247,10 +443,10 @@ const Profile = ({token,post}) => {
                                 <div className='post-card' key={index}>
                                     <div className='post-icon-title'>
                                         <img src="/src/assets/qa.svg" alt="" width={30} height={30} />
-                                        <div className='post-title'>{post.title}</div>
+                                        <div className='post-title' key={post._id} onClick={() => handlePostClick(post._id)}>{post.title}</div>
                                     </div>
                                 
-                                <div className='post-date'>{formattedDate}</div> {/* Hiển thị ngày đã chuyển đổi */}
+                                <div className='post-date'>{formattedDate}</div> 
                                 </div>
                                 );
                                 })}
