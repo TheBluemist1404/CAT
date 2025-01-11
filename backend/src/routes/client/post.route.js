@@ -27,7 +27,7 @@ router.patch(
 router.post('/comment/:id', auth.authenticateToken, commentController.comment);
 router.post('/reply/:id', auth.authenticateToken, commentController.reply);
 router.get('/search', searchController.search);
-router.get('/tags', auth.authenticateToken, controller.tags);
+router.get('/tags', controller.tags);
 router.post('/save/:id', auth.authenticateToken, controller.save);
 router.patch(
   '/edit/:id',
