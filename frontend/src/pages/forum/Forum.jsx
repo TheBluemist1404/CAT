@@ -6,6 +6,7 @@ import Pagination from './Pagination';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './forum.scss';
 import axios from 'axios';
+import Detail from './Detail_post';
 
 const Forum = ({ token, render }) => {
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
@@ -55,23 +56,38 @@ const Forum = ({ token, render }) => {
   };
 
   return (
-    <div className="forum">
-      <Header />
-      <div className="main-layout">
-        <Sidebar handleCreatePostToggle={handleCreatePostToggle} token={token} />
-        <Content
-          isCreatePostOpen={isCreatePostOpen}
-          handleCreatePostToggle={handleCreatePostToggle}
-          token={token}
+    <div>
+      {render === "forum" ? (<div className="forum">
+        <Header />
+        <div className="main-layout">
+          <Sidebar handleCreatePostToggle={handleCreatePostToggle} token={token} />
+          <Content
+            isCreatePostOpen={isCreatePostOpen}
+            handleCreatePostToggle={handleCreatePostToggle}
+            token={token}
+            currentPage={currentPage}
+            render={render}
+          />
+        </div>
+        {render === "forum" ? (<Pagination
+          totalPages={totalPages}
           currentPage={currentPage}
-          render={render}
-        />
-      </div>
-      {render === "forum" ? (<Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={handlePageChange}
-      />): (<></>)}
+          onPageChange={handlePageChange}
+        />): (<></>)}
+      </div>): (<div className="forum">
+        <Header />
+        <div className="main-layout">
+          <Sidebar handleCreatePostToggle={handleCreatePostToggle} token={token} />
+          <div className='content'>
+            <Detail token={token}/>
+          </div>
+        </div>
+        {render === "forum" ? (<Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+        />): (<></>)}
+      </div>)}
     </div>
   );
 };

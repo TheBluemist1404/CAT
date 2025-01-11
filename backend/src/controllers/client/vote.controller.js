@@ -6,6 +6,7 @@ const { initializeRedisClient } = require('../../utils/redis');
 // [PATCH] /api/v1/forum/vote/:typeVote/:id
 module.exports.vote = async (req, res) => {
   try {
+    console.log("this is vote api")
     const typeVote = req.params.typeVote;
     const id = req.params.id;
     const post = await Post.findById(id);
@@ -128,6 +129,8 @@ module.exports.vote = async (req, res) => {
         JSON.stringify(cachedData),
       );
     }
+
+    console.log(typeVote)
 
     res.status(200).json({
       upvote:
