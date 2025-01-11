@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../authentication/AuthProvider";
 import { useNavigate } from 'react-router-dom'
+import DOMPurify from 'dompurify';
 
 function Post({ post, token, update }) {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ function Post({ post, token, update }) {
 
   const comments = post.comments;
   const [isCommentBoxVisible, setIsCommentBoxVisible] = useState(false);
+  const sanitizedContent = DOMPurify.sanitize(post.content);
 
   //Handle time display
   const timestamp = post.createdAt;
@@ -282,7 +284,7 @@ function Post({ post, token, update }) {
       </div>
       <div className="post-body">
         <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post.title}</h1>
-        <p className="post-content">{post.content}</p>
+        <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
         {tag.map((tag, index) => (
         <div className="post-tags" key={index}>{tag}</div>
         ))}

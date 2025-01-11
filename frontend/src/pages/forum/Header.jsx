@@ -19,35 +19,36 @@ const Header = () => {
             return;
         }
 
-        const queryType = query.startsWith("user:") 
-            ? "users" 
-            : query.startsWith("title:") 
-            ? "posts" 
-            : query.startsWith("content:") 
-            ? "posts" 
-            : query.startsWith("tag:") 
-            ? "tags" 
+        const queryType = query.startsWith("user:")
+            ? "users"
+            : query.startsWith("title:")
+            ? "posts"
+            : query.startsWith("tag:")
+            ? "tags"
             : "posts";
 
-        const trimmedQuery = query.replace(/^(user:|title:|content:|tag:)/, '').trim();
-
+        const trimmedQuery = query.replace(/^(user:|title:|tag:)/, '').trim();
+        console.log(queryType);
+        console.log(trimmedQuery);
         setIsLoading(true);
 
         try {
             const response = await axios.get('http://localhost:3000/api/v1/forum/search', {
                 params: {
-                    type: queryType, 
-                    q: trimmedQuery, 
+                    type: queryType,
+                    q: trimmedQuery,
                     limit: 10,
                 },
             });
-
-            const results = response.data;
-
-            if (queryType === "posts") {
-                setFilteredResults(results.posts || []);
-            } else {
-                setFilteredResults(results || []);
+            console.log(response);
+            if (queryType === "users") {
+                setFilteredResults(response.data || []);
+            }
+            else if (queryType === "posts") {
+                setFilteredResults(response.data[0].posts || []);
+            }
+            else {
+                setFilteredResults(response);
             }
         } catch (error) {
             console.error("Error fetching search results:", error);
@@ -57,17 +58,23 @@ const Header = () => {
         }
     };
 
-    const handleSearchClick = () => {
-        if (!searchQuery.trim()) return;
+    const handleResultClick = (result, queryType) => {
+        if (queryType === "users") {
+            navigate(`/profile/${result._id}`);
+        } else if (queryType === "posts") {
+            navigate(`/forum/${result._id}`);
+        } else if (queryType === "tags") {
+            navigate(`/forum?tag=${result.title}`);
+        }
     };
 
     return (
         <header className="header-guest">
             <div className="logo">
-                <img 
-                    src="/src/pages/forum/assets/logo.svg" 
-                    alt="N/A" 
-                    onClick={() => navigate('/')} 
+                <img
+                    src="/src/pages/forum/assets/logo.svg"
+                    alt="N/A"
+                    onClick={() => navigate('/')}
                     style={{ cursor: 'pointer' }}
                 />
             </div>
@@ -75,10 +82,9 @@ const Header = () => {
                 <div className="search-icon"></div>
                 <input
                     type="text"
-                    placeholder="Search C.A.T..."
+                    placeholder="Search C.A.T... (e.g., user:abc, title:help)"
                     value={searchQuery}
                     onChange={handleInputChange}
-                    onClick={handleSearchClick}
                 />
                 <div className="search-results">
                     {isLoading ? (
@@ -86,8 +92,22 @@ const Header = () => {
                     ) : filteredResults.length > 0 ? (
                         <ul style={{ listStyleType: 'none', margin: 0, padding: 0 }}>
                             {filteredResults.map((result, index) => (
-                                <li key={index} className="search-result-item" onClick={() => navigate(`/posts/${result._id}`)} >
-                                    {result.title || result.fullName || result.slug || "Please search with valid prefix"}
+                                <li
+                                    key={index}
+                                    className="search-result-item"
+                                    onClick={() =>
+                                        handleResultClick(
+                                            result,
+                                            searchQuery.startsWith("user:")
+                                                ? "users"
+                                                : searchQuery.startsWith("tag:")
+                                                ? "tags"
+                                                : "posts"
+                                        )
+                                    }
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    {result.title || result.fullName || result.slug || "Untitled"}
                                 </li>
                             ))}
                         </ul>
@@ -98,35 +118,25 @@ const Header = () => {
             </div>
             {!isLoggedIn ? (
                 <div className="header-button">
-                    <button 
-                        className="login-button" 
-                        onClick={() => navigate('/auth/login')}
-                    >
+                    <button className="login-button" onClick={() => navigate('/auth/login')}>
                         Login
                     </button>
-                    <button 
-                        className="signup-button" 
-                        onClick={() => navigate('/auth/signup')}
-                    >
+                    <button className="signup-button" onClick={() => navigate('/auth/signup')}>
                         Sign up
                     </button>
                 </div>
             ) : (
-                <div 
+                <div
                     style={{
                         width: '40px',
                         height: '40px',
                         borderRadius: '50%',
                         overflow: 'hidden',
                         marginRight: '20px',
-                    }} 
+                    }}
                     onClick={() => navigate(`/profile/${user._id}`)}
                 >
-                    <img 
-                        src={user.avatar} 
-                        alt="User Avatar" 
-                        style={{ width: '40px' }}
-                    />
+                    <img src={user.avatar} alt="User Avatar" style={{ width: '40px' }} />
                 </div>
             )}
         </header>
