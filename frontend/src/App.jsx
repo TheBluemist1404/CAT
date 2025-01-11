@@ -14,6 +14,7 @@ import Signup from './authentication/Signup'
 import Forum from './pages/forum/Forum'
 import Detail from './pages/forum/Detail_post';
 import Profile from './pages/Profile/Profile'
+import Test from './pages/Test';
 
 function App() {
     const { isLoggedIn, setIsLoggedIn, setUser } = useContext(AuthContext);

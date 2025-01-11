@@ -68,7 +68,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
 
   return (
     <main className="content">
-      {render === "forum" ? (<div style={{width: '100%'}}>
+      <div style={{width: '100%'}}>
         {isCreatePostOpen && (
           <div className="create-post-modal" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', transform: 'translateX(0)' }}>
             <div className="modal-container" style={{ backgroundColor: '#1E1E2F', padding: '20px', borderRadius: '10px', width: '1000px' }}>
@@ -97,7 +97,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
             <Post key={index} post={post} token={token} update={fetchPosts} />
           ))}
         </section>
-      </div>): (<Detail/>)}
+      </div>
 
     </main>
   );

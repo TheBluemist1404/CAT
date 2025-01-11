@@ -109,6 +109,7 @@ function Detail({ token }) {
       const response = await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`,
         { user: { id: user._id } },
         { headers: { "Authorization": `Bearer ${token.accessToken}` } })
+      console.log(response)
       if (response) {
         const postUpdate = await fetchPosts();
         console.log(response, postUpdate)
@@ -131,6 +132,7 @@ function Detail({ token }) {
     try {
       console.log("update")
       const response = await axios.patch(`http://localhost:3000/api/v1/forum/vote/downvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
+      console.log(response)
       if (response) {
         const postUpdate = await fetchPosts();
         console.log(response, postUpdate)
@@ -241,10 +243,10 @@ function Detail({ token }) {
 
   //Render comments ---------------------------
   const comments = post ? post.comments : []
-  console.log(comments);
+  const sortComments = [...comments].reverse();
   const renderComments = () => (
     <div className="comments-list" >
-      {comments.map((comment) => (
+      {sortComments.map((comment) => (
         <div key={comment.id} className="comment">
           <div className="comment-header">
             <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden' }}><img src={comment.userDetails.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
@@ -265,6 +267,7 @@ function Detail({ token }) {
       ))}
     </div>
   );
+
 
   return (
     <div className="post" style={{height: 'calc(100vh - 60px)'}}>

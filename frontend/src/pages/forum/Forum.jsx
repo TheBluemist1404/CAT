@@ -5,12 +5,31 @@ import Content from './Content';
 import Pagination from './Pagination';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './forum.scss';
+import axios from 'axios';
+import Detail from './Detail_post';
 
 const Forum = ({ token, render }) => {
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const fetchTotalPosts = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/v1/forum?offset=0&limit=0`);
+      const posts = response.data[0].metadata[0].total;
+      console.log(posts)
+      setTotalPages(posts/10 + 1);
+      console.log(totalPages);
+    } catch (error) {
+      console.error("Failed to fetch posts:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalPosts();
+  }, []);
+
 
   const getPageFromURL = () => {
     const params = new URLSearchParams(location.search);
@@ -37,24 +56,38 @@ const Forum = ({ token, render }) => {
   };
 
   return (
-    <div className="forum">
-      <Header />
-      <div className="main-layout">
-        <Sidebar handleCreatePostToggle={handleCreatePostToggle} token={token} />
-        <Content
-          isCreatePostOpen={isCreatePostOpen}
-          handleCreatePostToggle={handleCreatePostToggle}
-          token={token}
+    <div>
+      {render === "forum" ? (<div className="forum">
+        <Header />
+        <div className="main-layout">
+          <Sidebar handleCreatePostToggle={handleCreatePostToggle} token={token} />
+          <Content
+            isCreatePostOpen={isCreatePostOpen}
+            handleCreatePostToggle={handleCreatePostToggle}
+            token={token}
+            currentPage={currentPage}
+            render={render}
+          />
+        </div>
+        {render === "forum" ? (<Pagination
+          totalPages={totalPages}
           currentPage={currentPage}
-          setTotalPages={setTotalPages}
-          render={render}
-        />
-      </div>
-      {render === "forum" ? (<Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={handlePageChange}
-      />): (<></>)}
+          onPageChange={handlePageChange}
+        />): (<></>)}
+      </div>): (<div className="forum">
+        <Header />
+        <div className="main-layout">
+          <Sidebar handleCreatePostToggle={handleCreatePostToggle} token={token} />
+          <div className='content'>
+            <Detail token={token}/>
+          </div>
+        </div>
+        {render === "forum" ? (<Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+        />): (<></>)}
+      </div>)}
     </div>
   );
 };
