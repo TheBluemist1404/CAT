@@ -1,9 +1,9 @@
+import { Editor } from "@tinymce/tinymce-react";
 import axios from 'axios';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import { AuthContext } from "../../authentication/AuthProvider";
 import Post from './Post';
 import Detail from './Detail_post';
-
 
 const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage, setTotalPages, render }) => {
   const { isLoggedIn, user } = useContext(AuthContext)
@@ -15,6 +15,8 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
   const [visibility, setVisibility] = useState('public');
   const [error, setError] = useState('');
 
+  const editorRef = useRef(null);
+
   const fetchPosts = async (page) => {
     const limit = 10;
     const offset = (page - 1) * limit;
@@ -23,7 +25,6 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
       const posts = response.data[0].posts
       console.log(posts)
       setPostFeed(posts);
-      setTotalPages(posts.length);
     } catch (error) {
       console.error("Failed to fetch posts:", error);
     }
@@ -34,6 +35,8 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
       setError('Need title to create post');
       return;
     }
+
+    const content = editorRef.current?.getContent();
 
     setError(''); 
     
@@ -67,7 +70,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
       // console.log('Post created:', response.data);
 
       setTitle('');
-      setContent('');
+      if (editorRef.current) editorRef.current.setContent('');
       setTags('');
       setVisibility('public');
       handleCreatePostToggle();
@@ -80,6 +83,8 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
   useEffect(() => {
     fetchPosts(currentPage);
   }, [currentPage]);
+
+  const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
 
   return (
     <main className="content">
@@ -94,9 +99,28 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
               </div>
               <div className="modal-body">
                 <textarea placeholder="Title" rows="1" className="modal-textarea-title" style={{ marginBottom: 10 }} value={title} onChange={(e) => setTitle(e.target.value)} />
-                {error && <div className="error-message" style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>{error}</div>}
-                <textarea placeholder="What's on your mind?" rows="4" className="modal-textarea" value={content} onChange={(e) => setContent(e.target.value)} />
-                <textarea placeholder="Tags Ex: #ObjectID (cannot fetch tags in db yet)" className="modal-textarea-tags" style={{ marginTop: 10 }} onChange={(e) => setTags(e.target.value)} />
+                {error && (<div className="title-error" style={{ color: "red", fontSize: "16px", }}>{error}</div>)}
+                <Editor
+                    apiKey = {textEditorAPI}
+                    onInit={(_, editor) => (editorRef.current = editor)}
+                    initialValue="<p>Write your content here...</p>"
+                    init={{
+                      height: 300,
+                      menubar: false,
+                      plugins: [
+                        "advlist autolink lists link image charmap preview anchor",
+                        "searchreplace visualblocks code fullscreen",
+                        "insertdatetime media table code help wordcount",
+                      ],
+                      toolbar:
+                        "undo redo | formatselect | bold italic underline forecolor backcolor | \
+                        alignleft aligncenter alignright alignjustify | \
+                        bullist numlist outdent indent | removeformat | help",
+                      content_style:
+                        "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                    }}
+                  />
+                <textarea placeholder="Tags Ex: #ObjectID (cannot fetch tags in db yet)" className="modal-textarea-tags" style={{ marginTop: 10, height: 50 }} onChange={(e) => setTags(e.target.value)} />
                 <div className="visibility-options">
                   <label htmlFor="visibility">Who can see this post?</label>
                   <select id="visibility" className="visibility-dropdown" value={visibility} onChange={(e) => setVisibility(e.target.value)}>
