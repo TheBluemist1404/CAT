@@ -86,17 +86,20 @@ function Post({ post, token, update }) {
 
   //Handle vote
   useEffect(() => {
-    const upvote = post.upvotes;
-    const userUpvote = upvote.find((voter) => voter.userId === user._id)
-    if (userUpvote) {
-      setIsUpvoted(true)
-    }
+    const renderVote = () => {
+      const upvote = post.upvotes;
+      const userUpvote = upvote.find((voter) => voter.userId === user._id)
+      if (userUpvote) {
+        setIsUpvoted(true)
+      }
 
-    const downvote = post.downvotes;
-    const userDownvote = downvote.find((voter) => voter.userId === user._id)
-    if (userDownvote) {
-      setIsDownvoted(true)
-    }
+      const downvote = post.downvotes;
+      const userDownvote = downvote.find((voter) => voter.userId === user._id)
+      if (userDownvote) {
+        setIsDownvoted(true)
+      }
+    } 
+    renderVote()
   }, [])
 
   const updateUpvote = async () => {
@@ -253,7 +256,7 @@ function Post({ post, token, update }) {
               <img src="/src/pages/forum/assets/Share Icon.svg" className="comment-action" alt="Share" /> Share
             </button>
           </div>
-          <hr className="post-line" style={{marginTop: '10px'}}/>
+          <hr className="post-line" style={{ marginTop: '10px' }} />
         </div>
       ))}
     </div>
@@ -286,7 +289,7 @@ function Post({ post, token, update }) {
         <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post.title}</h1>
         <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
         {tag.map((tag, index) => (
-        <div className="post-tags" key={index}>{tag}</div>
+          <div className="post-tags" key={index}>{tag}</div>
         ))}
       </div>
       <hr className="post-line" />
