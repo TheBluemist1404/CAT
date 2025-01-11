@@ -9,7 +9,7 @@ import "./profile.scss"
 import Header from "../../Header";
 
 
-const Profile = ({token, post}) => {
+const Profile = ({token,post}) => {
     
     const navigate = useNavigate();
     const { isLoggedIn, user } = useContext(AuthContext);
@@ -44,7 +44,7 @@ const Profile = ({token, post}) => {
                 const response = await axios.patch(
                     `http://localhost:3000/api/v1/profile/edit/${user._id}`,
                     {
-                        content: updatedSchools,
+                        schools: updatedSchools,
                         user: { id: user._id },
                         fullName: user.fullName,
                     },
