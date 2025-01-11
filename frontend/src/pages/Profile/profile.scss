@@ -163,7 +163,7 @@
         margin-left: 20px;
         padding: 10px;
         border-radius: 20px;
-        
+        max-height: 500px;
      
     }
     .about{
@@ -179,7 +179,7 @@
         margin-left: 20px;
         padding: 10px;
         border-radius: 20px;
-        
+        height: 500px;
     }
     .Post{
         background-color: rgb(0, 0, 0);
@@ -187,6 +187,7 @@
         padding: 10px;
         border-radius: 20px;
     }
+    
     .main2{
         position: relative;
         background-color: rgb(45, 43, 43);

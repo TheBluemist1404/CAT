@@ -11,7 +11,9 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
   const [postFeed, setPostFeed] = useState([]);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [tags, setTags] = useState('');
   const [visibility, setVisibility] = useState('public');
+  const [error, setError] = useState('');
 
   const fetchPosts = async (page) => {
     const limit = 10;
@@ -28,6 +30,18 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
   };
 
   const createPost = async () => {
+    if (title.trim() === '') {
+      setError('Need title to create post');
+      return;
+    }
+
+    setError(''); 
+    
+    const extractedTags = tags
+    .split(' ')
+    .filter(tag => tag.startsWith('#'))
+    .map(tag => tag.slice(1));
+
     try {
       // console.log("Creating post with:", { title, content, visibility });
       // console.log("Token:", token);
@@ -41,7 +55,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
           content,
           userCreated: user._id,
           status: visibility,
-
+          tags: extractedTags,
         },
         {
           headers: {
@@ -54,6 +68,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
 
       setTitle('');
       setContent('');
+      setTags('');
       setVisibility('public');
       handleCreatePostToggle();
       fetchPosts(currentPage);
@@ -79,7 +94,9 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
               </div>
               <div className="modal-body">
                 <textarea placeholder="Title" rows="1" className="modal-textarea-title" style={{ marginBottom: 10 }} value={title} onChange={(e) => setTitle(e.target.value)} />
+                {error && <div className="error-message" style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>{error}</div>}
                 <textarea placeholder="What's on your mind?" rows="4" className="modal-textarea" value={content} onChange={(e) => setContent(e.target.value)} />
+                <textarea placeholder="Tags Ex: #ObjectID (cannot fetch tags in db yet)" className="modal-textarea-tags" style={{ marginTop: 10 }} onChange={(e) => setTags(e.target.value)} />
                 <div className="visibility-options">
                   <label htmlFor="visibility">Who can see this post?</label>
                   <select id="visibility" className="visibility-dropdown" value={visibility} onChange={(e) => setVisibility(e.target.value)}>

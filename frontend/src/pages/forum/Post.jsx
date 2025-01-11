@@ -257,6 +257,18 @@ function Post({ post, token, update }) {
     </div>
   );
 
+  const tags = post.tags;
+  const [tag, setTags] = useState([]);
+  const handleSubmit = () => {
+    if (tags.length > 0) {
+      const titles = tags.map((tag) => `#${tag.title}`);
+      setTags(titles);
+    }
+  };
+  useEffect(() => {
+    handleSubmit();
+  }, []);
+
   return (
     <div className="post">
       <div className="post-header">
@@ -271,6 +283,9 @@ function Post({ post, token, update }) {
       <div className="post-body">
         <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post.title}</h1>
         <p className="post-content">{post.content}</p>
+        {tag.map((tag, index) => (
+        <div className="post-tags" key={index}>{tag}</div>
+        ))}
       </div>
       <hr className="post-line" />
       <div className="post-footer">
