@@ -18,12 +18,12 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
   const editorRef = useRef(null);
 
   const fetchPosts = async (page) => {
+    setPostFeed([])
     const limit = 10;
     const offset = (page - 1) * limit;
     try {
       const response = await axios.get(`http://localhost:3000/api/v1/forum?offset=${offset}&limit=${limit}`);
       const posts = response.data[0].posts
-      console.log(posts)
       setPostFeed(posts);
     } catch (error) {
       console.error("Failed to fetch posts:", error);
@@ -46,11 +46,6 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     .map(tag => tag.slice(1));
 
     try {
-      // console.log("Creating post with:", { title, content, visibility });
-      // console.log("Token:", token);
-
-      // const objectID = token;
-
       const response = await axios.post(
         'http://localhost:3000/api/v1/forum/create',
         {
@@ -66,8 +61,6 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
           },
         }
       );
-
-      // console.log('Post created:', response.data);
 
       setTitle('');
       if (editorRef.current) editorRef.current.setContent('');
