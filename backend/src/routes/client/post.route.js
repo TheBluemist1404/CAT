@@ -37,5 +37,6 @@ router.patch(
   validate.validateCreate,
   controller.edit,
 );
+router.delete('/delete/:id', auth.authenticateToken, controller.delete);
 
 module.exports = router;

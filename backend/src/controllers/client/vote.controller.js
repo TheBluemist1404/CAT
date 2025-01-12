@@ -129,6 +129,7 @@ module.exports.vote = async (req, res) => {
       );
     }
 
+
     res.status(200).json({
       upvote:
         totalVotes[0].upvotesCount.length > 0
