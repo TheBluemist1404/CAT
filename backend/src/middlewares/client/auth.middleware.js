@@ -22,7 +22,7 @@ module.exports.authenticateToken = async (req, res, next) => {
       });
     }
     req.user = user;
-    console.log("has passed authen")
+    // console.log("has passed authen")
     next();
   });
 };
