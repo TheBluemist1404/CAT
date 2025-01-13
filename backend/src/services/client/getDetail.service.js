@@ -22,7 +22,6 @@ module.exports.getDetail = async id => {
       {
         $match: {
           deleted: false,
-          status: 'public',
           _id: new mongoose.Types.ObjectId(postId),
         },
       },
