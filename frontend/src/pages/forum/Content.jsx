@@ -8,7 +8,7 @@ import Detail from './Detail_post';
 const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage, setTotalPages, render }) => {
   const { isLoggedIn, user } = useContext(AuthContext)
 
-  const [postFeed, setPostFeed] = useState([]);
+  const [postFeed, setPostFeed] = useState(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
@@ -18,7 +18,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
   const editorRef = useRef(null);
 
   const fetchPosts = async (page) => {
-    setPostFeed([])
+    setPostFeed(null)
     const limit = 10;
     const offset = (page - 1) * limit;
     try {
@@ -127,7 +127,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
           </div>
         )}
         <section className="post-feed" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', gap: '50px' }}>
-          {postFeed.map((post, index) => (
+          {postFeed && postFeed.map((post, index) => (
             <Post key={index} post={post} token={token} update={fetchPosts} />
           ))}
         </section>
