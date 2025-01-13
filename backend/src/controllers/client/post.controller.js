@@ -207,7 +207,7 @@ module.exports.detail = async (req, res) => {
     const id = req.params.id;
     const [post, cacheHit] = await getDetail(id);
 
-    if (!post || !req.user || (post.status === 'private' && post.userCreated.toString() !== req.user.id)) {
+    if (!post || post.status === 'private' && req.user.id !== post.userCreated._id.toString()) {
       res.status(404).json({
         message: 'Cannot find post!',
       });
