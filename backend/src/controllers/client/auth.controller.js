@@ -166,7 +166,7 @@ module.exports.forgot = async (req, res) => {
     </div>
   </body>
 </html>`;
-    sendMail(email, subject, html);
+    await sendMail(email, subject, html);
     res.status(200).json({
       message: 'Please check your email and type in otp!',
     });
