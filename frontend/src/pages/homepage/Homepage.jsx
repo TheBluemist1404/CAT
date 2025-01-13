@@ -1,9 +1,5 @@
-import axios from 'axios';
-
-
-import { useState, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AuthContext } from '../../authentication/AuthProvider'
 
 import './homepage.scss'
 import './title.scss'
@@ -19,6 +15,7 @@ import team from '@homepage-assets/code-team.png'
 import Header from '../../Header';
 import Footer from '../../Footer';
 import TypingEffect from './TypingEffect'
+import PlaneAnimation from './MoveEffect'
 
 
 function Title({ subhead, head }) {
@@ -42,13 +39,19 @@ function Card({ subhead, head }) {
 function Homepage({ token }) {
     const navigate = useNavigate();
 
-    const { setIsLoggedIn } = useContext(AuthContext);
+    const [scrollProgress, setScrollProgress] = useState(0);
 
-    const [dropdown, setDropdown] = useState(false)
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.scrollY;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = Math.min(scrollTop / maxScroll, 1); // Clamp value between 0 and 1
+            setScrollProgress(progress);
+        };
 
-    const toggleDropdown = () => {
-        setDropdown(!dropdown);
-    }
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     return (
         <div className='homepage'>
@@ -116,9 +119,8 @@ function Homepage({ token }) {
                                 Search with <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>#TAG</span> available
                             </div>
                         </div>
-                        <svg width="506" height="1632" viewBox="0 0 506 1632" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M44.4994 0.50107C1080 299.501 47 586.5 44.5 796.5C42 1006.5 521.499 868.502 492 1141C462.5 1413.5 1.00001 1631.5 1.00001 1631.5" stroke="black" stroke-dasharray="10.1 10.1" />
-                        </svg>
+                        <PlaneAnimation/>
+
                     </div>
                 </section>
                 <section className="live-code">
@@ -162,5 +164,29 @@ function Homepage({ token }) {
 
     )
 }
+
+const PlaneIcon = ({ progress }) => {
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+
+    useEffect(() => {
+        const path = document.getElementById("curve-path");
+        const pathLength = path.getTotalLength();
+        console.log(pathLength)
+        const point = path.getPointAtLength(0.5);
+        console.log(point)
+        setPosition({ x: point.x, y: point.y });
+    }, [progress]);
+
+    return (
+        <svg
+            transform={`translate(${position.x - 10, position.y - 10})`} // Offset for centering the icon
+        >
+            <path
+                d="M10 0 L20 10 L10 20 L0 10 Z" // Example plane shape
+                fill="black"
+            />
+        </svg>
+    );
+};
 
 export default Homepage;
