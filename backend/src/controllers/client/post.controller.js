@@ -479,7 +479,7 @@ module.exports.delete = async (req, res) => {
   }
 };
 
-// [PATCH] /api/v1/change-status/:typeStatus/:id
+// [PATCH] /api/v1/forum/change-status/:typeStatus/:id
 module.exports.changeStatus = async (req, res) => {
   const id = req.params.id;
   const type = req.params.typeStatus;
