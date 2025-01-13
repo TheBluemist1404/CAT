@@ -18,7 +18,7 @@ router.post(
   validate.validateCreate,
   controller.create,
 );
-router.get('/detail/:id', controller.detail);
+router.get('/detail/:id', auth.authenticateToken, controller.detail);
 router.patch(
   '/vote/:typeVote/:id',
   auth.authenticateToken,
