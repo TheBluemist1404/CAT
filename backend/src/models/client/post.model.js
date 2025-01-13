@@ -42,29 +42,29 @@ const postSchema = new mongoose.Schema(
 postSchema.index({ tags: 1 });
 postSchema.index({ userId: 1 });
 
-postSchema.virtual('upvotes', {
-  ref: 'Like',
-  localField: '_id',
-  foreignField: 'postId',
-});
+// postSchema.virtual('upvotes', {
+//   ref: 'Like',
+//   localField: '_id',
+//   foreignField: 'postId',
+// });
 
-postSchema.virtual('downvotes', {
-  ref: 'Like',
-  localField: '_id',
-  foreignField: 'postId',
-});
+// postSchema.virtual('downvotes', {
+//   ref: 'Like',
+//   localField: '_id',
+//   foreignField: 'postId',
+// });
 
-postSchema.virtual('comments', {
-  ref: 'Comment',
-  localField: '_id',
-  foreignField: 'postId',
-});
+// postSchema.virtual('comments', {
+//   ref: 'Comment',
+//   localField: '_id',
+//   foreignField: 'postId',
+// });
 
-postSchema.virtual('saves', {
-  ref: 'User',
-  localField: '_id',
-  foreignField: 'savedPosts'
-})
+// postSchema.virtual('saves', {
+//   ref: 'User',
+//   localField: '_id',
+//   foreignField: 'savedPosts'
+// })
 
 postSchema.pre('save', async function (next) {
   const post = this;
