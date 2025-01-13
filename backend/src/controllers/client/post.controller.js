@@ -262,7 +262,7 @@ module.exports.save = async (req, res) => {
 
     const id = req.params.id;
     const post = await Post.findById(id).select('_id title createdAt');
-    if (!post) {
+    if (!post || post.deleted === true) {
       res.status(404).json({
         message: 'Cannot find post!',
       });
@@ -341,7 +341,7 @@ module.exports.edit = async (req, res) => {
     const redisClient = await initializeRedisClient();
     const id = req.params.id;
     const post = await Post.findById(id);
-    if (!post) {
+    if (!post || post.deleted === true) {
       res.status(404).json({
         message: 'Cannot find post!',
       });
@@ -476,6 +476,54 @@ module.exports.delete = async (req, res) => {
     res.status(400).json({
       message: err.message,
     });
-
   }
+};
+
+// [PATCH] /api/v1/change-status/:typeStatus/:id
+module.exports.changeStatus = async (req, res) => {
+  const id = req.params.id;
+  const type = req.params.typeStatus;
+
+  const post = await Post.findById(id);
+  if (!post || post.deleted === true) {
+    res.status(404).json({
+      message: 'Cannot find post!',
+    });
+    return;
+  }
+
+  if (post.userCreated._id.toString() !== req.user.id) {
+    res.status(403).json({
+      message: 'Only the author can change status of post!',
+    });
+    return;
+  }
+
+  if (type !== 'public' && type !== 'private') {
+    res.status(400).json({
+      message: 'Invalid status type',
+    });
+    return;
+  }
+
+  post.status = type;
+  await post.save();
+
+  const redisClient = await initializeRedisClient();
+  const cachedPost = await redisClient.get(
+    `${process.env.CACHE_PREFIX}:post:${id}`,
+  );
+  if (cachedPost) {
+    const cachedData = JSON.parse(cachedPost);
+    cachedData.status = type;
+    await redisClient.setEx(
+      `${process.env.CACHE_PREFIX}:post:${id}`,
+      600,
+      JSON.stringify(cachedData),
+    );
+  }
+
+  res.status(200).json({
+    message: 'Update successfully!',
+  });
 };
