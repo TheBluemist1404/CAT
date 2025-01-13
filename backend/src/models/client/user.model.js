@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
     slug: String,
     description: {
       type: String,
-      default: "",
+      default: '',
     },
     schools: [String],
     companies: [String],
@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true},
+  { timestamps: true },
 );
 
 userSchema.pre('save', function (next) {

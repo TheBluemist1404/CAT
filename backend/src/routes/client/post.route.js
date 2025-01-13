@@ -18,7 +18,7 @@ router.post(
   validate.validateCreate,
   controller.create,
 );
-router.get('/detail/:id', controller.detail);
+router.get('/detail/:id', auth.authenticateToken, controller.detail);
 router.patch(
   '/vote/:typeVote/:id',
   auth.authenticateToken,
@@ -27,7 +27,7 @@ router.patch(
 router.post('/comment/:id', auth.authenticateToken, commentController.comment);
 router.post('/reply/:id', auth.authenticateToken, commentController.reply);
 router.get('/search', searchController.search);
-router.get('/tags', auth.authenticateToken, controller.tags);
+router.get('/tags', controller.tags);
 router.post('/save/:id', auth.authenticateToken, controller.save);
 router.patch(
   '/edit/:id',
@@ -37,5 +37,7 @@ router.patch(
   validate.validateCreate,
   controller.edit,
 );
+router.delete('/delete/:id', auth.authenticateToken, controller.delete);
+router.patch('/change-status/:typeStatus/:id', auth.authenticateToken, controller.changeStatus);
 
 module.exports = router;

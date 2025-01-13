@@ -8,7 +8,7 @@ import Detail from './Detail_post';
 const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage, setTotalPages, render }) => {
   const { isLoggedIn, user } = useContext(AuthContext)
 
-  const [postFeed, setPostFeed] = useState([]);
+  const [postFeed, setPostFeed] = useState(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
@@ -18,12 +18,12 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
   const editorRef = useRef(null);
 
   const fetchPosts = async (page) => {
+    setPostFeed(null)
     const limit = 10;
     const offset = (page - 1) * limit;
     try {
       const response = await axios.get(`http://localhost:3000/api/v1/forum?offset=${offset}&limit=${limit}`);
       const posts = response.data[0].posts
-      console.log(posts)
       setPostFeed(posts);
     } catch (error) {
       console.error("Failed to fetch posts:", error);
@@ -46,11 +46,6 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     .map(tag => tag.slice(1));
 
     try {
-      // console.log("Creating post with:", { title, content, visibility });
-      // console.log("Token:", token);
-
-      // const objectID = token;
-
       const response = await axios.post(
         'http://localhost:3000/api/v1/forum/create',
         {
@@ -66,8 +61,6 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
           },
         }
       );
-
-      // console.log('Post created:', response.data);
 
       setTitle('');
       if (editorRef.current) editorRef.current.setContent('');
@@ -134,7 +127,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
           </div>
         )}
         <section className="post-feed" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', gap: '50px' }}>
-          {postFeed.map((post, index) => (
+          {postFeed && postFeed.map((post, index) => (
             <Post key={index} post={post} token={token} update={fetchPosts} />
           ))}
         </section>
