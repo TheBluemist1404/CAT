@@ -207,7 +207,7 @@ module.exports.detail = async (req, res) => {
     const id = req.params.id;
     const [post, cacheHit] = await getDetail(id);
 
-    if (!post) {
+    if (!post || !req.user || (post.status === 'private' && post.userCreated.toString() !== req.user.id)) {
       res.status(404).json({
         message: 'Cannot find post!',
       });
@@ -502,6 +502,13 @@ module.exports.changeStatus = async (req, res) => {
   if (type !== 'public' && type !== 'private') {
     res.status(400).json({
       message: 'Invalid status type',
+    });
+    return;
+  }
+
+  if (post.status === type) {
+    res.status(200).json({
+      message: 'No update!',
     });
     return;
   }
