@@ -5,10 +5,10 @@ import { AuthContext } from '../../authentication/AuthProvider';
 import axios from "axios";
 import ReactQuill from "react-quill"; // Import ReactQuill
 import "react-quill/dist/quill.snow.css"; // Import style của Quill
-
+import { Editor } from "@tinymce/tinymce-react";
 import "./profile.scss"
 import Header from "../../Header";
-
+import DOMPurify from "dompurify";
 
 const Profile = ({token,post}) => {
     
@@ -249,6 +249,11 @@ useEffect(() => {
       const handlePostClick = (postId) => {
         navigate(`/forum/${postId}`);
       };
+      const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
+      const handleEditorChange = (content) => {
+        const sanitizedContent = DOMPurify.sanitize(content); // Làm sạch nội dung
+        setNewDescription(sanitizedContent); // Lưu vào state
+    };
     const id = useParams(); 
     console.log(id.id, user._id)
     
@@ -377,21 +382,36 @@ useEffect(() => {
 
                             {editMode ? (
                                 <div>
-                                    <ReactQuill
-                                        className="input"
-                                        style={{
-                                            margin: "0",
-                                            padding: "5px",
-                                            width: "100%",
-                                            maxWidth: "900px",
-                                        }}
-                                        value={newDescription}
-                                        modules={modules}
-                                        onChange={(e) => setNewDescription(e.target.value)} 
-                                        placeholder="Type here ..."
-                                        rows="10"
-                                        cols="50"
-                                    />
+                                    <Editor
+                apiKey = {textEditorAPI} // Thay bằng API Key của bạn nếu cần
+                value={newDescription}
+                onEditorChange={handleEditorChange}
+                
+                init={{
+                    height: 300,
+                    menubar: true,
+                      plugins: [
+                        "advlist autolink lists link image charmap preview anchor",
+                        "searchreplace visualblocks code fullscreen",
+                        "insertdatetime media table code help wordcount",
+                      ],
+                      toolbar:
+                        "undo redo | formatselect | bold italic underline forecolor backcolor | \
+                        alignleft aligncenter alignright alignjustify | \
+                        bullist numlist outdent indent | removeformat | help",
+                      content_style:
+                        "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                }}
+            />
+            <div
+                style={{
+                    border: "1px solid #ccc",
+                    padding: "10px",
+                    marginTop: "10px",
+                    borderRadius: "5px",
+                }}
+                dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+            />
                                     <div style={{ marginTop: "10px" }}>
                                         <button onClick={handleUpdateDescription}>Save</button>
                                         <button
