@@ -38,5 +38,6 @@ router.patch(
   controller.edit,
 );
 router.delete('/delete/:id', auth.authenticateToken, controller.delete);
+router.patch('/change-status/:typeStatus/:id', auth.authenticateToken, controller.changeStatus);
 
 module.exports = router;
