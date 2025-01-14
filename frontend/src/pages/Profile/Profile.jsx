@@ -5,10 +5,10 @@ import { AuthContext } from '../../authentication/AuthProvider';
 import axios from "axios";
 import ReactQuill from "react-quill"; // Import ReactQuill
 import "react-quill/dist/quill.snow.css"; // Import style của Quill
-
+import { Editor } from "@tinymce/tinymce-react";
 import "./profile.scss"
 import Header from "../../Header";
-
+import DOMPurify from "dompurify";
 
 const Profile = ({token,post}) => {
     
@@ -179,7 +179,10 @@ useEffect(() => {
     const [newDescription, setNewDescription] = useState(""); 
     const [editMode, setEditMode] = useState(false); 
 
-    
+    const handleEditorChange = (content) => {
+        const sanitizedContent = DOMPurify.sanitize(content); // Làm sạch nội dung
+        setNewDescription(sanitizedContent); // Lưu vào state
+    };
     const handleUpdateDescription = async () => {
         if (newDescription.trim() !== "") {
             try {
@@ -234,21 +237,25 @@ useEffect(() => {
         fetchDescription();
     }, [user, token]);
     
-    const modules = {
-        toolbar: [
-          [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
-          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{ 'align': [] }],
-          ['link'],
-          [{ 'color': [] }, { 'background': [] }],
-          ['blockquote', 'code-block'],
-          ['clean'],
-        ],
-      };
+    
       const handlePostClick = (postId) => {
         navigate(`/forum/${postId}`);
       };
+      const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
+      
+    const [isVisible, setIsVisible] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  const handleSvgClick = (e) => {
+    // Lấy vị trí của click chuột
+    const rect = e.target.getBoundingClientRect();
+    setPosition({ top: rect.top + window.scrollY, left: rect.left + window.scrollX });
+    setIsVisible(!isVisible);
+  };
+
+  const handleClose = () => {
+    setIsVisible(false);
+  };
     const id = useParams(); 
     console.log(id.id, user._id)
     
@@ -292,38 +299,56 @@ useEffect(() => {
                         <button type='button' className='v' onClick={() =>setView("videos")}>Videos</button>
                         </div>
                         <div>
-                        <div className="settings" onClick={toggleDropdown} style={{ marginRight: "20px" }}>
+                        <div className="settings" onClick={handleSvgClick} style={{ marginRight: "20px" }}>
                             <img src="/src/assets/setting.svg" alt="" width={30} height={30} />
                         </div>
 
-                        {dropdown && (
-                            <div className="option">
-                                <div className="set">Settings</div>
-                                <div className="adjusts">Adjust</div>
-                                <div className="close" onClick={toggleDropdown}>Close</div>
-                            </div>
-                        )}
+                        {isVisible && (
+        <div className='bb'
+          style={{
+            position: "absolute",
+            top: position.top -150, // Đặt khoảng cách dưới SVG
+            left: position.left-200,
+            
+            
+            
+            padding: "10px",
+            zIndex: 1000, // Đảm bảo div này đè lên các div khác
+            display: "flex", // Sử dụng flexbox
+      flexDirection: "column", // Xếp các button theo cột
+      alignItems: "center", // Căn giữa theo chiều ngang
+      justifyContent: "center", // Căn giữa theo chiều dọc
+      gap:"10px",
+          }}
+        >
+          <button onClick={() => alert("Button 1 clicked!")} className='b' >Settings</button>
+          <button onClick={() => alert("Button 2 clicked!")} className='b'>Adjusts</button>
+          <button onClick={handleClose} className='b'>Close</button>
+        </div>
+      )}
 
                         </div>
                     </div>
                     {view ==="posts"&&(
                     <div className='main'>
-                        <div className='bio'>
-                            <h1>Bio</h1>
+                        <div className='bio' >
+                            <h1 style={{ margin: "20px" }}>Bio</h1>
                             {/* school */}
-                            <div style={{marginLeft:'10px',marginTop:'10px'}}>
+                            <div style={{marginLeft:'30px'}}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                             <div onClick={() =>setShowSchoolInput(!showSchoolInput) } style={{ cursor: "pointer" }}>
                                 <img src="/src/assets/school.svg" alt="" width={30} height={30}/>
                             </div>
                             {schools.length > 0 && (
-                            <div style={{ marginLeft: "10px" }}>
-                            {schools[schools.length - 1]} 
+                            <div style={{ marginLeft: "10px",display: "flex",flexDirection: "column", gap: "5px"  }}>
+                            {schools.slice(-2).map((school, index) => (
+                            <div key={index}>{school}</div>
+                            ))}
                             </div>
                             )}
                             </div >
                             {showSchoolInput && (
-                             <div style={{ marginLeft: "10px" }}>
+                             <div style={{display: 'flex', alignItems: 'center', marginLeft: "10px" }}>
                             <input
                             type="text"
                             className='input'
@@ -331,24 +356,32 @@ useEffect(() => {
                             onChange={(e) => setNewSchool(e.target.value)}
                             placeholder="type..."
                             />
-                            <button onClick={handleAddSchool} >+</button>
+                            <div tabindex="0" class="plusButton" onClick={handleAddSchool}>
+                                        <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+                                            <g mask="url(#mask0_21_345)">
+                                            <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
+                                            </g>
+                                        </svg>
+                            </div>
                             </div>
                             )}
                             </div>
                             {/* companies */}
-                            <div style={{marginLeft:'10px',marginTop:'10px'}}>
+                            <div style={{marginLeft:'30px',marginTop:'20px',marginBottom:'20px'}}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <div onClick={()=>setShowCompanyInput(!showCompanyInput)} style={{ cursor: "pointer" }}>
                                         <img src="/src/assets/company.svg" alt="" width={30} height={30} />
                                     </div>
                                     {companies.length > 0 && (
-                                        <div style={{ marginLeft: "10px" }}>
-                                            {companies[companies.length - 1]}
+                                        <div style={{ marginLeft: "10px",display: "flex",flexDirection: "column", gap: "5px" }}>
+                                            {companies.slice(-2).map((company, index) => (
+                                                <div key={index}>{company}</div>
+                                            ))}
                                         </div>
                                     )}
                                 </div>
                                 {showCompanyInput  && (
-                                    <div style={{ marginLeft: "10px" }}>
+                                    <div style={{ display: 'flex', alignItems: 'center',marginLeft: "10px" }}>
                                         <input
                                             type="text"
                                             className='input'
@@ -356,12 +389,22 @@ useEffect(() => {
                                             onChange={(e) => setNewCompany(e.target.value)}
                                             placeholder="type..."
                                         />
-                                        <button onClick={handleAddCompany}>+</button>
+                                        
+                                        <div tabindex="0" class="plusButton" onClick={handleAddCompany}>
+                                        <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+                                            <g mask="url(#mask0_21_345)">
+                                            <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
+                                            </g>
+                                        </svg>
+                                        </div>
+                                        
                                     </div>
                                 )}
                             </div>
 
-
+                                <div className='editbut'>
+                                    Edit personal details 
+                                </div>
                         </div>
                         <div className='about' >
                         <div style={{ margin: "20px" }}>
@@ -376,22 +419,40 @@ useEffect(() => {
                         </div>
 
                             {editMode ? (
-                                <div>
-                                    <ReactQuill
-                                        className="input"
-                                        style={{
-                                            margin: "0",
-                                            padding: "5px",
-                                            width: "100%",
-                                            maxWidth: "900px",
-                                        }}
-                                        value={newDescription}
-                                        modules={modules}
-                                        onChange={(e) => setNewDescription(e.target.value)} 
-                                        placeholder="Type here ..."
-                                        rows="10"
-                                        cols="50"
-                                    />
+                                <div >
+                                     <div dangerouslySetInnerHTML={{ __html: newDescription }} />
+
+                                    <Editor 
+                apiKey = {textEditorAPI} // Thay bằng API Key của bạn nếu cần
+                value={newDescription}
+                onEditorChange={handleEditorChange}
+                
+                init={{
+                    height: 300,
+                    menubar: true,
+                      plugins: [
+                        "advlist autolink lists link image charmap preview anchor",
+                        "searchreplace visualblocks code fullscreen",
+                        "insertdatetime media table code help wordcount",
+                      ],
+                      toolbar:
+                        "undo redo | formatselect | bold italic underline forecolor backcolor | \
+                        alignleft aligncenter alignright alignjustify | \
+                        bullist numlist outdent indent | removeformat | help",
+                      content_style:
+                        "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                        
+                }}
+            />
+            <div
+                style={{
+                    border: "1px solid #ccc",
+                    padding: "10px",
+                    marginTop: "10px",
+                    borderRadius: "5px",
+                }}
+                
+            />
                                     <div style={{ marginTop: "10px" }}>
                                         <button onClick={handleUpdateDescription}>Save</button>
                                         <button
@@ -429,7 +490,7 @@ useEffect(() => {
                             </div>
                         </div>
                         <div className='Post'>
-                            <h1>Posts</h1>
+                            <h1 style={{ margin: "20px" }}>Posts</h1>
                             
                             <div>
                             

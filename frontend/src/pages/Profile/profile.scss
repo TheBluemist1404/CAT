@@ -219,17 +219,17 @@
         padding-right: 100px; 
     }
     .input {
-        border: none;
+        border: 1px solid rgb(255, 255, 255);
         padding: 1rem;
-        border-radius: 1rem;
-        background: #000000;
         
+        background: #000000;
+        height: 40px;
         transition: 0.3s;
        }
        
        .input:focus {
-        outline-color: #e8e8e8;
-        background: #e8e8e8;
+        
+        background: #161616;
         
         transition: 0.3s;
        }
@@ -283,8 +283,8 @@
     flex-direction: row; 
     align-items: center; 
     justify-content: space-between; 
-    border: 2px solid rgb(133, 1, 120);
-    box-shadow: 0 4px 8px rgba(255, 34, 97, 0.1); 
+    border: 1px solid rgb(49, 49, 49);
+    box-shadow: 0 4px 8px rgba(152, 152, 152, 0.1); 
     border-radius: 10px; 
     padding: 10px;
     transition: transform 0.2s, box-shadow 0.2s; 
@@ -292,7 +292,8 @@
   
   .post-card:hover {
     transform: translateY(-5px); 
-    box-shadow: 0 8px 16px rgba(164, 0, 88, 0.2); 
+    background-color: #131313;
+    box-shadow: 0 8px 16px rgba(187, 187, 187, 0.2); 
   }
   
   /* Icon */
@@ -313,8 +314,102 @@
     color: #ffffff; 
   }
   .post-title:hover {
-    color: #ff00a6; 
+    font-weight: bold;
     text-decoration: underline; 
   }
+  .bb{
+    background: rgba(194, 179, 179, 0.4);
+border-radius: 16px;
+box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+backdrop-filter: blur(5.7px);
+-webkit-backdrop-filter: blur(11.7px);
+border: 1px solid rgba(0, 0, 0, 1);
+width: 200px;
+  }
+  button.b{
+    background-color: #3b3b3b;
+    color: #fffefe;
+    padding: 10px;
+    backdrop-filter: blur(11.7px);
+    width: 90%;
+    font-size: 15px;
+  }
+  .b:hover{
+    background-color: rgb(35, 35, 35);
+  }
+  .plusButton {
+    /* Config start */
+    --plus_sideLength: 2.5rem;
+    --plus_topRightTriangleSideLength: 0.9rem;
+    /* Config end */
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid white;
+    width: var(--plus_sideLength);
+    height: var(--plus_sideLength);
+    background-color: #000000;
+    overflow: hidden;
+  }
   
+  .plusButton::before {
+    position: absolute;
+    content: "";
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-width: 0 var(--plus_topRightTriangleSideLength) var(--plus_topRightTriangleSideLength) 0;
+    border-style: solid;
+    border-color: transparent white transparent transparent;
+    transition-timing-function: ease-in-out;
+    transition-duration: 0.2s;
+  }
+  
+  .plusButton:hover {
+    cursor: pointer;
+  }
+  
+  .plusButton:hover::before {
+    --plus_topRightTriangleSideLength: calc(var(--plus_sideLength) * 2);
+  }
+  
+  .plusButton:focus-visible::before {
+    --plus_topRightTriangleSideLength: calc(var(--plus_sideLength) * 2);
+  }
+  
+  .plusButton>.plusIcon {
+    fill: white;
+    width: calc(var(--plus_sideLength) * 0.7);
+    height: calc(var(--plus_sideLength) * 0.7);
+    z-index: 1;
+    transition-timing-function: ease-in-out;
+    transition-duration: 0.2s;
+  }
+  
+  .plusButton:hover>.plusIcon {
+    fill: black;
+    transform: rotate(180deg);
+  }
+  
+  .plusButton:focus-visible>.plusIcon {
+    fill: black;
+    transform: rotate(180deg);
+  }
+  .editbut{
+    background-color: #424242;
+    width: 50%;
+    height: 40px;
+    margin: 0 auto;
+    display: flex; /* Kích hoạt flexbox */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    text-align: center; /* Căn giữa văn bản (nếu cần) */
+    border-radius: 10px;
+  }
+  .editbut:hover{
+    background-color: #131313;
+    transition: 0.3s;
+  }
 }
