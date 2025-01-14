@@ -19,7 +19,7 @@ function Detail({ token }) {
 
   const { id } = useParams();
   const fetchData = async () => {
-    const response = await axios.get(`http://localhost:3000/api/v1/forum/detail/${id}`)
+    const response = await axios.get(`http://localhost:3000/api/v1/forum/detail/${id}`, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
     const postDetail = response.data
     console.log(postDetail)
     if (postDetail) {
@@ -41,7 +41,11 @@ function Detail({ token }) {
   }
 
   useEffect(() => {
-    fetchData()
+    if (!isLoggedIn) {
+      navigate('/auth/login');
+    } else {
+      fetchData();
+    }
   }, [])
   //Handle time display
   const timestamp = post ? post.createdAt : new Date();
@@ -262,7 +266,7 @@ function Detail({ token }) {
               <img src="/src/pages/forum/assets/Share Icon.svg" className="comment-action" alt="Share" /> Share
             </button>
           </div>
-          <hr className="post-line" style={{marginTop: '10px'}}/>
+          <hr className="post-line" style={{ marginTop: '10px' }} />
         </div>
       ))}
     </div>
@@ -270,7 +274,7 @@ function Detail({ token }) {
 
 
   return (
-    <div className="post" style={{height: 'calc(100vh - 60px)'}}>
+    <div className="post" style={{ height: 'calc(100vh - 60px)' }}>
       <div className="post-header">
         <img src={post ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" />
         <div className="user-name">{post ? post.userCreated.fullName : "unknown"}</div>
