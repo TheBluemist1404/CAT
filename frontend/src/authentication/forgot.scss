@@ -50,11 +50,19 @@
       }
 
       button {
+        cursor: pointer;
         margin-top: 20px;
         border: none;
         border-radius: 25px;
         background-color: var(--primary-color);
         color: white;
+        font-size: medium;
+        font-weight: bold;
+      }
+
+      button:hover{
+        transform: scale(1.02);
+        opacity: 0.9;
       }
     }
 
@@ -84,6 +92,7 @@
       }
 
       button {
+        cursor: pointer;
         height: 50px;
         margin-top: 20px;
         border: none;
@@ -92,6 +101,11 @@
         color: white;
         font-size: medium;
         font-weight: bold;
+      }
+
+      button:hover{
+        transform: scale(1.02);
+        opacity: 0.9;
       }
     }
   }

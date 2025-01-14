@@ -71,8 +71,6 @@ const PlaneIcon = ({ progress }) => {
     setAngle(tangent(progress * pathLength))
   }, [progress]);
 
-  console.log(angle)
-
   return (
     <g
       transform={`translate(${position.x - 20}, ${position.y - 70}) scale(0.1) rotate(${angle}, 300, 750)`}  // Offset for centering the icon
