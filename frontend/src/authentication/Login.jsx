@@ -15,6 +15,7 @@ const Login = () => {
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [correctPass, setCorrectPass] = useState(true);
   const navigate = useNavigate();
 
   //OAuth setup
@@ -43,6 +44,11 @@ const Login = () => {
       localStorage.setItem('token', JSON.stringify(token));
       setIsLoggedIn(true);
     } catch (error) {
+      if (error.response) {
+        if (error.response.status === 403 || error.response.status === 404) {
+          setCorrectPass(false)
+        }
+      }
       console.error("Login failed", error);
     }
   }
@@ -59,11 +65,13 @@ const Login = () => {
   return (
     <div className="login">
       <div className="bg" style={{ '--backgroundImage': `url(${background})` }}>
-        <Header isAuth={true}/>
+        <Header isAuth={true} />
         <form action="action_page.php" method="post" onSubmit={handleSubmit}>
           <div className='con'>
             <div className="auth-con">
               <div className="heading">Login</div>
+              <div style={{ marginTop: '15px', color: correctPass? 'transparent': 'var(--highlight-red)'}}>Password or email not correct</div>
+
               <div className="name">
                 <div className="wave-group">
                   <a className="user">
@@ -98,18 +106,18 @@ const Login = () => {
                   </label>
                 </div>
               </div>
-              <div className="forget" onClick={()=>{navigate('/auth/forgot')}}>Forget password?</div>
+              <div className="forget" onClick={() => { navigate('/auth/forgot') }}>Forget password?</div>
               <button type="submit">Login</button>
               <div className="reg">
                 Don't have an account?<p onClick={toLogin}> Register</p>
               </div>
             </div>
 
-            <div style={{marginBottom: '20px', display: 'flex', flexDirection: 'row', gap: '50px'}}>
+            <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'row', gap: '50px' }}>
               <a className="fb">
-                <img src="/src/assets/facebook-svgrepo-com.svg" alt="" style={{width: '50px'}}/>
+                <img src="/src/assets/facebook-svgrepo-com.svg" alt="" style={{ width: '50px' }} />
               </a>
-              <a className="gg" href={`${rootURL}?${qs.toString()}`} style={{width: '50px'}}>
+              <a className="gg" href={`${rootURL}?${qs.toString()}`} style={{ width: '50px' }}>
                 <img src="/src/assets/gmail.svg" alt="" />
               </a>
             </div>

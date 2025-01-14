@@ -7,12 +7,14 @@ function Forgot() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [getOtp, setGetOtp] = useState(false)
+  const [otpMatch, setOtpMatch] = useState(true)
   const [otp, setOtp] = useState("");
   const [reset, setReset] = useState(false);
   const [otpToken, setOtpToken] = useState();
 
   const [pass, setPass] = useState();
   const [confirm, setConfirm] = useState();
+  const [confirmMatch, setConfirmMatch] = useState(true)
 
   const handleMail = async (e) => {
     e.preventDefault();
@@ -38,6 +40,9 @@ function Forgot() {
         setReset(true);
       }
     } catch (error) {
+      if (error.response && error.response.status === 403) {
+        setOtpMatch(false)
+      }
       console.error("fail to send otp", error)
     }
   }
@@ -52,7 +57,10 @@ function Forgot() {
         navigate('/auth/login')
       }
     } catch (error) {
-      console.error("fail to reset password", error)
+      if (error.response && error.response.status === 400) {
+        setConfirmMatch(false)
+      }
+      console.error("fail to reset password", error.response)
     }
   }
 
@@ -62,11 +70,12 @@ function Forgot() {
         <h1>Forgot password?</h1>
         <p>To reset your password, please enter the email address associated with your account</p>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" required="true" placeholder="cat@example.com" onChange={(e) => { setEmail(e.target.value) }} />
+        <input id="email" type="text" required={true} placeholder="cat@example.com" onChange={(e) => { setEmail(e.target.value) }} />
         <button type="submit" style={{ width: '100%' }} >Get OTP</button>
       </form>) : (<form className="verify-otp" onSubmit={handleOTP}>
         <label htmlFor="otp">Enter your OTP here</label>
-        <input id="otp" type="text" required="true" placeholder="******" onChange={(e) => { setOtp(e.target.value) }} />
+        <input id="otp" type="text" required={true} placeholder="******" onChange={(e) => { setOtp(e.target.value) }} />
+        {!otpMatch && <span style={{color: 'var(--highlight-red)', fontSize: '14px  '}}>OTP not correct!</span>}
         <button type="submit">Verify</button>
       </form>)}
     </div>
@@ -79,10 +88,11 @@ function Forgot() {
         <p>Let's get you a new password!</p>
 
         <label htmlFor="reset">New password</label>
-        <input id="reset" type="password" onChange={(e) => { setPass(e.target.value) }} />
+        <input id="reset" type="password" required={true} onChange={(e) => { setPass(e.target.value) }} />
 
         <label htmlFor="confirm">Confirm new password</label>
-        <input id="confirm" type="password" onChange={(e) => { setConfirm(e.target.value) }} />
+        <input id="confirm" type="password" required={true} onChange={(e) => { setConfirm(e.target.value) }} />
+        {!confirmMatch && <span style={{color: 'var(--highlight-red)', fontSize: '14px  '}}>Password does not match, try again!</span>}
 
         <button type="submit">Reset</button>
       </form>
