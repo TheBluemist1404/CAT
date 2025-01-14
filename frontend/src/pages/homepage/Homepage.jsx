@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import './homepage.scss'
@@ -39,18 +39,34 @@ function Card({ subhead, head }) {
 function Homepage({ token }) {
     const navigate = useNavigate();
 
-    const [scrollProgress, setScrollProgress] = useState(0);
+    //Handle scroll-into-view effect
+    const pitchRef = useRef();
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        const handleScroll = () => {
-            const scrollTop = window.scrollY;
-            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-            const progress = Math.min(scrollTop / maxScroll, 1); // Clamp value between 0 and 1
-            setScrollProgress(progress);
-        };
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("animate");
+                        setIsVisible(!isVisible)
+                        observer.unobserve(entry.target) //one-time render
+                    }
+                    // else {
+                    //     entry.target.classList.remove("animate")
+                    // }
+                });
+            },
+            {
+                root: null, // Default: viewport
+                rootMargin: "-40% 0px -40% 0px", // Trigger when the element is in the middle
+                threshold: 0.3, // Trigger as soon as it enters the margin
+            }
+        );
 
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+        observer.observe(pitchRef.current)
+
+        return () => observer.disconnect(); // Cleanup
     }, []);
 
     return (
@@ -63,7 +79,7 @@ function Homepage({ token }) {
                         <h1>c.a.t</h1>
                         <div className="subhead">
                             <div id='where'>where we</div>
-                            <TypingEffect text={"code-all-time"} speed={150}></TypingEffect>
+                            <TypingEffect text={"code-all-time"} decor={true} loop={true} speed={150}></TypingEffect>
                         </div>
                     </div>
                 </section>
@@ -119,7 +135,7 @@ function Homepage({ token }) {
                                 Search with <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>#TAG</span> available
                             </div>
                         </div>
-                        <PlaneAnimation/>
+                        <PlaneAnimation />
 
                     </div>
                 </section>
@@ -143,10 +159,12 @@ function Homepage({ token }) {
                             <Card subhead={'for team management'} head={'restriction'}></Card>
                         </div>
                     </div>
-                    <div className="live-pitch">
-                        <div>Colaborating with <span id='blue-span'>no limitations</span></div>
-                        <div>-</div>
-                        <div>In our <span id='red-span'>modern IDE</span></div>
+                    <div className="live-pitch" ref={pitchRef} style={{ minHeight: '300px' }}>
+                        {isVisible && <>
+                            <div>Colaborating with <span id='blue-span'><TypingEffect text={"no limitation"} decor={false} cursor={false} speed={150} /></span></div>
+                            <div>-</div>
+                            <div>In our <span id='red-span'><TypingEffect text={"modern IDE"} decor={false} cursor={false} speed={150} /></span></div>
+                        </>}
                     </div>
                 </section>
                 <section className="outro">
@@ -164,29 +182,5 @@ function Homepage({ token }) {
 
     )
 }
-
-const PlaneIcon = ({ progress }) => {
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-
-    useEffect(() => {
-        const path = document.getElementById("curve-path");
-        const pathLength = path.getTotalLength();
-        console.log(pathLength)
-        const point = path.getPointAtLength(0.5);
-        console.log(point)
-        setPosition({ x: point.x, y: point.y });
-    }, [progress]);
-
-    return (
-        <svg
-            transform={`translate(${position.x - 10, position.y - 10})`} // Offset for centering the icon
-        >
-            <path
-                d="M10 0 L20 10 L10 20 L0 10 Z" // Example plane shape
-                fill="black"
-            />
-        </svg>
-    );
-};
 
 export default Homepage;
