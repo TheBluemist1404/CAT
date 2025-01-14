@@ -1,11 +1,18 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import './typing_effect.css';
 
 
-function TypingEffect({text, speed=100, delay=500}) {
+function TypingEffect({text, decor, loop, speed=100, delay=500}) {
+    const containerRef = useRef();
     const [displayText, setDisplayText] = useState("");
     const [index, setIndex] = useState(0);
     const [typeForward, setTypeForward] = useState(true)
+
+    useEffect(() => {
+        if (decor) {
+            containerRef.current.classList.add("typing-container")
+        }
+    })
 
     useEffect(()=>{
         const type = () =>{
@@ -18,12 +25,14 @@ function TypingEffect({text, speed=100, delay=500}) {
                     setTimeout(()=> setIndex(index-1), delay);
                 }
             } else{
-                if (index>=0) {
-                    setDisplayText(text.slice(0, index));
-                    setIndex(index-1);
-                } else {
-                    setTypeForward(true);
-                    setTimeout(()=> setIndex(index+1), delay)
+                if (loop) {
+                    if (index>=0) {
+                        setDisplayText(text.slice(0, index));
+                        setIndex(index-1);
+                    } else {
+                        setTypeForward(true);
+                        setTimeout(()=> setIndex(index+1), delay)
+                    }
                 }
             }
         }
@@ -33,9 +42,9 @@ function TypingEffect({text, speed=100, delay=500}) {
 
 
     return(
-        <div className='typing-container'>
-            <span>{displayText}</span><span className="typing-cursor">|</span>
-        </div>
+        <span ref={containerRef}>
+            <span>{displayText}</span>{loop && <span className="typing-cursor">|</span>}
+        </span>
     )
 
 }

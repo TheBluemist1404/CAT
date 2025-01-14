@@ -28,14 +28,14 @@ body {
   align-items: center;
   margin: 0 30px;
 
+
   .navbar {
-    margin-left: 80px;
-    width: fit-content;
+    margin-left: 3%;
     display: flex;
     gap: 10vw;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-around;
   }
 
   .navbar div {
