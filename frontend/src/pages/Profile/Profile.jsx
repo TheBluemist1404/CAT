@@ -478,16 +478,10 @@ useEffect(() => {
                                     </div>
                                 </div>
                             ) : (
-                                <div
-                                    style={{
-                                        width: "100%",
-                                        maxWidth: "900px",
-                                        wordWrap: "break-word",
-                                        overflowWrap: "break-word",
-                                        marginTop: "5px",
-                                    }}
+                                <div dangerouslySetInnerHTML={{ __html: description }}
+                                    
                                 >
-                                    {description || "No description available. Click the edit button to add one!"}
+                                    
                                 </div>
                             )}
                         </div>
