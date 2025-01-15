@@ -12,7 +12,6 @@
     border-radius: 7px;
 } 
 
-  
 .typing-cursor {
     animation: blink 0.7s step-end infinite;
 }
@@ -21,4 +20,6 @@
     from, to {color: transparent; }
     50% {color: var(--code-font); }
 }
+  
+
   

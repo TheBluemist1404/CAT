@@ -47,8 +47,7 @@ function Header({token, isAuth}) {
 
     return (
         <div className="header">
-            <div style={{display:'flex', flexDirection: 'row'}}>
-                <img src="/src/assets/logo.svg" alt="" onClick={() => navigate('/')} style={{ cursor: 'pointer' }} />
+            <img src="/src/assets/logo.svg" alt="" onClick={() => navigate('/')} style={{ cursor: 'pointer' }} />
                 <div className="navbar">
                     {navbar.map((obj, index) => (
                         <div ref={el => linkRefs.current[index] = el}
@@ -59,8 +58,7 @@ function Header({token, isAuth}) {
                         </div>
                     ))}
                 </div>
-            </div>
-            <div className='login' style={{position:'relative', display: isAuth? 'none': 'block'}}>
+            <div className='login' style={{position:'relative', opacity: isAuth? 0: 1}}>
                 {
                     !isLoggedIn ? (<div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
                         <div className="login-button" onClick={() => { navigate('/auth/login') }}>Login</div>

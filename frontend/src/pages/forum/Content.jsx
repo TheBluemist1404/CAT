@@ -11,7 +11,9 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
   const [postFeed, setPostFeed] = useState(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [tags, setTags] = useState('');
+  const [images, setImages] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
   const [visibility, setVisibility] = useState('public');
   const [error, setError] = useState('');
 
@@ -30,6 +32,22 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     }
   };
 
+  const fetchTags = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/api/v1/forum/tags");
+      setTags(response.data); // response.data contains all tag objects
+    } catch (error) {
+      console.error("Failed to fetch tags:", error);
+    }
+  };
+
+  const toggleTagSelection = (tagId) => {
+    setSelectedTags((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
+    );
+  };
+
+
   const createPost = async () => {
     if (title.trim() === '') {
       setError('Need title to create post');
@@ -39,11 +57,6 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     const content = editorRef.current?.getContent();
 
     setError(''); 
-    
-    const extractedTags = tags
-    .split(' ')
-    .filter(tag => tag.startsWith('#'))
-    .map(tag => tag.slice(1));
 
     try {
       const response = await axios.post(
@@ -53,18 +66,19 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
           content,
           userCreated: user._id,
           status: visibility,
-          tags: extractedTags,
+          tags: selectedTags,
         },
         {
           headers: {
             Authorization: `Bearer ${token.accessToken}`,
+            Type: 'multipart/form-data',
           },
         }
       );
 
       setTitle('');
       if (editorRef.current) editorRef.current.setContent('');
-      setTags('');
+      setSelectedTags([]);
       setVisibility('public');
       handleCreatePostToggle();
       fetchPosts(currentPage);
@@ -75,6 +89,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
 
   useEffect(() => {
     fetchPosts(currentPage);
+    fetchTags();
   }, [currentPage]);
 
   const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
@@ -94,26 +109,44 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                 <textarea placeholder="Title" rows="1" className="modal-textarea-title" style={{ marginBottom: 10 }} value={title} onChange={(e) => setTitle(e.target.value)} />
                 {error && (<div className="title-error" style={{ color: "red", fontSize: "16px", }}>{error}</div>)}
                 <Editor
-                    apiKey = {textEditorAPI}
-                    onInit={(_, editor) => (editorRef.current = editor)}
-                    initialValue="<p>Write your content here...</p>"
-                    init={{
-                      height: 300,
-                      menubar: false,
-                      plugins: [
-                        "advlist autolink lists link image charmap preview anchor",
-                        "searchreplace visualblocks code fullscreen",
-                        "insertdatetime media table code help wordcount",
-                      ],
-                      toolbar:
-                        "undo redo | formatselect | bold italic underline forecolor backcolor | \
-                        alignleft aligncenter alignright alignjustify | \
-                        bullist numlist outdent indent | removeformat | help",
-                      content_style:
-                        "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-                    }}
-                  />
-                <textarea placeholder="Tags Ex: #ObjectID (cannot fetch tags in db yet)" className="modal-textarea-tags" style={{ marginTop: 10, height: 50 }} onChange={(e) => setTags(e.target.value)} />
+                  apiKey={textEditorAPI}
+                  onInit={(_, editor) => (editorRef.current = editor)}
+                  initialValue="<p>Write your content here...</p>"
+                  init={{
+                    height: 300,
+                    menubar: false,
+                    plugins: [
+                      "advlist autolink lists link image charmap preview anchor",
+                      "searchreplace visualblocks code fullscreen",
+                      "insertdatetime media table code help wordcount",
+                      "image",
+                    ],
+                    toolbar:
+                      "undo redo | link image | code | formatselect | bold italic underline forecolor backcolor | \
+                      alignleft aligncenter alignright alignjustify | \
+                      bullist numlist outdent indent | removeformat | help",
+                    content_style:
+                      "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                  }}
+                />
+                <div className="tags-container" style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: 10 }}>
+                  {tags.map((tag) => (
+                    <div
+                      key={tag._id}
+                      className={`tag-box ${selectedTags.includes(tag._id) ? "selected" : ""}`}
+                      onClick={() => toggleTagSelection(tag._id)}
+                      style={{
+                        padding: "5px 10px",
+                        borderRadius: "5px",
+                        backgroundColor: selectedTags.includes(tag._id) ? "#FF4B5C" : "#2B2B3B",
+                        color: "#FFFFFF",
+                        cursor: "pointer",
+                      }}
+                    >
+                      #{tag.title}
+                    </div>
+                  ))}
+                </div>
                 <div className="visibility-options">
                   <label htmlFor="visibility">Who can see this post?</label>
                   <select id="visibility" className="visibility-dropdown" value={visibility} onChange={(e) => setVisibility(e.target.value)}>
@@ -127,7 +160,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
           </div>
         )}
         <section className="post-feed" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', gap: '50px' }}>
-          {postFeed && postFeed.map((post, index) => (
+        {postFeed && postFeed.map((post, index) => (
             <Post key={index} post={post} token={token} update={fetchPosts} />
           ))}
         </section>
