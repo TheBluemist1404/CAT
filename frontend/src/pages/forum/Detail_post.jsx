@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../authentication/AuthProvider";
 import { useParams, useNavigate } from "react-router-dom";
+import DOMPurify from 'dompurify';
+
 
 function Detail({ token }) {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ function Detail({ token }) {
   const [commentInput, setCommentInput] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
+
 
 
   const { id } = useParams();
@@ -47,6 +50,7 @@ function Detail({ token }) {
       fetchData();
     }
   }, [])
+  const sanitizedContent = DOMPurify.sanitize(post ? post.content : "");
   //Handle time display
   const timestamp = post ? post.createdAt : new Date();
   const createdDate = new Date(timestamp);
@@ -286,7 +290,7 @@ function Detail({ token }) {
       </div>
       <div className="post-body">
         <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post ? post.title : ""}</h1>
-        <p className="post-content">{post ? post.content : ""}</p>
+        <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
       </div>
       <hr className="post-line" />
       <div className="post-footer">

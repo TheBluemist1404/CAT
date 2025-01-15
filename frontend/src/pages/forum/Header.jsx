@@ -48,7 +48,7 @@ const Header = () => {
                 setFilteredResults(response.data[0].posts || []);
             }
             else {
-                setFilteredResults(response);
+                setFilteredResults(response.data[0].posts || []);
             }
         } catch (error) {
             console.error("Error fetching search results:", error);
@@ -64,7 +64,7 @@ const Header = () => {
         } else if (queryType === "posts") {
             navigate(`/forum/${result._id}`);
         } else if (queryType === "tags") {
-            navigate(`/forum?tag=${result.title}`);
+            navigate(`/forum/${result._id}`);
         }
     };
 
