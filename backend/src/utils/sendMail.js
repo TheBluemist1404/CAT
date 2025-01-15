@@ -18,11 +18,5 @@ module.exports.sendMail = async (email, subject, html) => {
     html: html,
   };
 
-  await transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log('Error:', error);
-    } else {
-      console.log('Email sent: ', info.response);
-    }
-  });
+  await transporter.sendMail(mailOptions);
 };
