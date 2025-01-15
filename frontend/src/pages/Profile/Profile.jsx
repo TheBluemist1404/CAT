@@ -256,6 +256,20 @@ useEffect(() => {
   const handleClose = () => {
     setIsVisible(false);
   };
+  
+    const [timeSpent, setTimeSpent] = useState(0); // Thời gian đã trôi qua trong giây
+  
+    useEffect(() => {
+      // Khởi tạo một bộ đếm thời gian
+      const timer = setInterval(() => {
+        setTimeSpent(prevTime => prevTime + 1); // Cập nhật thời gian mỗi giây
+      }, 1000); // Mỗi giây
+  
+      // Dọn dẹp khi component unmount hoặc khi page bị rời khỏi
+      return () => {
+        clearInterval(timer); // Xóa bộ đếm khi component unmount
+      };
+    }, []); // Chạy một lần khi component mount
     const id = useParams(); 
     console.log(id.id, user._id)
     
@@ -275,12 +289,12 @@ useEffect(() => {
                         </div>
                         <div className="box" style={{top: '85%'}}>
                             <div className="box-item">
-                                <span className="number">150</span>
+                                <span className="number">{user.posts.length}</span>
                                 <span className="label">Posts</span>
                             </div>
                             <div className="divider"></div>
                             <div className="box-item">
-                                <span className="number">15h</span>
+                                <span className="number">{timeSpent}s</span>
                                 <span className="label">Coding</span>
                             </div>
                             <div className="divider"></div>
