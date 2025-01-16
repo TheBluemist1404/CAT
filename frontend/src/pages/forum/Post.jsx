@@ -215,11 +215,31 @@ function Post({ post, token, update }) {
       />
     </div>
   );
+  useEffect(() => {
+    const isPostSaved = user.savedPosts.some(
+      (savedPost) => savedPost.toString() === post._id.toString()
+    );
+    const Saved = isPostSaved;
+  }, [post._id, user.savedPosts]);
 
-  // Save post
-  const handleSavePost = () => {
-    setIsSaved(!isSaved);
-  }
+  // Handle Save/Unsave Toggle
+  const handleSavePost = async () => {
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/forum/save/${post._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
+
+      if (response.status === 200) {
+        setIsSaved(!isSaved); // Toggle saved status
+      } else {
+        console.error("Error updating save status:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error saving the post:", error);
+    }
+  };
 
   const renderDropdown = (index) => (
     <div
@@ -288,9 +308,11 @@ function Post({ post, token, update }) {
       <div className="post-body">
         <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post.title}</h1>
         <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
-        {tag.map((tag, index) => (
-          <div className="post-tags" key={index}>{tag}</div>
-        ))}
+        <div className="tag-box">
+          {tag.map((tag, index) => (
+            <div className="post-tags" key={index}>{tag}</div>
+          ))}
+        </div>
       </div>
       <hr className="post-line" />
       <div className="post-footer">
