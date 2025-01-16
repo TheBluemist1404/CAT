@@ -3,8 +3,8 @@ import { useNavigate, useParams, Routes, Route } from 'react-router-dom';
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../authentication/AuthProvider';
 import axios from "axios";
-import ReactQuill from "react-quill"; // Import ReactQuill
-import "react-quill/dist/quill.snow.css"; // Import style của Quill
+import ReactQuill from "react-quill"; 
+import "react-quill/dist/quill.snow.css"; 
 import { Editor } from "@tinymce/tinymce-react";
 import "./profile.scss"
 import Header from "../../Header";
@@ -31,7 +31,7 @@ const Profile = ({token,post}) => {
     const [showInput2, setShowInput2] = useState(false);
     const [showSchoolInput, setShowSchoolInput] = useState(false); 
     const [showCompanyInput, setShowCompanyInput] = useState(false);
-    
+    const [avatar, setAvatar] = useState(user?.avatar || '');
     
     const handleAddSchool = async () => {
         if (newSchool.trim() !== "") {
@@ -51,6 +51,7 @@ const Profile = ({token,post}) => {
                         fullName: user.fullName,
                         companies,
                         description,
+                        avatar: user.avatar,
                     },
                     {
                         headers: {
@@ -115,6 +116,7 @@ const handleAddCompany = async () => {
                     fullName: user.fullName,
                     schools,
                     description,
+                    avatar: user.avatar,
                 },
                 {
                     headers: {
@@ -178,10 +180,11 @@ useEffect(() => {
     const [description, setDescription] = useState(""); 
     const [newDescription, setNewDescription] = useState(""); 
     const [editMode, setEditMode] = useState(false); 
+    
 
     const handleEditorChange = (content) => {
-        const sanitizedContent = DOMPurify.sanitize(content); // Làm sạch nội dung
-        setNewDescription(sanitizedContent); // Lưu vào state
+        const sanitizedContent = DOMPurify.sanitize(content); 
+        setNewDescription(sanitizedContent); 
     };
     const handleUpdateDescription = async () => {
         if (newDescription.trim() !== "") {
@@ -193,7 +196,8 @@ useEffect(() => {
                         user: { id: user._id },
                     fullName: user.fullName,
                     schools,
-                    companies
+                    companies,
+                    avatar: user.avatar,
                     },
                     {
                         headers: {
@@ -206,6 +210,7 @@ useEffect(() => {
                     setDescription(response.data.description || newDescription); 
                     setEditMode(false); 
                     setNewDescription(""); 
+                    
                 }
             } catch (err) {
                 console.error("Error updating description:", err.response?.data?.message || err.message);
@@ -228,6 +233,7 @@ useEffect(() => {
 
                 if (response.status === 200 && response.data.description) {
                     setDescription(response.data.description); 
+                    
                 }
             } catch (err) {
                 console.error("Error fetching description:", err.response?.data?.message || err.message);
@@ -247,7 +253,6 @@ useEffect(() => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
   const handleSvgClick = (e) => {
-    // Lấy vị trí của click chuột
     const rect = e.target.getBoundingClientRect();
     setPosition({ top: rect.top + window.scrollY, left: rect.left + window.scrollX });
     setIsVisible(!isVisible);
@@ -256,20 +261,78 @@ useEffect(() => {
   const handleClose = () => {
     setIsVisible(false);
   };
-  
-    const [timeSpent, setTimeSpent] = useState(0); // Thời gian đã trôi qua trong giây
-  
-    useEffect(() => {
-      // Khởi tạo một bộ đếm thời gian
-      const timer = setInterval(() => {
-        setTimeSpent(prevTime => prevTime + 1); // Cập nhật thời gian mỗi giây
-      }, 1000); // Mỗi giây
-  
-      // Dọn dẹp khi component unmount hoặc khi page bị rời khỏi
-      return () => {
-        clearInterval(timer); // Xóa bộ đếm khi component unmount
-      };
-    }, []); // Chạy một lần khi component mount
+  const handleRemoveSchool = async () => {
+    if (schools.length >= 2) {
+        
+        const indexToRemove = schools.length - 1;
+
+        
+        const updatedSchools = schools.filter((_, index) => index !== indexToRemove);
+        setSchools(updatedSchools);
+    try {
+        const response = await axios.patch(
+            `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+            {
+                schools: updatedSchools,  
+                user: { id: user._id },
+                fullName: user.fullName,
+                companies,
+                description,
+                avatar: user.avatar,
+            },
+            {
+                headers: {
+                    "Authorization": `Bearer ${token.accessToken}`,
+                },
+            }
+        );
+    
+
+        if (response.status === 200) {
+            console.log("School removed successfully");
+        }
+    } catch (err) {
+        console.error("Error removing school:", err.response?.data?.message || err.message);
+    }
+};
+  };
+
+  const handleRemoveCompany = async () => {
+    if (companies.length >= 2) {
+        
+        const indexToRemove = companies.length - 1;
+
+        
+        const updatedCompany = companies.filter((_, index) => index !== indexToRemove);
+        setCompanies(updatedCompany);
+    try {
+        const response = await axios.patch(
+            `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+            {
+                companies: updatedCompany,  
+                user: { id: user._id },
+                fullName: user.fullName,
+                schools,
+                description,
+                avatar: user.avatar,
+            },
+            {
+                headers: {
+                    "Authorization": `Bearer ${token.accessToken}`,
+                },
+            }
+        );
+    
+
+        if (response.status === 200) {
+            console.log("Company removed successfully");
+        }
+    } catch (err) {
+        console.error("Error removing company:", err.response?.data?.message || err.message);
+    }
+};
+  };
+const [showDeleteButtons, setShowDeleteButtons] = useState(false);
     const id = useParams(); 
     console.log(id.id, user._id)
     
@@ -294,7 +357,7 @@ useEffect(() => {
                             </div>
                             <div className="divider"></div>
                             <div className="box-item">
-                                <span className="number">{timeSpent}s</span>
+                                <span className="number">15h</span>
                                 <span className="label">Coding</span>
                             </div>
                             <div className="divider"></div>
@@ -309,8 +372,8 @@ useEffect(() => {
                     <div className='tabs'>
                         <div>
                         <button type='button' className='p' onClick={() =>setView("posts")}>Posts</button>
-                        <button type='button' className='i' onClick={() =>setView("images")}>Images</button>
-                        <button type='button' className='v' onClick={() =>setView("videos")}>Videos</button>
+                        <button type='button' className='i' onClick={() =>setView("Media")}>Media</button>
+                        <button type='button' className='v' onClick={() =>setView("Saved")}>Saved</button>
                         </div>
                         <div>
                         <div className="settings" onClick={handleSvgClick} style={{ marginRight: "20px" }}>
@@ -321,22 +384,19 @@ useEffect(() => {
         <div className='bb'
           style={{
             position: "absolute",
-            top: position.top -150, // Đặt khoảng cách dưới SVG
+            top: position.top -150, 
             left: position.left-200,
-            
-            
-            
             padding: "10px",
-            zIndex: 1000, // Đảm bảo div này đè lên các div khác
-            display: "flex", // Sử dụng flexbox
-      flexDirection: "column", // Xếp các button theo cột
-      alignItems: "center", // Căn giữa theo chiều ngang
-      justifyContent: "center", // Căn giữa theo chiều dọc
-      gap:"10px",
+            zIndex: 1000, 
+            display: "flex", 
+            flexDirection: "column", 
+            alignItems: "center", 
+            justifyContent: "center", 
+            gap:"10px",
           }}
         >
-          <button onClick={() => alert("Button 1 clicked!")} className='b' >Settings</button>
-          <button onClick={() => alert("Button 2 clicked!")} className='b'>Adjusts</button>
+          <button onClick={() => alert("settings!")} className='b' >Settings</button>
+          <button onClick={() => alert("adjusts!")} className='b'>Adjusts</button>
           <button onClick={handleClose} className='b'>Close</button>
         </div>
       )}
@@ -347,20 +407,33 @@ useEffect(() => {
                     <div className='main'>
                         <div className='bio' >
                             <h1 style={{ margin: "20px" }}>Bio</h1>
-                            {/* school */}
                             <div style={{marginLeft:'30px'}}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <div onClick={() =>setShowSchoolInput(!showSchoolInput) } style={{ cursor: "pointer" }}>
+                            <div onClick={() =>{setShowSchoolInput(!showSchoolInput)} } style={{ cursor: "pointer" }}>
                                 <img src="/src/assets/school.svg" alt="" width={30} height={30}/>
                             </div>
                             {schools.length > 0 && (
-                            <div style={{ marginLeft: "10px",display: "flex",flexDirection: "column", gap: "5px"  }}>
-                            {schools.slice(-2).map((school, index) => (
-                            <div key={index}>{school}</div>
-                            ))}
-                            </div>
-                            )}
-                            </div >
+            <div style={{ marginLeft: "10px" }}>
+                <div>{schools[schools.length-2]}</div>
+                
+            </div>
+        )}
+    </div>
+    {schools.length > 1 && (
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                marginTop: "10px",
+                marginLeft: "40px"
+            }}
+        >
+            {schools[schools.length-1]}
+            {showDeleteButtons &&(
+                <button onClick={() => handleRemoveSchool(schools[0])}>x</button>)}
+        </div>
+    )}
                             {showSchoolInput && (
                              <div style={{display: 'flex', alignItems: 'center', marginLeft: "10px" }}>
                             <input
@@ -381,21 +454,35 @@ useEffect(() => {
                             )}
                             </div>
                             {/* companies */}
-                            <div style={{marginLeft:'30px',marginTop:'20px',marginBottom:'20px'}}>
+                            <div style={{marginLeft:'30px',marginTop:'10px',marginBottom:'20px'}}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <div onClick={()=>setShowCompanyInput(!showCompanyInput)} style={{ cursor: "pointer" }}>
                                         <img src="/src/assets/company.svg" alt="" width={30} height={30} />
                                     </div>
                                     {companies.length > 0 && (
-                                        <div style={{ marginLeft: "10px",display: "flex",flexDirection: "column", gap: "5px" }}>
-                                            {companies.slice(-2).map((company, index) => (
-                                                <div key={index}>{company}</div>
-                                            ))}
+                                        <div style={{ marginLeft: "10px" }}>
+                                            <div>{companies[companies.length-2]}</div>
                                         </div>
                                     )}
                                 </div>
+                                {companies.length > 1 && (
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            gap: "10px",
+                                            marginTop: "10px",
+                                            marginLeft: "40px"
+                                        }}
+                                    >
+                                        {companies[companies.length-1]}
+                                        {showDeleteButtons &&(
+                                            <button onClick={() => handleRemoveCompany(companies[0])}>x</button>)}
+                                    </div>
+                                )}
                                 {showCompanyInput  && (
-                                    <div style={{ display: 'flex', alignItems: 'center',marginLeft: "10px" }}>
+                                    
+                                    <div style={{ display: 'flex', alignItems: 'center',marginLeft: "10px", }}>
                                         <input
                                             type="text"
                                             className='input'
@@ -416,7 +503,7 @@ useEffect(() => {
                                 )}
                             </div>
 
-                                <div className='editbut'>
+                                <div className='editbut' onClick={() =>{setShowDeleteButtons(!showDeleteButtons)} }>
                                     Edit personal details 
                                 </div>
                         </div>
@@ -425,7 +512,7 @@ useEffect(() => {
                         <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
                             <h1 style={{ margin: "0 20px 0 0" }}>About</h1>
                             <div
-                                onClick={() => setEditMode(true)} 
+                                onClick={() => {setEditMode(true);setNewDescription(description); }}
                                 style={{ cursor: "pointer" }}
                             >
                                 <img src="/src/assets/pen.svg" alt="Edit" width={15} height={15} />
@@ -522,6 +609,9 @@ useEffect(() => {
                             </div>
                             </div>
                         </div>
+                        {/* <div className='badge'>
+                                hello
+                        </div> */}
                     </div>)}
                     
                     

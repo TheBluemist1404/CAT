@@ -401,7 +401,9 @@ width: 200px;
     background-color: #424242;
     width: 50%;
     height: 40px;
+    
     margin: 0 auto;
+    margin-top: 50px;
     display: flex; /* Kích hoạt flexbox */
     justify-content: center; /* Căn giữa theo chiều ngang */
     align-items: center; /* Căn giữa theo chiều dọc */
@@ -412,4 +414,5 @@ width: 200px;
     background-color: #131313;
     transition: 0.3s;
   }
+  
 }
