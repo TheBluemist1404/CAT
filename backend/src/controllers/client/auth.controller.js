@@ -119,11 +119,15 @@ module.exports.forgot = async (req, res) => {
       });
       return;
     }
+
+    await Otp.deleteMany({ email: user.email });
+
     const { randomOtp, hashOtp } = await hashingOtp(1000000);
     const newOtp = new Otp({
       otp: hashOtp,
       email: email,
     });
+
     await newOtp.save();
     const subject = 'CAT - OTP Verification';
     const html = `<html lang='vi'>
@@ -167,11 +171,11 @@ module.exports.forgot = async (req, res) => {
   </body>
 </html>`;
     await sendMail(email, subject, html);
-    res.status(200).json({
+    return res.status(200).json({
       message: 'Please check your email and type in otp!',
     });
   } catch (err) {
-    res.status(400).json({
+    return res.status(400).json({
       message: err.message,
     });
   }
