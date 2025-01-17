@@ -35,7 +35,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
   const fetchTags = async () => {
     try {
       const response = await axios.get("http://localhost:3000/api/v1/forum/tags");
-      setTags(response.data); // response.data contains all tag objects
+      setTags(response.data); 
     } catch (error) {
       console.error("Failed to fetch tags:", error);
     }
@@ -57,6 +57,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     const content = editorRef.current?.getContent();
 
     setError(''); 
+    console.log(user.savedPosts);
 
     try {
       const response = await axios.post(
@@ -111,7 +112,6 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                 <Editor
                   apiKey={textEditorAPI}
                   onInit={(_, editor) => (editorRef.current = editor)}
-                  initialValue="<p>Write your content here...</p>"
                   init={{
                     height: 300,
                     menubar: false,
@@ -119,21 +119,26 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                       "advlist autolink lists link image charmap preview anchor",
                       "searchreplace visualblocks code fullscreen",
                       "insertdatetime media table code help wordcount",
-                      "image",
                     ],
                     toolbar:
-                      "undo redo | link image | code | formatselect | bold italic underline forecolor backcolor | \
+                      "undo redo | code | formatselect | bold italic underline forecolor backcolor | \
                       alignleft aligncenter alignright alignjustify | \
                       bullist numlist outdent indent | removeformat | help",
-                    content_style:
-                      "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                    placeholder: "Write your content here...",
+                    content_style: `
+                      body { font-family:Helvetica,Arial,sans-serif; font-size:14px;color: white;}
+                      .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+                        color: grey;
+                        opacity: 0.8;
+                      }
+                    `,
                   }}
                 />
                 <div className="tags-container" style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: 10 }}>
                   {tags.map((tag) => (
                     <div
                       key={tag._id}
-                      className={`tag-box ${selectedTags.includes(tag._id) ? "selected" : ""}`}
+                      className={`tag-suggestion ${selectedTags.includes(tag._id) ? "selected" : ""}`}
                       onClick={() => toggleTagSelection(tag._id)}
                       style={{
                         padding: "5px 10px",
@@ -160,7 +165,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
           </div>
         )}
         <section className="post-feed" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', gap: '50px' }}>
-        {postFeed && postFeed.map((post, index) => (
+          {postFeed && postFeed.map((post, index) => (
             <Post key={index} post={post} token={token} update={fetchPosts} />
           ))}
         </section>

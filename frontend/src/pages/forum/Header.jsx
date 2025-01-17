@@ -82,7 +82,7 @@ const Header = () => {
                 <div className="search-icon"></div>
                 <input
                     type="text"
-                    placeholder="Search C.A.T... (e.g., user:abc, title:help)"
+                    placeholder="Search C.A.T... (e.g., user:abc, title:help, tag:c++)"
                     value={searchQuery}
                     onChange={handleInputChange}
                 />
