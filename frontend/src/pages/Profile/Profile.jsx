@@ -373,7 +373,7 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                         <div>
                         <button type='button' className='p' onClick={() =>setView("posts")}>Posts</button>
                         <button type='button' className='i' onClick={() =>setView("Media")}>Media</button>
-                        <button type='button' className='v' onClick={() =>setView("Saved")}>Saved</button>
+                        <button type='button' className={`v ${view === 'Saved' ? 'active' : ''}`} onClick={() =>setView("Saved")}>Saved</button>
                         </div>
                         <div>
                         <div className="settings" onClick={handleSvgClick} style={{ marginRight: "20px" }}>
@@ -596,6 +596,7 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                                 const formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}, ${date.getFullYear()}`;
 
                                 return (
+                                    
                                 <div className='post-card' key={index}>
                                     <div className='post-icon-title'>
                                         <img src="/src/assets/qa.svg" alt="" width={30} height={30} />
@@ -613,7 +614,28 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                                 hello
                         </div> */}
                     </div>)}
-                    
+                    {view ==="Saved"&&(
+                        <div className='mainS'>
+                            <div className="posts-container" style={{backgroundColor:"#333333" }}>
+                            {user.savedPosts.slice().reverse().map((post, index) => {
+                                const date = new Date(post.createdAt);
+                                const formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}, ${date.getFullYear()}`;
+                                return (
+                                    <div className='spost'>
+                                        <div className='post-card' key={index} style={{backgroundColor:"#000000" }}>
+                                            <div className='post-icon-title'>
+                                                <img src="/src/assets/qa.svg" alt="" width={30} height={30} />
+                                                <div className='post-title' key={post._id} onClick={() => handlePostClick(post._id)}>{post.title}</div>
+                                            </div>
+                                        
+                                            <div className='post-date'>{formattedDate}</div> 
+                                        </div>
+                                    </div>
+                                    );
+                                    })}
+                                    </div>
+                        </div>
+                    )}
                     
                 </div>
                 <Routes>
