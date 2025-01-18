@@ -401,7 +401,9 @@ width: 200px;
     background-color: #424242;
     width: 50%;
     height: 40px;
+    
     margin: 0 auto;
+    margin-top: 50px;
     display: flex; /* Kích hoạt flexbox */
     justify-content: center; /* Căn giữa theo chiều ngang */
     align-items: center; /* Căn giữa theo chiều dọc */
@@ -411,5 +413,23 @@ width: 200px;
   .editbut:hover{
     background-color: #131313;
     transition: 0.3s;
+  }
+  .mainS{
+    position: relative;
+    background-color: #2b2b2b;
+    width: 100%;
+    
+  }
+  .spost{
+  display: flex;
+  flex-direction: column; 
+  gap: 20px;
+  }
+  button.active {
+    color: red; /* Khi được chọn thì đổi thành màu đỏ */
+  }
+  
+  button:not(.active) {
+    color: white; /* Những nút không được chọn */
   }
 }

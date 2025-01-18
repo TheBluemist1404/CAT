@@ -1,5 +1,6 @@
+import { Editor } from "@tinymce/tinymce-react";
 import axios from "axios";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { AuthContext } from "../../authentication/AuthProvider";
 import { useParams, useNavigate } from "react-router-dom";
 import DOMPurify from 'dompurify';
@@ -14,9 +15,10 @@ function Detail({ token }) {
   const [isDownvoted, setIsDownvoted] = useState(false);
   const [voteCount, setVoteCount] = useState(post ? post.upvotes.length - post.downvotes.length : 0)
 
-  const [commentInput, setCommentInput] = useState('');
+  const [commentInput, setCommentInput] = useState('a');
   const [dropdownVisible, setDropdownVisible] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
+  const editorRef = useRef(null);
 
 
 
@@ -85,11 +87,13 @@ function Detail({ token }) {
       if (!isLoggedIn) {
         navigate('/auth/login')
       } else {
+        const commentContent = editorRef.current?.getContent();
         try {
           const response = await axios.post(`http://localhost:3000/api/v1/forum/comment/${post._id}`,
-            { content: commentInput, user: { id: user._id } },
-            { headers: { "Authorization": `Bearer ${token.accessToken}` } },)
-          console.log(response)
+            { content: commentContent, user: { id: user._id } },
+            { headers: { "Authorization": `Bearer ${token.accessToken}` } },);
+          console.log(response);
+          if (editorRef.current) editorRef.current.setCommentContent('');
         } catch (error) {
           if (error.response && error.response.status === 403) {
             const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
@@ -98,14 +102,14 @@ function Detail({ token }) {
             localStorage.setItem('token', JSON.stringify(token))
 
             const response = await axios.post(`http://localhost:3000/api/v1/forum/comment/${post._id}`,
-              { content: commentInput, user: { id: user._id } },
+              { content: commentContent, user: { id: user._id } },
               { headers: { "Authorization": `Bearer ${newAccessToken}` } },)
             console.log(response)
           }
         }
         setCommentInput('');
-        console.log(comments)
-        fetchData();
+        console.log(comments);
+        update();
       }
     }
   };
@@ -253,29 +257,59 @@ function Detail({ token }) {
   const comments = post ? post.comments : []
   const sortComments = [...comments].reverse();
   const renderComments = () => (
-    <div className="comments-list" >
-      {sortComments.map((comment) => (
-        <div key={comment.id} className="comment">
-          <div className="comment-header">
-            <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden' }}><img src={comment.userDetails.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
-            <span className="comment-user-name">{comment.userDetails.fullName}</span>
-            {/* <span className="comment-time">{comment.time}</span> */}
+    <div className="comments-list">
+      {comments.map((comment) => {
+        const sanitizedContent = DOMPurify.sanitize(comment.content); // Sanitize the comment content
+        return (
+          <div key={comment.id} className="comment">
+            <div className="comment-header">
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden' }}>
+                <img 
+                  src={comment.userDetails.avatar} 
+                  className="comment-avatar" 
+                  alt="Avatar" 
+                  style={{ width: '40px' }} 
+                />
+              </div>
+              <span className="comment-user-name">{comment.userDetails.fullName}</span>
+              {/* <span className="comment-time">{comment.time}</span> */}
+            </div>
+            <div 
+              className="comment-body" 
+              dangerouslySetInnerHTML={{ __html: sanitizedContent }} // Use sanitized HTML content
+            ></div>
+            <div className="comment-footer">
+              <button className="comment-reply">
+                <img 
+                  src="/src/pages/forum/assets/Comment Icon.svg" 
+                  className="comment-action" 
+                  alt="Reply" 
+                /> 
+                Reply
+              </button>
+            </div>
+            <hr className="post-line" style={{ marginTop: '10px' }} />
           </div>
-          <div className="comment-body">{comment.content}</div>
-          <div className="comment-footer">
-            <button className="comment-reply">
-              <img src="/src/pages/forum/assets/Comment Icon.svg" className="comment-action" alt="Reply" /> Reply
-            </button>
-            <button className="comment-like">
-              <img src="/src/pages/forum/assets/Share Icon.svg" className="comment-action" alt="Share" /> Share
-            </button>
-          </div>
-          <hr className="post-line" style={{ marginTop: '10px' }} />
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 
+  const [tag, setTags] = useState([]);
+
+  const handleSubmit = () => {
+    const tags = post ? post.tags : [];
+    if (tags.length > 0) {
+      const titles = tags.map((tag) => `#${tag.title}`);
+      setTags(titles);
+    }
+  };
+  
+  useEffect(() => {
+    handleSubmit();
+  }, [post]); 
+
+  const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
 
   return (
     <div className="post" style={{ height: 'calc(100vh - 60px)' }}>
@@ -291,6 +325,11 @@ function Detail({ token }) {
       <div className="post-body">
         <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post ? post.title : ""}</h1>
         <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
+        <div className="tag-box">
+          {tag.map((tag, index) => (
+            <div className="post-tags" key={index}>{tag}</div>
+          ))}
+        </div>
       </div>
       <hr className="post-line" />
       <div className="post-footer">
@@ -306,14 +345,32 @@ function Detail({ token }) {
       <div className="create-comment">
         <div className="create-comment-header">
           <div style={{ width: '40px', height: '40px', borderRadius: '20px', overflow: 'hidden' }}><img src={user.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
-          <textarea
-            className="create-comment-input"
-            placeholder="Write a comment..."
-            value={commentInput}
-            onChange={handleCommentInput}
-            style={{ height: 'auto', maxHeight: '200px', width: '90%' }}
-            onFocus={() => { !isLoggedIn ? (navigate('/auth/login')) : ({}) }}
-          />
+              <Editor
+                  apiKey={textEditorAPI}
+                  onInit={(_, editor) => (editorRef.current = editor)}
+                  init={{
+                    height: 150,
+                    width: 800,
+                    menubar: false,
+                    plugins: [
+                      "advlist autolink lists link image charmap preview anchor",
+                      "searchreplace visualblocks code fullscreen",
+                      "insertdatetime media table code help wordcount",
+                    ],
+                    toolbar:
+                      "undo redo | code | formatselect | bold italic underline forecolor backcolor | \
+                      alignleft aligncenter alignright alignjustify | \
+                      bullist numlist outdent indent | removeformat | help",
+                    placeholder: "Write your comment here...",
+                    content_style: `
+                      body { font-family:Helvetica,Arial,sans-serif; font-size:14px;color: white;}
+                      .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+                        color: grey;
+                        opacity: 0.8;
+                      }
+                    `,
+                  }}
+                />
           <button className="submit-comment" onClick={handleAddComment}>Post</button>
         </div>
       </div>

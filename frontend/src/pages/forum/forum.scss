@@ -38,12 +38,13 @@
     header .searchbar {
         display: flex;
         align-items: center;
+        flex-direction: column;
         background-color: #1E1E2F;
         border-radius: 25px;
         padding: 5px 15px;
         width: 750px;
-        height: 40px;
-    }
+        position: relative; /* Make the searchbar the reference point */
+    } 
     
     header .searchbar input {
         border: none;
@@ -58,16 +59,15 @@
     
     .search-results {
         position: absolute;
-        top: 60px; 
-        left: 435px;
-        width: 750px; 
+        top: 50px; /* Offset from the searchbar */
+        width: 100%; /* Match the searchbar's width */
         background-color: #1E1E2F;
         border: 1px solid #2B2B3B;
         border-radius: 5px;
         max-height: 200px;
         overflow-y: auto;
         z-index: 10;
-        box-sizing: border-box; 
+        box-sizing: border-box;
         box-shadow: 3px 3px 3px #000000;
     }
     
@@ -325,6 +325,22 @@
         word-break: break-word; 
         white-space: normal; 
     }
+
+    .tag-box {
+        display: flex; /* Makes the children align horizontally */
+        flex-wrap: wrap; /* Allows tags to wrap to the next line if they overflow */
+        gap: 10px; /* Adds spacing between the tags */
+        margin: 0 5%;
+        margin-top: 10px;
+    }
+    
+    .post-tags {
+        color: #FFFFFF;
+        border-radius: 5px;
+        font-size: 18px;
+        text-decoration: underline;
+    }
+    
     
     /* Post Footer Styles */
     .post-footer {
