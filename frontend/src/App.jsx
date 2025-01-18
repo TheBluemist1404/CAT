@@ -13,6 +13,7 @@ import Forgot from './authentication/Forgot';
 import Signup from './authentication/Signup'
 import Forum from './pages/forum/Forum'
 import Profile from './pages/Profile/Profile'
+import CodeEditor from './pages/live-code/CodeEditor';
 
 function App() {
     const { isLoggedIn, setIsLoggedIn, setUser } = useContext(AuthContext);
@@ -94,8 +95,8 @@ function App() {
                     <Route path='post' element={<></>} />
                     <Route path='media' element={<></>} />
                     <Route path='saved' element={<></>} />
-                    <Route path='image' element={<Image />} />
                 </Route>
+                <Route path='live-code' element={<CodeEditor/>} />
             </Route>
         </Routes>
     );
