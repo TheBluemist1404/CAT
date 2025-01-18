@@ -9,16 +9,17 @@ module.exports.redisRateLimiter = async (req, res, next) => {
   try {
     const redisClient = await initializeRedisClient();
     if (!redisClient) {
-      return res.status(500).json({
+      res.status(500).json({
         message: 'Redis Client does not exist!',
       });
+      return;
     }
     const record = await redisClient.get(
       `${process.env.CACHE_PREFIX}:rate-limit:${req.ip}`,
     );
     const currentReqTime = moment();
 
-    if (record == null) {
+    if (!record) {
       const newRecord = [
         {
           requestTimestamp: currentReqTime.unix(),
