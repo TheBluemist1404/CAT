@@ -171,7 +171,7 @@ module.exports.forgot = async (req, res) => {
   </body>
 </html>`;
     await sendMail(email, subject, html);
-    res.status(200).json({
+    return res.status(200).json({
       message: 'Please check your email and type in otp!',
     });
   } catch (err) {
@@ -190,18 +190,16 @@ module.exports.otp = async (req, res) => {
     createdAt: -1,
   });
   if (!checkOtpExist) {
-    res.status(404).json({
+    return res.status(404).json({
       message: 'Email or otp does not exist!',
     });
-    return;
   }
 
   const isOtpMatch = await bcrypt.compare(otp, checkOtpExist.otp);
   if (!isOtpMatch) {
-    res.status(403).json({
+    return res.status(403).json({
       message: 'Invalid otp!',
     });
-    return;
   }
 
   const user = await User.findOne({
@@ -210,7 +208,7 @@ module.exports.otp = async (req, res) => {
   });
   const token = await otpToken(user);
 
-  res.status(200).json({
+  return res.status(200).json({
     otpToken: token,
   });
 };
@@ -221,7 +219,7 @@ module.exports.changePassword = async (req, res) => {
   const user = await User.findById(req.user.id);
   user.password = await hashPassword.hash(password);
   await user.save();
-  res.status(200).json({
+  return res.status(200).json({
     message: 'Change password successfully!',
   });
 };

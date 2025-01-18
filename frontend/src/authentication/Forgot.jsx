@@ -25,6 +25,7 @@ function Forgot() {
         setGetOtp(true);
       }
       console.log(response.data)
+      return;
     } catch (error) {
       console.error("fail to send email", error)
     }
@@ -39,6 +40,7 @@ function Forgot() {
         setOtpToken(response.data.otpToken)
         setReset(true);
       }
+      return;
     } catch (error) {
       if (error.response && error.response.status === 403) {
         setOtpMatch(false)
@@ -56,6 +58,7 @@ function Forgot() {
       if (response.status === 200) {
         navigate('/auth/login')
       }
+      return;
     } catch (error) {
       if (error.response && error.response.status === 400) {
         setConfirmMatch(false)
