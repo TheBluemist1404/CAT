@@ -371,8 +371,8 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                     
                     <div className='tabs'>
                         <div>
-                        <button type='button' className='p' onClick={() =>setView("posts")}>Posts</button>
-                        <button type='button' className='i' onClick={() =>setView("Media")}>Media</button>
+                        <button type='button' className={`p ${view === "posts" ? "active" : ""}`} onClick={() =>setView("posts")}>Posts</button>
+                        <button type='button' className={`i ${view === "Media" ? "active" : ""}`} onClick={() =>setView("Media")}>Media</button>
                         <button type='button' className={`v ${view === 'Saved' ? 'active' : ''}`} onClick={() =>setView("Saved")}>Saved</button>
                         </div>
                         <div>
@@ -575,7 +575,7 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
     
                         </div>
                         <div className='im'>
-                            <h1>Image</h1>
+                            <h1 style={{ margin: "20px" }}>Image</h1>
                             <div className="flex-container">
                             {Array.from({ length: 9 }).map((_, index) => (
                             <div className="flex-item" key={index}>
@@ -624,7 +624,7 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                                     <div className='spost'>
                                         <div className='post-card' key={index} style={{backgroundColor:"#000000" }}>
                                             <div className='post-icon-title'>
-                                                <img src="/src/assets/qa.svg" alt="" width={30} height={30} />
+                                                <img src="/src/assets/save.svg" alt="" width={30} height={30} />
                                                 <div className='post-title' key={post._id} onClick={() => handlePostClick(post._id)}>{post.title}</div>
                                             </div>
                                         

@@ -425,7 +425,11 @@ width: 200px;
   flex-direction: column; 
   gap: 20px;
   }
-  .v.active {
-    color: red; /* Change to red when active */
+  button.active {
+    color: red; /* Khi được chọn thì đổi thành màu đỏ */
+  }
+  
+  button:not(.active) {
+    color: white; /* Những nút không được chọn */
   }
 }
