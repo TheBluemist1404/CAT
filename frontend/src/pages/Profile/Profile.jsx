@@ -3,46 +3,46 @@ import { useNavigate, useParams, Routes, Route } from 'react-router-dom';
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../authentication/AuthProvider';
 import axios from "axios";
-import ReactQuill from "react-quill"; 
-import "react-quill/dist/quill.snow.css"; 
+// import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import { Editor } from "@tinymce/tinymce-react";
 import "./profile.scss"
 import Header from "../../Header";
 import DOMPurify from "dompurify";
 
-const Profile = ({token,post}) => {
-    
+const Profile = ({ token, post }) => {
+
     const navigate = useNavigate();
     const { isLoggedIn, user } = useContext(AuthContext);
-    
+
     console.log(user.post);
-    
+
 
     useEffect(() => {
         if (!isLoggedIn) {
             navigate('/auth/login', { replace: true });
         }
     }, [navigate, isLoggedIn])
-    
+
     const [view, setView] = useState("posts");
     const [schools, setSchools] = useState([]);
     const [newSchool, setNewSchool] = useState("");
     const [showInput1, setShowInput1] = useState(false);
     const [showInput2, setShowInput2] = useState(false);
-    const [showSchoolInput, setShowSchoolInput] = useState(false); 
+    const [showSchoolInput, setShowSchoolInput] = useState(false);
     const [showCompanyInput, setShowCompanyInput] = useState(false);
     const [avatar, setAvatar] = useState(user?.avatar || '');
-    
+
     const handleAddSchool = async () => {
         if (newSchool.trim() !== "") {
             const updatedSchools = [...schools, newSchool];
             setSchools(updatedSchools); 
             setNewSchool(""); 
-            setShowSchoolInput(false);
+            
             
     
             try {
-                
+
                 const response = await axios.patch(
                     `http://localhost:3000/api/v1/profile/edit/${user._id}`,
                     {
@@ -59,9 +59,9 @@ const Profile = ({token,post}) => {
                         },
                     }
                 );
-    
+
                 if (response.status === 200) {
-                    
+
                     if (Array.isArray(response.data.schools)) {
                         setSchools(response.data.schools);
                     }
@@ -71,8 +71,8 @@ const Profile = ({token,post}) => {
             }
         }
     };
-    
-    
+
+
     useEffect(() => {
         const fetchSchools = async () => {
             try {
@@ -80,24 +80,24 @@ const Profile = ({token,post}) => {
                     `http://localhost:3000/api/v1/profile/detail/${user._id}`,
                     {
                         headers: {
-                            "Authorization": `Bearer ${token.accessToken}`, 
+                            "Authorization": `Bearer ${token.accessToken}`,
                         },
                     }
                 );
                 console.log(response.data);
                 if (response.status === 200 && Array.isArray(response.data.schools)) {
-                    setSchools(response.data.schools); 
+                    setSchools(response.data.schools);
                 }
             } catch (err) {
                 console.error("Error fetching schools:", err.response?.data?.message || err.message);
             }
         };
-    
+
         fetchSchools();
-    }, [user, token]); 
+    }, [user, token]);
 
     const [companies, setCompanies] = useState([]);
-const [newCompany, setNewCompany] = useState("");
+    const [newCompany, setNewCompany] = useState("");
 
 
 const handleAddCompany = async () => {
@@ -105,86 +105,86 @@ const handleAddCompany = async () => {
         const updatedCompanies = [...companies, newCompany];
         setCompanies(updatedCompanies); 
         setNewCompany(""); 
-        setShowCompanyInput(false);
+        
 
-        try {
-            const response = await axios.patch(
-                `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-                {
-                    companies: updatedCompanies,
-                    user: { id: user._id },
-                    fullName: user.fullName,
-                    schools,
-                    description,
-                    avatar: user.avatar,
-                },
-                {
-                    headers: {
-                        "Authorization": `Bearer ${token.accessToken}`,
+            try {
+                const response = await axios.patch(
+                    `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+                    {
+                        companies: updatedCompanies,
+                        user: { id: user._id },
+                        fullName: user.fullName,
+                        schools,
+                        description,
+                        avatar: user.avatar,
                     },
-                }
-            );
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token.accessToken}`,
+                        },
+                    }
+                );
 
-            if (response.status === 200) {
-                if (Array.isArray(response.data.companies)) {
+                if (response.status === 200) {
+                    if (Array.isArray(response.data.companies)) {
+                        setCompanies(response.data.companies);
+                    }
+                }
+            } catch (err) {
+                console.error("Error:", err.response?.data?.message || err.message);
+            }
+        }
+    };
+
+    useEffect(() => {
+        const fetchCompanies = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:3000/api/v1/profile/detail/${user._id}`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token.accessToken}`,
+                        },
+                    }
+                );
+                console.log(response.data);
+                if (response.status === 200 && Array.isArray(response.data.companies)) {
                     setCompanies(response.data.companies);
                 }
+            } catch (err) {
+                console.error("Error fetching companies:", err.response?.data?.message || err.message);
             }
-        } catch (err) {
-            console.error("Error:", err.response?.data?.message || err.message);
-        }
-    }
-};
+        };
 
-useEffect(() => {
-    const fetchCompanies = async () => {
-        try {
-            const response = await axios.get(
-                `http://localhost:3000/api/v1/profile/detail/${user._id}`,
-                {
-                    headers: {
-                        "Authorization": `Bearer ${token.accessToken}`, 
-                    },
-                }
-            );
-            console.log(response.data);
-            if (response.status === 200 && Array.isArray(response.data.companies)) {
-                setCompanies(response.data.companies); 
-            }
-        } catch (err) {
-            console.error("Error fetching companies:", err.response?.data?.message || err.message);
-        }
-    };
+        fetchCompanies();
+    }, [user, token]);
 
-    fetchCompanies();
-}, [user, token]); 
-    
-    
-    const toggleInput1 = () => {
-        setShowInput1(prevState => !prevState); 
-      };
-      const toggleInput2 = () => {
-        setShowInput2(prevState => !prevState); 
-      };
-      const [text, setText] = useState(''); 
 
-      
-     
-      
-      const [dropdown, setDropdown] = useState(false)
+    // const toggleInput1 = () => {
+    //     setShowInput1(prevState => !prevState);
+    // };
+    // const toggleInput2 = () => {
+    //     setShowInput2(prevState => !prevState);
+    // };
+    // const [text, setText] = useState('');
 
-      const toggleDropdown = () => {
-        setDropdown((prevState) => !prevState); 
-    };
-     
-    const [description, setDescription] = useState(""); 
-    const [newDescription, setNewDescription] = useState(""); 
-    const [editMode, setEditMode] = useState(false); 
-    
+
+
+
+    // const [dropdown, setDropdown] = useState(false)
+
+    // const toggleDropdown = () => {
+    //     setDropdown((prevState) => !prevState);
+    // };
+
+    const [description, setDescription] = useState("");
+    const [newDescription, setNewDescription] = useState("");
+    const [editMode, setEditMode] = useState(false);
+
 
     const handleEditorChange = (content) => {
-        const sanitizedContent = DOMPurify.sanitize(content); 
-        setNewDescription(sanitizedContent); 
+        const sanitizedContent = DOMPurify.sanitize(content);
+        setNewDescription(sanitizedContent);
     };
     const handleUpdateDescription = async () => {
         if (newDescription.trim() !== "") {
@@ -194,10 +194,10 @@ useEffect(() => {
                     {
                         description: newDescription,
                         user: { id: user._id },
-                    fullName: user.fullName,
-                    schools,
-                    companies,
-                    avatar: user.avatar,
+                        fullName: user.fullName,
+                        schools,
+                        companies,
+                        avatar: user.avatar,
                     },
                     {
                         headers: {
@@ -207,10 +207,10 @@ useEffect(() => {
                 );
 
                 if (response.status === 200) {
-                    setDescription(response.data.description || newDescription); 
-                    setEditMode(false); 
-                    setNewDescription(""); 
-                    
+                    setDescription(response.data.description || newDescription);
+                    setEditMode(false);
+                    setNewDescription("");
+
                 }
             } catch (err) {
                 console.error("Error updating description:", err.response?.data?.message || err.message);
@@ -218,7 +218,7 @@ useEffect(() => {
         }
     };
 
-    
+
     useEffect(() => {
         const fetchDescription = async () => {
             try {
@@ -232,8 +232,8 @@ useEffect(() => {
                 );
 
                 if (response.status === 200 && response.data.description) {
-                    setDescription(response.data.description); 
-                    
+                    setDescription(response.data.description);
+
                 }
             } catch (err) {
                 console.error("Error fetching description:", err.response?.data?.message || err.message);
@@ -242,115 +242,115 @@ useEffect(() => {
 
         fetchDescription();
     }, [user, token]);
-    
-    
-      const handlePostClick = (postId) => {
-        navigate(`/forum/${postId}`);
-      };
-      const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
-      
-    const [isVisible, setIsVisible] = useState(false);
-  const [position, setPosition] = useState({ top: 0, left: 0 });
 
-  const handleSvgClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    setPosition({ top: rect.top + window.scrollY, left: rect.left + window.scrollX });
-    setIsVisible(!isVisible);
-  };
+
+    const handlePostClick = (postId) => {
+        navigate(`/forum/${postId}`);
+    };
+    const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
+
+    const [isVisible, setIsVisible] = useState(false);
+    const [position, setPosition] = useState({ top: 0, left: 0 });
+
+    const handleSvgClick = (e) => {
+        const rect = e.target.getBoundingClientRect();
+        setPosition({ top: rect.top + window.scrollY, left: rect.left + window.scrollX });
+        setIsVisible(!isVisible);
+    };
 
   const handleClose = () => {
     setIsVisible(false);
   };
   const handleRemoveSchool = async () => {
-    if (schools.length >= 2) {
+    if (schools.length >= 1) {
         
         const indexToRemove = schools.length - 1;
 
-        
-        const updatedSchools = schools.filter((_, index) => index !== indexToRemove);
-        setSchools(updatedSchools);
-    try {
-        const response = await axios.patch(
-            `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-            {
-                schools: updatedSchools,  
-                user: { id: user._id },
-                fullName: user.fullName,
-                companies,
-                description,
-                avatar: user.avatar,
-            },
-            {
-                headers: {
-                    "Authorization": `Bearer ${token.accessToken}`,
-                },
-            }
-        );
-    
 
-        if (response.status === 200) {
-            console.log("School removed successfully");
-        }
-    } catch (err) {
-        console.error("Error removing school:", err.response?.data?.message || err.message);
-    }
-};
-  };
+            const updatedSchools = schools.filter((_, index) => index !== indexToRemove);
+            setSchools(updatedSchools);
+            try {
+                const response = await axios.patch(
+                    `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+                    {
+                        schools: updatedSchools,
+                        user: { id: user._id },
+                        fullName: user.fullName,
+                        companies,
+                        description,
+                        avatar: user.avatar,
+                    },
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token.accessToken}`,
+                        },
+                    }
+                );
+
+
+                if (response.status === 200) {
+                    console.log("School removed successfully");
+                }
+            } catch (err) {
+                console.error("Error removing school:", err.response?.data?.message || err.message);
+            }
+        };
+    };
 
   const handleRemoveCompany = async () => {
-    if (companies.length >= 2) {
+    if (companies.length >= 1) {
         
         const indexToRemove = companies.length - 1;
 
-        
-        const updatedCompany = companies.filter((_, index) => index !== indexToRemove);
-        setCompanies(updatedCompany);
-    try {
-        const response = await axios.patch(
-            `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-            {
-                companies: updatedCompany,  
-                user: { id: user._id },
-                fullName: user.fullName,
-                schools,
-                description,
-                avatar: user.avatar,
-            },
-            {
-                headers: {
-                    "Authorization": `Bearer ${token.accessToken}`,
-                },
+
+            const updatedCompany = companies.filter((_, index) => index !== indexToRemove);
+            setCompanies(updatedCompany);
+            try {
+                const response = await axios.patch(
+                    `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+                    {
+                        companies: updatedCompany,
+                        user: { id: user._id },
+                        fullName: user.fullName,
+                        schools,
+                        description,
+                        avatar: user.avatar,
+                    },
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token.accessToken}`,
+                        },
+                    }
+                );
+
+
+                if (response.status === 200) {
+                    console.log("Company removed successfully");
+                }
+            } catch (err) {
+                console.error("Error removing company:", err.response?.data?.message || err.message);
             }
-        );
-    
-
-        if (response.status === 200) {
-            console.log("Company removed successfully");
-        }
-    } catch (err) {
-        console.error("Error removing company:", err.response?.data?.message || err.message);
-    }
-};
-  };
-const [showDeleteButtons, setShowDeleteButtons] = useState(false);
-    const id = useParams(); 
+        };
+    };
+    const [showDeleteButtons, setShowDeleteButtons] = useState(false);
+    const id = useParams();
     console.log(id.id, user._id)
-    
-    if (id.id === user._id) { 
-        return (
-            <div className="profile" style={{position: 'relative'}}>
-                <div style={{zIndex: 2, position: 'relative'}}><Header token={token} isAuth={false}/></div>
 
-                <div style={{zIndex: 1, position: 'relative'}}>
+    if (id.id === user._id) {
+        return (
+            <div className="profile" style={{ position: 'relative' }}>
+                <div style={{ zIndex: 2, position: 'relative' }}><Header token={token} isAuth={false} /></div>
+
+                <div style={{ zIndex: 1, position: 'relative' }}>
                     <div className='image' >
                         <div className="profile-avatar"><img src={user.avatar} alt="" /></div>
                         <h1 className='profile-username'>{user.fullName}</h1>
                         <div className='social'>
-                        <img src="/src/assets/facebook.svg" alt="" width={30} height={30}/>
-                        <img src="/src/assets/github.svg" alt="" width={30} height={30}/>
-                        <img src="/src/assets/twitter.svg" alt="" width={30} height={30}/>
+                            <img src="/src/assets/facebook.svg" alt="" width={30} height={30} />
+                            <img src="/src/assets/github.svg" alt="" width={30} height={30} />
+                            <img src="/src/assets/twitter.svg" alt="" width={30} height={30} />
                         </div>
-                        <div className="box" style={{top: '85%'}}>
+                        <div className="box" style={{ top: '85%' }}>
                             <div className="box-item">
                                 <span className="number">{user.posts.length}</span>
                                 <span className="label">Posts</span>
@@ -368,38 +368,38 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                         </div>
 
                     </div>
-                    
+
                     <div className='tabs'>
                         <div>
-                        <button type='button' className={`p ${view === "posts" ? "active" : ""}`} onClick={() =>setView("posts")}>Posts</button>
-                        <button type='button' className={`i ${view === "Media" ? "active" : ""}`} onClick={() =>setView("Media")}>Media</button>
-                        <button type='button' className={`v ${view === 'Saved' ? 'active' : ''}`} onClick={() =>setView("Saved")}>Saved</button>
+                            <button type='button' className={`p ${view === "posts" ? "active" : ""}`} onClick={() => setView("posts")}>Posts</button>
+                            <button type='button' className={`i ${view === "Media" ? "active" : ""}`} onClick={() => setView("Media")}>Media</button>
+                            <button type='button' className={`v ${view === 'Saved' ? 'active' : ''}`} onClick={() => setView("Saved")}>Saved</button>
                         </div>
                         <div>
-                        <div className="settings" onClick={handleSvgClick} style={{ marginRight: "20px" }}>
-                            <img src="/src/assets/setting.svg" alt="" width={30} height={30} />
-                        </div>
+                            <div className="settings" onClick={handleSvgClick} style={{ marginRight: "20px" }}>
+                                <img src="/src/assets/setting.svg" alt="" width={30} height={30} />
+                            </div>
 
-                        {isVisible && (
-        <div className='bb'
-          style={{
-            position: "absolute",
-            top: position.top -150, 
-            left: position.left-200,
-            padding: "10px",
-            zIndex: 1000, 
-            display: "flex", 
-            flexDirection: "column", 
-            alignItems: "center", 
-            justifyContent: "center", 
-            gap:"10px",
-          }}
-        >
-          <button onClick={() => alert("settings!")} className='b' >Settings</button>
-          <button onClick={() => alert("adjusts!")} className='b'>Adjusts</button>
-          <button onClick={handleClose} className='b'>Close</button>
-        </div>
-      )}
+                            {isVisible && (
+                                <div className='bb'
+                                    style={{
+                                        position: "absolute",
+                                        top: position.top - 150,
+                                        left: position.left - 200,
+                                        padding: "10px",
+                                        zIndex: 1000,
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        gap: "10px",
+                                    }}
+                                >
+                                    <button onClick={() => alert("settings!")} className='b' >Settings</button>
+                                    <button onClick={() => alert("adjusts!")} className='b'>Adjusts</button>
+                                    <button onClick={handleClose} className='b'>Close</button>
+                                </div>
+                            )}
 
                         </div>
                     </div>
@@ -414,6 +414,8 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                             </div>
                             {schools.length > 0 && (
             <div style={{ marginLeft: "10px" }}>
+                <div>{schools.length === 1 && schools[0]}</div>
+
                 <div>{schools[schools.length-2]}</div>
                 
             </div>
@@ -430,12 +432,11 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
             }}
         >
             {schools[schools.length-1]}
-            {showDeleteButtons &&(
-                <button onClick={() => handleRemoveSchool(schools[0])}>x</button>)}
+            
         </div>
     )}
                             {showSchoolInput && (
-                             <div style={{display: 'flex', alignItems: 'center', marginLeft: "10px" }}>
+                             <div style={{display: 'flex', alignItems: 'center', marginLeft: "10px",marginTop:"15px" }}>
                             <input
                             type="text"
                             className='input'
@@ -452,6 +453,16 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                             </div>
                             </div>
                             )}
+                            {showDeleteButtons &&(
+                <button onClick={() => handleRemoveSchool(schools[0])} style={{ 
+                    marginLeft: '10px', 
+                    backgroundColor: 'black', 
+                    color: 'white', 
+                    border: '1px solid white', 
+                    padding: '8px 12px', 
+                    borderRadius: '4px', 
+                    cursor: 'pointer' 
+                  }}>Delete</button>)}
                             </div>
                             {/* companies */}
                             <div style={{marginLeft:'30px',marginTop:'10px',marginBottom:'20px'}}>
@@ -461,6 +472,7 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                                     </div>
                                     {companies.length > 0 && (
                                         <div style={{ marginLeft: "10px" }}>
+                                            <div>{companies.length === 1 && companies[0]}</div>
                                             <div>{companies[companies.length-2]}</div>
                                         </div>
                                     )}
@@ -476,13 +488,12 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                                         }}
                                     >
                                         {companies[companies.length-1]}
-                                        {showDeleteButtons &&(
-                                            <button onClick={() => handleRemoveCompany(companies[0])}>x</button>)}
+                                        
                                     </div>
                                 )}
                                 {showCompanyInput  && (
                                     
-                                    <div style={{ display: 'flex', alignItems: 'center',marginLeft: "10px", }}>
+                                    <div style={{ display: 'flex', alignItems: 'center',marginLeft: "10px",marginTop:"15px" }}>
                                         <input
                                             type="text"
                                             className='input'
@@ -501,27 +512,37 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                                         
                                     </div>
                                 )}
+                                {showDeleteButtons &&(
+                                            <button onClick={() => handleRemoveCompany(companies[0])} style={{ 
+                                                marginLeft: '10px', 
+                                                backgroundColor: 'black', 
+                                                color: 'white', 
+                                                border: '1px solid white', 
+                                                padding: '8px 12px', 
+                                                borderRadius: '4px', 
+                                                cursor: 'pointer' 
+                                              }}>Delete</button>)}
                             </div>
 
-                                <div className='editbut' onClick={() =>{setShowDeleteButtons(!showDeleteButtons)} }>
+                                <div className='editbut' onClick={() =>{setShowDeleteButtons(!showDeleteButtons),setShowSchoolInput(!showSchoolInput),setShowCompanyInput(!showCompanyInput)} }>
                                     Edit personal details 
                                 </div>
-                        </div>
-                        <div className='about' >
-                        <div style={{ margin: "20px" }}>
-                        <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
-                            <h1 style={{ margin: "0 20px 0 0" }}>About</h1>
-                            <div
-                                onClick={() => {setEditMode(true);setNewDescription(description); }}
-                                style={{ cursor: "pointer" }}
-                            >
-                                <img src="/src/assets/pen.svg" alt="Edit" width={15} height={15} />
                             </div>
-                        </div>
+                            <div className='about' >
+                                <div style={{ margin: "20px" }}>
+                                    <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+                                        <h1 style={{ margin: "0 20px 0 0" }}>About</h1>
+                                        <div
+                                            onClick={() => { setEditMode(true); setNewDescription(description); }}
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            <img src="/src/assets/pen.svg" alt="Edit" width={15} height={15} />
+                                        </div>
+                                    </div>
 
-                            {editMode ? (
-                                <div >
-                                     <div dangerouslySetInnerHTML={{ __html: newDescription }} />
+                                    {editMode ? (
+                                        <div >
+                                            <div dangerouslySetInnerHTML={{ __html: newDescription }} />
 
                                     <Editor 
                 apiKey = {textEditorAPI} // Thay bằng API Key của bạn nếu cần
@@ -546,19 +567,30 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                 }}
             />
             <div
-                style={{
-                    border: "1px solid #ccc",
-                    padding: "10px",
-                    marginTop: "10px",
-                    borderRadius: "5px",
-                }}
+                
                 
             />
                                     <div style={{ marginTop: "10px" }}>
-                                        <button onClick={handleUpdateDescription}>Save</button>
+                                        <button onClick={handleUpdateDescription} style={{ 
+                                                marginLeft: '10px', 
+                                                backgroundColor: 'black', 
+                                                color: 'white', 
+                                                border: '1px solid white', 
+                                                padding: '8px 12px', 
+                                                borderRadius: '4px', 
+                                                cursor: 'pointer' 
+                                              }}>Save</button>
                                         <button
                                             onClick={() =>{ setEditMode(false);setNewDescription("");}}
-                                            style={{ marginLeft: "10px" }}
+                                            style={{ 
+                                                marginLeft: '10px', 
+                                                backgroundColor: 'black', 
+                                                color: 'white', 
+                                                border: '1px solid white', 
+                                                padding: '8px 12px', 
+                                                borderRadius: '4px', 
+                                                cursor: 'pointer' 
+                                              }}
                                         >
                                             Cancel
                                         </button>
@@ -595,48 +627,48 @@ const [showDeleteButtons, setShowDeleteButtons] = useState(false);
                                 const date = new Date(post.createdAt);
                                 const formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}, ${date.getFullYear()}`;
 
-                                return (
-                                    
-                                <div className='post-card' key={index}>
-                                    <div className='post-icon-title'>
-                                        <img src="/src/assets/qa.svg" alt="" width={30} height={30} />
-                                        <div className='post-title' key={post._id} onClick={() => handlePostClick(post._id)}>{post.title}</div>
+                                            return (
+
+                                                <div className='post-card' key={index}>
+                                                    <div className='post-icon-title'>
+                                                        <img src="/src/assets/qa.svg" alt="" width={30} height={30} />
+                                                        <div className='post-title' key={post._id} onClick={() => handlePostClick(post._id)}>{post.title}</div>
+                                                    </div>
+
+                                                    <div className='post-date'>{formattedDate}</div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
-                                
-                                <div className='post-date'>{formattedDate}</div> 
                                 </div>
-                                );
-                                })}
                             </div>
-                            </div>
-                        </div>
-                        {/* <div className='badge'>
+                            {/* <div className='badge'>
                                 hello
                         </div> */}
-                    </div>)}
-                    {view ==="Saved"&&(
+                        </div>)}
+                    {view === "Saved" && (
                         <div className='mainS'>
-                            <div className="posts-container" style={{backgroundColor:"#333333" }}>
-                            {user.savedPosts.slice().reverse().map((post, index) => {
-                                const date = new Date(post.createdAt);
-                                const formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}, ${date.getFullYear()}`;
-                                return (
-                                    <div className='spost'>
-                                        <div className='post-card' key={index} style={{backgroundColor:"#000000" }}>
-                                            <div className='post-icon-title'>
-                                                <img src="/src/assets/save.svg" alt="" width={30} height={30} />
-                                                <div className='post-title' key={post._id} onClick={() => handlePostClick(post._id)}>{post.title}</div>
+                            <div className="posts-container" style={{ backgroundColor: "#333333" }}>
+                                {user.savedPosts.slice().reverse().map((post, index) => {
+                                    const date = new Date(post.createdAt);
+                                    const formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}, ${date.getFullYear()}`;
+                                    return (
+                                        <div className='spost'>
+                                            <div className='post-card' key={index} style={{ backgroundColor: "#000000" }}>
+                                                <div className='post-icon-title'>
+                                                    <img src="/src/assets/save.svg" alt="" width={30} height={30} />
+                                                    <div className='post-title' key={post._id} onClick={() => handlePostClick(post._id)}>{post.title}</div>
+                                                </div>
+
+                                                <div className='post-date'>{formattedDate}</div>
                                             </div>
-                                        
-                                            <div className='post-date'>{formattedDate}</div> 
                                         </div>
-                                    </div>
                                     );
-                                    })}
-                                    </div>
+                                })}
+                            </div>
                         </div>
                     )}
-                    
+
                 </div>
                 <Routes>
                 </Routes>

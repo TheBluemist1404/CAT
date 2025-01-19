@@ -58,7 +58,7 @@ function Header({token, isAuth}) {
                         </div>
                     ))}
                 </div>
-            <div className='login' style={{position:'relative', opacity: isAuth? 0: 1}}>
+            <div className='login' style={{position:'relative', opacity: isAuth? 0: 1, minWidth: '180px'}}>
                 {
                     !isLoggedIn ? (<div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
                         <div className="login-button" onClick={() => { navigate('/auth/login') }}>Login</div>

@@ -47,10 +47,6 @@ function Post({ post, token, update }) {
     setDropdownVisible(dropdownVisible === index ? null : index);
   };
 
-  const handleCommentInput = (e) => {
-    setCommentInput(e.target.value);
-  };
-
   const handleAddComment = async () => {
     if (commentInput.trim()) {
       if (!isLoggedIn) {
@@ -221,10 +217,12 @@ function Post({ post, token, update }) {
     </div>
   );
   useEffect(() => {
-    const isPostSaved = user.savedPosts.some(
-      (savedPost) => savedPost.toString() === post._id.toString()
-    );
-    const Saved = isPostSaved;
+    if (user.savedPost) {
+      setIsSaved((savedPost) => savedPost.toString() === post._id.toString())
+    }
+    // const isPostSaved = user.savedPosts.some(
+    //   (savedPost) => savedPost.toString() === post._id.toString()
+    // );
   }, [post._id, user.savedPosts]);
 
   const handleSavePost = async () => {

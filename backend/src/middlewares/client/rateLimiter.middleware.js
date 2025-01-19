@@ -6,19 +6,20 @@ const MAX_WINDOW_REQUEST_COUNT = 20;
 const WINDOW_LOG_INTERVAL_IN_MINUTES = 10;
 
 module.exports.redisRateLimiter = async (req, res, next) => {
+  const redisClient = await initializeRedisClient();
+  if (!redisClient) {
+    res.status(500).json({
+      message: 'Redis Client does not exist!',
+    });
+    return;
+  }
   try {
-    const redisClient = await initializeRedisClient();
-    if (!redisClient) {
-      return res.status(500).json({
-        message: 'Redis Client does not exist!',
-      });
-    }
     const record = await redisClient.get(
       `${process.env.CACHE_PREFIX}:rate-limit:${req.ip}`,
     );
     const currentReqTime = moment();
 
-    if (record == null) {
+    if (!record) {
       const newRecord = [
         {
           requestTimestamp: currentReqTime.unix(),
@@ -31,7 +32,7 @@ module.exports.redisRateLimiter = async (req, res, next) => {
         WINDOW_SIZE_IN_MINUTES * 60,
         JSON.stringify(newRecord),
       );
-      next();
+      return next();
     }
 
     let data = JSON.parse(record);
@@ -84,12 +85,11 @@ module.exports.redisRateLimiter = async (req, res, next) => {
       JSON.stringify(entriesWithinWindow),
     );
 
+    console.log('pass');
     next();
   } catch (err) {
     res.status(500).json({
       message: err.message,
     });
   }
-  
-
 };
