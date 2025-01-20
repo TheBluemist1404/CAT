@@ -91,22 +91,27 @@ function Detail({ token }) {
             { content: commentContent, user: { id: user._id } },
             { headers: { "Authorization": `Bearer ${token.accessToken}` } },);
           console.log(response);
-          if (editorRef.current) editorRef.current.setCommentContent('');
+          if (editorRef.current) editorRef.current.setContent('');
+          
+          // Refetch the post data to get the updated comments
+          fetchData();  // This triggers the re-render
+  
         } catch (error) {
           if (error.response && error.response.status === 403) {
             const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
             const newAccessToken = getToken.data.accessToken
             token.accessToken = newAccessToken;
             localStorage.setItem('token', JSON.stringify(token))
-
+  
             const response = await axios.post(`http://localhost:3000/api/v1/forum/comment/${post._id}`,
               { content: commentContent, user: { id: user._id } },
-              { headers: { "Authorization": `Bearer ${newAccessToken}` } },)
+              { headers: { "Authorization": `Bearer ${newAccessToken}` } })
             console.log(response)
+  
+            fetchData();  // Refetch to get the updated post with comments
           }
         }
         setCommentInput('');
-        console.log(comments);
       }
     }
   };
@@ -121,7 +126,7 @@ function Detail({ token }) {
   const handleAddReply = async (commentId) => {
     const editorContent = editorRef.current[commentId]?.getContent();
     if (!editorContent.trim()) return;
-
+  
     try {
       const response = await axios.post(
         `http://localhost:3000/api/v1/forum/reply/${commentId}`,
@@ -129,13 +134,18 @@ function Detail({ token }) {
         { headers: { Authorization: `Bearer ${token.accessToken}` } }
       );
       console.log("Reply posted:", response.data);
-
+  
       editorRef.current[commentId]?.setContent("");
       setActiveReply(null);
+  
+      // Refetch the post data to get the updated replies
+      fetchData();  // This triggers the re-render
+  
     } catch (error) {
       console.error("Error posting reply:", error);
     }
   };
+  
 
   const updateUpvote = async () => {
     try {
