@@ -5,7 +5,6 @@ import { AuthContext } from "../../authentication/AuthProvider";
 import { useParams, useNavigate } from "react-router-dom";
 import DOMPurify from 'dompurify';
 
-
 function Detail({ token }) {
   const navigate = useNavigate();
   const { isLoggedIn, user } = useContext(AuthContext)
@@ -19,7 +18,6 @@ function Detail({ token }) {
   const [dropdownVisible, setDropdownVisible] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const editorRef = useRef(null);
-
 
 
   const { id } = useParams();
@@ -114,6 +112,39 @@ function Detail({ token }) {
     }
   };
 
+  const [activeReply, setActiveReply] = useState(null); // Track which comment's reply editor is open
+  // Function to handle showing the reply editor
+  const toggleReplyEditor = (commentId) => {
+    setActiveReply(activeReply === commentId ? null : commentId); // Toggle reply editor for the comment
+  };
+
+  // Handle adding a reply to a comment
+  const handleAddReply = async (commentId) => {
+    const editorContent = editorRef.current[commentId]?.getContent();
+    if (!editorContent.trim()) return;
+
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/forum/reply/${commentId}`,
+        { content: editorContent },
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
+      console.log("Reply posted:", response.data);
+
+      // Refresh post or update replies locally
+      const updatedPost = { ...post };
+      const commentIndex = updatedPost.comments.findIndex((c) => c._id === commentId);
+      updatedPost.comments[commentIndex].replies.push(response.data);
+      setPost(updatedPost);
+
+      // Clear editor and hide it
+      editorRef.current[commentId]?.setContent("");
+      setActiveReply(null);
+    } catch (error) {
+      console.error("Error posting reply:", error);
+    }
+    update();
+  };
 
   const updateUpvote = async () => {
     try {
@@ -260,6 +291,7 @@ function Detail({ token }) {
     <div className="comments-list">
       {comments.map((comment) => {
         const sanitizedContent = DOMPurify.sanitize(comment.content); // Sanitize the comment content
+        const isReplyEditorOpen = activeReply === comment._id;
         return (
           <div key={comment.id} className="comment">
             <div className="comment-header">
@@ -279,7 +311,10 @@ function Detail({ token }) {
               dangerouslySetInnerHTML={{ __html: sanitizedContent }} // Use sanitized HTML content
             ></div>
             <div className="comment-footer">
-              <button className="comment-reply">
+              <button
+                className="comment-reply"
+                onClick={() => toggleReplyEditor(comment._id)}
+              >
                 <img 
                   src="/src/pages/forum/assets/Comment Icon.svg" 
                   className="comment-action" 
@@ -287,6 +322,72 @@ function Detail({ token }) {
                 /> 
                 Reply
               </button>
+            </div>
+            {isReplyEditorOpen && (
+              <div className="create-comment-header">
+                <div style={{ width: '40px', height: '40px', borderRadius: '20px', overflow: 'hidden' }}><img src={user.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
+                <Editor
+                  apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+                  onInit={(_, editor) => {
+                    editorRef.current[comment._id] = editor;
+                  }}
+                  init={{
+                    height: 150,
+                    width: 850,
+                    menubar: false,
+                    plugins: [
+                      "advlist autolink lists link image charmap preview anchor",
+                      "searchreplace visualblocks code fullscreen",
+                      "insertdatetime media table code help wordcount",
+                    ],
+                    toolbar:
+                      "undo redo | code | formatselect | bold italic underline forecolor backcolor | \
+                      alignleft aligncenter alignright alignjustify | \
+                      bullist numlist outdent indent | removeformat | help",
+                    placeholder: "Write your reply here...",
+                    content_style: `
+                      body { font-family:Helvetica,Arial,sans-serif; font-size:14px;color: white;}
+                      .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+                        color: grey;
+                        opacity: 0.8;
+                      }
+                    `,
+                  }}
+                />
+                <button
+                  className="submit-comment"
+                  onClick={() => handleAddReply(comment._id)}
+                >
+                  Post
+                </button>
+              </div>
+            )}
+
+            {/* Render Replies */}
+            <div className="replies-list">
+              {comment.replies.map((reply) => (
+                <div key={reply._id} className="reply">
+                  <div className="comment-header">
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden' }}>
+                      <img
+                        src={reply.userDetails.avatar}
+                        alt="Avatar"
+                        className="comment-avatar"
+                        style={{ width: '40px' }} 
+                      />
+                    </div>
+                    <span className="comment-user-name">
+                      {reply.userDetails.fullName}
+                    </span>
+                  </div>
+                  <div
+                    className="comment-body"
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(reply.content),
+                    }}
+                  ></div>
+                </div>
+              ))}
             </div>
             <hr className="post-line" style={{ marginTop: '10px' }} />
           </div>
@@ -350,7 +451,7 @@ function Detail({ token }) {
                   onInit={(_, editor) => (editorRef.current = editor)}
                   init={{
                     height: 150,
-                    width: 800,
+                    width: 850,
                     menubar: false,
                     plugins: [
                       "advlist autolink lists link image charmap preview anchor",
@@ -382,3 +483,4 @@ function Detail({ token }) {
 }
 
 export default Detail;
+

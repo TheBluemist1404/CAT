@@ -7,63 +7,68 @@ const Header = () => {
     const { isLoggedIn, user } = useContext(AuthContext);
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedQuery, setDebouncedQuery] = useState('');
     const [filteredResults, setFilteredResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleInputChange = async (e) => {
-        const query = e.target.value;
-        setSearchQuery(query);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedQuery(searchQuery);
+        }, 400);
 
-        if (!query.trim()) {
+        return () => clearTimeout(handler); 
+    }, [searchQuery]);
+
+    useEffect(() => {
+        if (!debouncedQuery.trim()) {
             setFilteredResults([]);
             return;
         }
 
-        const queryType = query.startsWith("user:")
-            ? "users"
-            : query.startsWith("title:")
-            ? "posts"
-            : query.startsWith("tag:")
-            ? "tags"
-            : "posts";
+        const fetchResults = async () => {
+            const queryType = debouncedQuery.startsWith("user:")
+                ? "users"
+                : debouncedQuery.startsWith("title:")
+                ? "posts"
+                : debouncedQuery.startsWith("tag:")
+                ? "tags"
+                : "posts";
 
-        const trimmedQuery = query.replace(/^(user:|title:|tag:)/, '').trim();
-        console.log(queryType);
-        console.log(trimmedQuery);
-        setIsLoading(true);
+            const trimmedQuery = debouncedQuery.replace(/^(user:|title:|tag:)/, '').trim();
+            setIsLoading(true);
 
-        try {
-            const response = await axios.get('http://localhost:3000/api/v1/forum/search', {
-                params: {
-                    type: queryType,
-                    q: trimmedQuery,
-                    limit: 10,
-                },
-            });
-            console.log(response);
-            if (queryType === "users") {
-                setFilteredResults(response.data || []);
+            try {
+                const response = await axios.get('http://localhost:3000/api/v1/forum/search', {
+                    params: {
+                        type: queryType,
+                        q: trimmedQuery,
+                        limit: 10,
+                    },
+                });
+                if (queryType === "users") {
+                    setFilteredResults(response.data || []);
+                } else if (queryType === "posts" || queryType === "tags") {
+                    setFilteredResults(response.data[0].posts || []);
+                }
+            } catch (error) {
+                console.error("Error fetching search results:", error);
+                setFilteredResults([]);
+            } finally {
+                setIsLoading(false);
             }
-            else if (queryType === "posts") {
-                setFilteredResults(response.data[0].posts || []);
-            }
-            else {
-                setFilteredResults(response.data[0].posts || []);
-            }
-        } catch (error) {
-            console.error("Error fetching search results:", error);
-            setFilteredResults([]);
-        } finally {
-            setIsLoading(false);
-        }
+        };
+
+        fetchResults();
+    }, [debouncedQuery]);
+
+    const handleInputChange = (e) => {
+        setSearchQuery(e.target.value);
     };
 
     const handleResultClick = (result, queryType) => {
         if (queryType === "users") {
             navigate(`/profile/${result._id}`);
-        } else if (queryType === "posts") {
-            navigate(`/forum/${result._id}`);
-        } else if (queryType === "tags") {
+        } else if (queryType === "posts" || queryType === "tags") {
             navigate(`/forum/${result._id}`);
         }
     };
