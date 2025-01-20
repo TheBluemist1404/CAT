@@ -544,21 +544,21 @@ const handleAddCompany = async () => {
                                         <div >
                                             <div dangerouslySetInnerHTML={{ __html: newDescription }} />
 
-                                    <Editor 
-                apiKey = {textEditorAPI} // Thay bằng API Key của bạn nếu cần
-                value={newDescription}
-                onEditorChange={handleEditorChange}
-                
-                init={{
-                    height: 300,
-                    menubar: true,
-                      plugins: [
-                        "advlist autolink lists link image charmap preview anchor",
-                        "searchreplace visualblocks code fullscreen",
-                        "insertdatetime media table code help wordcount",
-                      ],
-                      toolbar:
-                        "undo redo | formatselect | bold italic underline forecolor backcolor | \
+                                            <Editor
+                                                apiKey={textEditorAPI} // Thay bằng API Key của bạn nếu cần
+                                                value={newDescription}
+                                                onEditorChange={handleEditorChange}
+
+                                                init={{
+                                                    height: 300,
+                                                    menubar: true,
+                                                    plugins: [
+                                                        "advlist autolink lists link image charmap preview anchor",
+                                                        "searchreplace visualblocks code fullscreen",
+                                                        "insertdatetime media table code help wordcount",
+                                                    ],
+                                                    toolbar:
+                                                        "undo redo | formatselect | bold italic underline forecolor backcolor | \
                         alignleft aligncenter alignright alignjustify | \
                         bullist numlist outdent indent | removeformat | help",
                       content_style:

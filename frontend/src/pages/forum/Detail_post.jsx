@@ -290,7 +290,7 @@ function Detail({ token }) {
   const sortComments = [...comments].reverse();
   const renderComments = () => (
     <div className="comments-list">
-      {comments.map((comment) => {
+      {sortComments.map((comment) => {
         const sanitizedContent = DOMPurify.sanitize(comment.content); // Sanitize the comment content
         const isReplyEditorOpen = activeReply === comment._id;
         return (
