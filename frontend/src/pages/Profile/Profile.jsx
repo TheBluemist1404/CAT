@@ -409,7 +409,7 @@ const handleAddCompany = async () => {
                             <h1 style={{ margin: "20px" }}>Bio</h1>
                             <div style={{marginLeft:'30px'}}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <div onClick={() =>{setShowSchoolInput(!showSchoolInput)} } style={{ cursor: "pointer" }}>
+                            <div style={{ cursor: "pointer" }}>
                                 <img src="/src/assets/school.svg" alt="" width={30} height={30}/>
                             </div>
                             {schools.length > 0 && (
@@ -467,7 +467,7 @@ const handleAddCompany = async () => {
                             {/* companies */}
                             <div style={{marginLeft:'30px',marginTop:'10px',marginBottom:'20px'}}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <div onClick={()=>setShowCompanyInput(!showCompanyInput)} style={{ cursor: "pointer" }}>
+                                    <div  style={{ cursor: "pointer" }}>
                                         <img src="/src/assets/company.svg" alt="" width={30} height={30} />
                                     </div>
                                     {companies.length > 0 && (
