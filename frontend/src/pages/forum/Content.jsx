@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useEffect, useState, useContext, useRef } from 'react';
 import { AuthContext } from "../../authentication/AuthProvider";
 import Post from './Post';
-import Detail from './Detail_post';
 
 const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage, setTotalPages, render }) => {
   const { isLoggedIn, user } = useContext(AuthContext)
