@@ -107,7 +107,6 @@ function Detail({ token }) {
         }
         setCommentInput('');
         console.log(comments);
-        update();
       }
     }
   };
@@ -131,19 +130,11 @@ function Detail({ token }) {
       );
       console.log("Reply posted:", response.data);
 
-      // Refresh post or update replies locally
-      const updatedPost = { ...post };
-      const commentIndex = updatedPost.comments.findIndex((c) => c._id === commentId);
-      updatedPost.comments[commentIndex].replies.push(response.data);
-      setPost(updatedPost);
-
-      // Clear editor and hide it
       editorRef.current[commentId]?.setContent("");
       setActiveReply(null);
     } catch (error) {
       console.error("Error posting reply:", error);
     }
-    update();
   };
 
   const updateUpvote = async () => {
