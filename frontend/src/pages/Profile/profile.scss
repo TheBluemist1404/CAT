@@ -431,15 +431,11 @@
     height: 40px;
 
     margin: 0 auto;
-    margin-top: 50px;
-    display: flex;
-    /* Kích hoạt flexbox */
-    justify-content: center;
-    /* Căn giữa theo chiều ngang */
-    align-items: center;
-    /* Căn giữa theo chiều dọc */
-    text-align: center;
-    /* Căn giữa văn bản (nếu cần) */
+    margin-bottom: 10px;
+    display: flex; /* Kích hoạt flexbox */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    text-align: center; /* Căn giữa văn bản (nếu cần) */
     border-radius: 10px;
   }
 
@@ -469,5 +465,8 @@
   button:not(.active) {
     color: white;
     /* Những nút không được chọn */
+  }
+  .but{
+    color: #000;
   }
 }

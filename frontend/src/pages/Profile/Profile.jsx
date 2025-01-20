@@ -36,11 +36,11 @@ const Profile = ({ token, post }) => {
     const handleAddSchool = async () => {
         if (newSchool.trim() !== "") {
             const updatedSchools = [...schools, newSchool];
-            setSchools(updatedSchools);
-            setNewSchool("");
-            setShowSchoolInput(false);
-
-
+            setSchools(updatedSchools); 
+            setNewSchool(""); 
+            
+            
+    
             try {
 
                 const response = await axios.patch(
@@ -100,12 +100,12 @@ const Profile = ({ token, post }) => {
     const [newCompany, setNewCompany] = useState("");
 
 
-    const handleAddCompany = async () => {
-        if (newCompany.trim() !== "") {
-            const updatedCompanies = [...companies, newCompany];
-            setCompanies(updatedCompanies);
-            setNewCompany("");
-            setShowCompanyInput(false);
+const handleAddCompany = async () => {
+    if (newCompany.trim() !== "") {
+        const updatedCompanies = [...companies, newCompany];
+        setCompanies(updatedCompanies); 
+        setNewCompany(""); 
+        
 
             try {
                 const response = await axios.patch(
@@ -258,13 +258,13 @@ const Profile = ({ token, post }) => {
         setIsVisible(!isVisible);
     };
 
-    const handleClose = () => {
-        setIsVisible(false);
-    };
-    const handleRemoveSchool = async () => {
-        if (schools.length >= 2) {
-
-            const indexToRemove = schools.length - 1;
+  const handleClose = () => {
+    setIsVisible(false);
+  };
+  const handleRemoveSchool = async () => {
+    if (schools.length >= 1) {
+        
+        const indexToRemove = schools.length - 1;
 
 
             const updatedSchools = schools.filter((_, index) => index !== indexToRemove);
@@ -297,10 +297,10 @@ const Profile = ({ token, post }) => {
         };
     };
 
-    const handleRemoveCompany = async () => {
-        if (companies.length >= 2) {
-
-            const indexToRemove = companies.length - 1;
+  const handleRemoveCompany = async () => {
+    if (companies.length >= 1) {
+        
+        const indexToRemove = companies.length - 1;
 
 
             const updatedCompany = companies.filter((_, index) => index !== indexToRemove);
@@ -403,108 +403,129 @@ const Profile = ({ token, post }) => {
 
                         </div>
                     </div>
-                    {view === "posts" && (
-                        <div className='main'>
-                            <div className='bio' >
-                                <h1 style={{ margin: "20px" }}>Bio</h1>
-                                <div style={{ marginLeft: '30px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <div onClick={() => { setShowSchoolInput(!showSchoolInput) }} style={{ cursor: "pointer" }}>
-                                            <img src="/src/assets/school.svg" alt="" width={30} height={30} />
-                                        </div>
-                                        {schools.length > 0 && (
-                                            <div style={{ marginLeft: "10px" }}>
-                                                <div>{schools[schools.length - 2]}</div>
+                    {view ==="posts"&&(
+                    <div className='main'>
+                        <div className='bio' >
+                            <h1 style={{ margin: "20px" }}>Bio</h1>
+                            <div style={{marginLeft:'30px'}}>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <div onClick={() =>{setShowSchoolInput(!showSchoolInput)} } style={{ cursor: "pointer" }}>
+                                <img src="/src/assets/school.svg" alt="" width={30} height={30}/>
+                            </div>
+                            {schools.length > 0 && (
+            <div style={{ marginLeft: "10px" }}>
+                <div>{schools.length === 1 && schools[0]}</div>
 
-                                            </div>
-                                        )}
+                <div>{schools[schools.length-2]}</div>
+                
+            </div>
+        )}
+    </div>
+    {schools.length > 1 && (
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                marginTop: "10px",
+                marginLeft: "40px"
+            }}
+        >
+            {schools[schools.length-1]}
+            
+        </div>
+    )}
+                            {showSchoolInput && (
+                             <div style={{display: 'flex', alignItems: 'center', marginLeft: "10px",marginTop:"15px" }}>
+                            <input
+                            type="text"
+                            className='input'
+                            value={newSchool}
+                            onChange={(e) => setNewSchool(e.target.value)}
+                            placeholder="type..."
+                            />
+                            <div tabindex="0" class="plusButton" onClick={handleAddSchool}>
+                                        <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+                                            <g mask="url(#mask0_21_345)">
+                                            <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
+                                            </g>
+                                        </svg>
+                            </div>
+                            </div>
+                            )}
+                            {showDeleteButtons &&(
+                <button onClick={() => handleRemoveSchool(schools[0])} style={{ 
+                    marginLeft: '10px', 
+                    backgroundColor: 'black', 
+                    color: 'white', 
+                    border: '1px solid white', 
+                    padding: '8px 12px', 
+                    borderRadius: '4px', 
+                    cursor: 'pointer' 
+                  }}>Delete</button>)}
+                            </div>
+                            {/* companies */}
+                            <div style={{marginLeft:'30px',marginTop:'10px',marginBottom:'20px'}}>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <div onClick={()=>setShowCompanyInput(!showCompanyInput)} style={{ cursor: "pointer" }}>
+                                        <img src="/src/assets/company.svg" alt="" width={30} height={30} />
                                     </div>
-                                    {schools.length > 1 && (
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                gap: "10px",
-                                                marginTop: "10px",
-                                                marginLeft: "40px"
-                                            }}
-                                        >
-                                            {schools[schools.length - 1]}
-                                            {showDeleteButtons && (
-                                                <button onClick={() => handleRemoveSchool(schools[0])}>x</button>)}
-                                        </div>
-                                    )}
-                                    {showSchoolInput && (
-                                        <div style={{ display: 'flex', alignItems: 'center', marginLeft: "10px" }}>
-                                            <input
-                                                type="text"
-                                                className='input'
-                                                value={newSchool}
-                                                onChange={(e) => setNewSchool(e.target.value)}
-                                                placeholder="type..."
-                                            />
-                                            <div tabindex="0" class="plusButton" onClick={handleAddSchool}>
-                                                <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
-                                                    <g mask="url(#mask0_21_345)">
-                                                        <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
-                                                    </g>
-                                                </svg>
-                                            </div>
+                                    {companies.length > 0 && (
+                                        <div style={{ marginLeft: "10px" }}>
+                                            <div>{companies.length === 1 && companies[0]}</div>
+                                            <div>{companies[companies.length-2]}</div>
                                         </div>
                                     )}
                                 </div>
-                                {/* companies */}
-                                <div style={{ marginLeft: '30px', marginTop: '10px', marginBottom: '20px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <div onClick={() => setShowCompanyInput(!showCompanyInput)} style={{ cursor: "pointer" }}>
-                                            <img src="/src/assets/company.svg" alt="" width={30} height={30} />
-                                        </div>
-                                        {companies.length > 0 && (
-                                            <div style={{ marginLeft: "10px" }}>
-                                                <div>{companies[companies.length - 2]}</div>
-                                            </div>
-                                        )}
+                                {companies.length > 1 && (
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            gap: "10px",
+                                            marginTop: "10px",
+                                            marginLeft: "40px"
+                                        }}
+                                    >
+                                        {companies[companies.length-1]}
+                                        
                                     </div>
-                                    {companies.length > 1 && (
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                gap: "10px",
-                                                marginTop: "10px",
-                                                marginLeft: "40px"
-                                            }}
-                                        >
-                                            {companies[companies.length - 1]}
-                                            {showDeleteButtons && (
-                                                <button onClick={() => handleRemoveCompany(companies[0])}>x</button>)}
+                                )}
+                                {showCompanyInput  && (
+                                    
+                                    <div style={{ display: 'flex', alignItems: 'center',marginLeft: "10px",marginTop:"15px" }}>
+                                        <input
+                                            type="text"
+                                            className='input'
+                                            value={newCompany}
+                                            onChange={(e) => setNewCompany(e.target.value)}
+                                            placeholder="type..."
+                                        />
+                                        
+                                        <div tabindex="0" class="plusButton" onClick={handleAddCompany}>
+                                        <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+                                            <g mask="url(#mask0_21_345)">
+                                            <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
+                                            </g>
+                                        </svg>
                                         </div>
-                                    )}
-                                    {showCompanyInput && (
+                                        
+                                    </div>
+                                )}
+                                {showDeleteButtons &&(
+                                            <button onClick={() => handleRemoveCompany(companies[0])} style={{ 
+                                                marginLeft: '10px', 
+                                                backgroundColor: 'black', 
+                                                color: 'white', 
+                                                border: '1px solid white', 
+                                                padding: '8px 12px', 
+                                                borderRadius: '4px', 
+                                                cursor: 'pointer' 
+                                              }}>Delete</button>)}
+                            </div>
 
-                                        <div style={{ display: 'flex', alignItems: 'center', marginLeft: "10px", }}>
-                                            <input
-                                                type="text"
-                                                className='input'
-                                                value={newCompany}
-                                                onChange={(e) => setNewCompany(e.target.value)}
-                                                placeholder="type..."
-                                            />
-
-                                            <div tabindex="0" class="plusButton" onClick={handleAddCompany}>
-                                                <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
-                                                    <g mask="url(#mask0_21_345)">
-                                                        <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
-                                                    </g>
-                                                </svg>
-                                            </div>
-
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className='editbut' onClick={() => { setShowDeleteButtons(!showDeleteButtons) }}>
-                                    Edit personal details
+                                <div className='editbut' onClick={() =>{setShowDeleteButtons(!showDeleteButtons),setShowSchoolInput(!showSchoolInput),setShowCompanyInput(!showCompanyInput)} }>
+                                    Edit personal details 
                                 </div>
                             </div>
                             <div className='about' >
@@ -540,60 +561,71 @@ const Profile = ({ token, post }) => {
                                                         "undo redo | formatselect | bold italic underline forecolor backcolor | \
                         alignleft aligncenter alignright alignjustify | \
                         bullist numlist outdent indent | removeformat | help",
-                                                    content_style:
-                                                        "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-
-                                                }}
-                                            />
-                                            <div
-                                                style={{
-                                                    border: "1px solid #ccc",
-                                                    padding: "10px",
-                                                    marginTop: "10px",
-                                                    borderRadius: "5px",
-                                                }}
-
-                                            />
-                                            <div style={{ marginTop: "10px" }}>
-                                                <button onClick={handleUpdateDescription}>Save</button>
-                                                <button
-                                                    onClick={() => { setEditMode(false); setNewDescription(""); }}
-                                                    style={{ marginLeft: "10px" }}
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div dangerouslySetInnerHTML={{ __html: description }}
-
+                      content_style:
+                        "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                        
+                }}
+            />
+            <div
+                
+                
+            />
+                                    <div style={{ marginTop: "10px" }}>
+                                        <button onClick={handleUpdateDescription} style={{ 
+                                                marginLeft: '10px', 
+                                                backgroundColor: 'black', 
+                                                color: 'white', 
+                                                border: '1px solid white', 
+                                                padding: '8px 12px', 
+                                                borderRadius: '4px', 
+                                                cursor: 'pointer' 
+                                              }}>Save</button>
+                                        <button
+                                            onClick={() =>{ setEditMode(false);setNewDescription("");}}
+                                            style={{ 
+                                                marginLeft: '10px', 
+                                                backgroundColor: 'black', 
+                                                color: 'white', 
+                                                border: '1px solid white', 
+                                                padding: '8px 12px', 
+                                                borderRadius: '4px', 
+                                                cursor: 'pointer' 
+                                              }}
                                         >
-
-                                        </div>
-                                    )}
+                                            Cancel
+                                        </button>
+                                    </div>
                                 </div>
-
-                            </div>
-                            <div className='im'>
-                                <h1 style={{ margin: "20px" }}>Image</h1>
-                                <div className="flex-container">
-                                    {Array.from({ length: 9 }).map((_, index) => (
-                                        <div className="flex-item" key={index}>
-                                            {index + 1}
-                                        </div>
-                                    ))}
+                            ) : (
+                                <div dangerouslySetInnerHTML={{ __html: description }}
+                                    
+                                >
+                                    
                                 </div>
+                            )}
+                        </div>
+    
+                        </div>
+                        <div className='im'>
+                            <h1 style={{ margin: "20px" }}>Image</h1>
+                            <div className="flex-container">
+                            {Array.from({ length: 9 }).map((_, index) => (
+                            <div className="flex-item" key={index}>
+                            {index + 1}
                             </div>
-                            <div className='Post'>
-                                <h1 style={{ margin: "20px" }}>Posts</h1>
-
-                                <div>
-
-                                    <div className="posts-container">
-                                        {user.posts.slice().reverse().map((post, index) => {
-
-                                            const date = new Date(post.createdAt);
-                                            const formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}, ${date.getFullYear()}`;
+                            ))}
+                            </div>
+                        </div>
+                        <div className='Post'>
+                            <h1 style={{ margin: "20px" }}>Posts</h1>
+                            
+                            <div>
+                            
+                            <div className="posts-container">
+                            {user.posts.slice().reverse().map((post, index) => {
+    
+                                const date = new Date(post.createdAt);
+                                const formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}, ${date.getFullYear()}`;
 
                                             return (
 
