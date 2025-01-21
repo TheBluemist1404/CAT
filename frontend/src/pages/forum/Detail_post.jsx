@@ -263,11 +263,48 @@ function Detail({ token }) {
     </div>
   );
 
-  // Save post
-  const handleSavePost = () => {
-    setIsSaved(!isSaved);
-  }
-
+  useEffect(() => {
+    // Ensure post is defined before proceeding
+    if (!post || !post._id) {
+      console.error("Post is undefined or missing _id.");
+      return;
+    }
+  
+    console.log(post._id); // Debugging post._id value
+  
+    if (user.savedPosts && Array.isArray(user.savedPosts)) {
+      const isPostSaved = user.savedPosts.some(
+        (savedPost) => savedPost._id.toString() === post._id.toString() // Updated comparison
+      );
+      setIsSaved(isPostSaved);
+    }
+  }, [post, user.savedPosts]); // Make sure post is also included in the dependencies
+  
+  const handleSavePost = async () => {
+    // Ensure post is defined before making the API call
+    if (!post || !post._id) {
+      console.error("Post is undefined, can't save the post.");
+      return;
+    }
+  
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/forum/save/${post._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
+  
+      console.log(response.data); // Debugging the response
+      if (response.status === 200) {
+        setIsSaved(!isSaved); // Toggle the save status
+      } else {
+        console.error("Error updating save status:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error saving the post:", error);
+    }
+  };
+  
   const renderDropdown = (index) => (
     <div
       className="post-navigate-dropdown"
