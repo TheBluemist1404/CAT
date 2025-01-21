@@ -11,7 +11,7 @@ import Header from "../Header";
 
 const Signup = () => {
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
-  const [validMail, setValidMail] = useState(true);
+  const [error, setError] = useState(null);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +24,10 @@ const Signup = () => {
       navigate('/auth/login') 
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setValidMail(false)
+        setError("invalid email format!")
+      } else if 
+      (error.response && error.response.status === 409) {
+        setError("email already used!")
       }
       console.error("Signup failed", error)
     }
@@ -39,7 +42,7 @@ const Signup = () => {
             <div className="auth-con">
               <auth>
                 <div className="heading">Join The CATs</div>
-                {!validMail && <div style={{position: 'absolute', width:'100%', left: '0', transform: 'translateY(10px)', color: 'var(--highlight-red)', fontSize: '14px'}}>Invalid email format</div>}
+                {error && <div style={{position: 'absolute', width:'100%', left: '0', transform: 'translateY(10px)', color: 'var(--highlight-red)', fontSize: '16px'}}>{error}</div>}
                 <div className="name">
                   <div className="wave-group">
                     <a className="user">
