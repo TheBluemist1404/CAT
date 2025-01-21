@@ -321,8 +321,8 @@ function Post({ post, token, update }) {
               dangerouslySetInnerHTML={{ __html: sanitizedContent }} // Use sanitized HTML content
             ></div>
             <div className="comment-footer">
-              <button className="comment-reply" onClick={() => toggleReplyEditor(comment._id)}>
-                <img 
+            <button className="comment-reply"  onClick={() => {if (!isLoggedIn) {navigate('/auth/login'); } else {toggleReplyEditor(comment._id);}}}>
+            <img 
                   src="/src/pages/forum/assets/Comment Icon.svg" 
                   className="comment-action" 
                   alt="Reply" 
@@ -390,6 +390,14 @@ function Post({ post, token, update }) {
 
   const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
 
+  const handleFocus = () => {
+    if (!isLoggedIn) {
+      navigate("/auth/login");
+    }
+  };
+
+  const defaultAvatar = "https://res.cloudinary.com/cat-project/image/upload/v1735743336/coder-sign-icon-programmer-symbol-vector-2879989_ecvn23.webp";
+
   return (
     <div className="post">
       <div className="post-header">
@@ -426,33 +434,34 @@ function Post({ post, token, update }) {
           {renderComments()}
           <div className="create-comment">
             <div className="create-comment-header">
-              <div style={{ width: '40px', height: '40px', borderRadius: '20px', overflow: 'hidden' }}><img src={user.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
+              <div style={{ width: '40px', height: '40px', borderRadius: '20px', overflow: 'hidden' }}><img src={!isLoggedIn ? defaultAvatar : user.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
               <Editor
-                  apiKey={textEditorAPI}
-                  onInit={(_, editor) => (editorRef.current = editor)}
-                  init={{
-                    height: 150,
-                    width: 800,
-                    menubar: false,
-                    plugins: [
-                      "advlist autolink lists link image charmap preview anchor",
-                      "searchreplace visualblocks code fullscreen",
-                      "insertdatetime media table code help wordcount",
-                    ],
-                    toolbar:
-                      "undo redo | code | formatselect | bold italic underline forecolor backcolor | \
-                      alignleft aligncenter alignright alignjustify | \
-                      bullist numlist outdent indent | removeformat | help",
-                    placeholder: "Write your comment here...",
-                    content_style: `
-                      body { font-family:Helvetica,Arial,sans-serif; font-size:14px;color: white;}
-                      .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
-                        color: grey;
-                        opacity: 0.8;
-                      }
-                    `,
-                  }}
-                />
+                apiKey={textEditorAPI}
+                onInit={(_, editor) => (editorRef.current = editor)}
+                onFocus={handleFocus}
+                init={{
+                  height: 150,
+                  width: 800,
+                  menubar: false,
+                  plugins: [
+                    "advlist autolink lists link image charmap preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "insertdatetime media table code help wordcount",
+                  ],
+                  toolbar:
+                    "undo redo | code | formatselect | bold italic underline forecolor backcolor | \
+                    alignleft aligncenter alignright alignjustify | \
+                    bullist numlist outdent indent | removeformat | help",
+                  placeholder: "Write your comment here...",
+                  content_style: `
+                    body { font-family:Helvetica,Arial,sans-serif; font-size:14px;color: white;}
+                    .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+                      color: grey;
+                      opacity: 0.8;
+                    }
+                  `,
+                }}
+              />
               <button className="submit-comment" onClick={handleAddComment}>Post</button>
             </div>
           </div>
