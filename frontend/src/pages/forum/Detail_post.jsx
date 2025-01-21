@@ -414,7 +414,7 @@ function Detail({ token }) {
   const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
 
   return (
-    <div className="post" style={{ height: 'calc(100vh - 60px)' }}>
+    <div className="post" style={{ minheight: 'calc(100vh - 60px)' }}>
       <div className="post-header">
         <img src={post ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" />
         <div className="user-name">{post ? post.userCreated.fullName : "unknown"}</div>
@@ -476,7 +476,7 @@ function Detail({ token }) {
           <button className="submit-comment" onClick={handleAddComment}>Post</button>
         </div>
       </div>
-      <div className="comment-section" style={{ padding: '10px' }}>
+      <div className="comment-section-detail" style={{ padding: '10px' }}>
         {renderComments()}
       </div>
     </div>
