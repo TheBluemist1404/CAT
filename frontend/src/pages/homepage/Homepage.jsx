@@ -68,7 +68,7 @@ function Homepage({ token }) {
 
         return () => observer.disconnect(); // Cleanup
     }, []);
-
+    
     return (
         <div className='homepage'>
             <div className='container' style={{ '--backgroundImage': `url(${background})` }}>

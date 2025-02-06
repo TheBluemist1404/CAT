@@ -26,7 +26,7 @@ function Header({token, isAuth}) {
         });
     }, [hoveredIndex]);
 
-    const navbar = [{ sect: "About", link: "/" }, { sect: "Forum", link: "/forum?page=1&limit=10" }, { sect: "Live Code", link: "/" }];
+    const navbar = [{ sect: "About", link: "/" }, { sect: "Forum", link: "/forum?page=1&limit=10" }, { sect: "Live Code", link: "/live-code" }];
 
     const [dropdown, setDropdown] = useState(false)
 
