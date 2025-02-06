@@ -1,3 +1,5 @@
+import './code-editor.scss'
+
 import Editor from "@monaco-editor/react";
 import { useRef } from "react";
 
@@ -13,16 +15,19 @@ function CodeEditor () {
   }
 
   return (
-    <>
-      <button onClick={showValue}>Show value</button>
+    <div className="code-editor">
+      <button onClick={showValue}>code editor</button>
       <Editor
         height="90vh"
         defaultLanguage="javascript"
         defaultValue="// some comment"
         onMount={handleEditorDidMount}
+        options={{
+          fontSize: 20
+        }}
       />
-    </>
+    </div>
   );
 }
 
-export default CodeEditor
+export default CodeEditor;

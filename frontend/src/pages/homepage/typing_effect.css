@@ -2,8 +2,8 @@
     all: unset;
     display: inline-block;
     text-align: justify;
-    font-family: var(--code-font);
     font-size: 18px;
+    font-family: 'Fira Code';
     color: var(--highlight-red);
     font-weight: bold;
     background-color: #1e1e1e;
@@ -18,7 +18,7 @@
   
 @keyframes blink {
     from, to {color: transparent; }
-    50% {color: var(--code-font); }
+    50% {color: var(--highlight-red); }
 }
   
 
