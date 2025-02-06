@@ -1,6 +1,7 @@
 import './code-editor.scss'
 
 import Editor from "@monaco-editor/react";
+import axios from 'axios';
 import { useRef } from "react";
 
 function CodeEditor () {
@@ -10,13 +11,15 @@ function CodeEditor () {
     editorRef.current = editor;
   }
 
-  function showValue() {
-    alert(editorRef.current.getValue());
+  const execute = async () => {
+    const code = editorRef.current.getValue();
+    const response = await axios.post('http://localhost:3000/execute', {code: code})
+    console.log(response.data.logs)
   }
 
   return (
     <div className="code-editor">
-      <button onClick={showValue}>code editor</button>
+      <button onClick={execute}>Run code</button>
       <Editor
         height="90vh"
         defaultLanguage="javascript"
