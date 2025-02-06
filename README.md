@@ -1,4 +1,4 @@
-This is CAT, on your first pull, run `docker-compose up --build`
+This is CAT, on your first pull, run `docker-compose up --build` (of course remember to run docker first)
 
 - **You only need to rebuild (`--build`) if you change `execute.js` or `Dockerfile`.**
 - **For normal work, just use `docker-compose up`.**
