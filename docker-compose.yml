@@ -8,6 +8,7 @@ services:
       - "3000:3000"
     volumes:
       - ./backend:/app
+      - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock  # ✅ Allows backend to run Docker commands
     depends_on:
       - sandbox

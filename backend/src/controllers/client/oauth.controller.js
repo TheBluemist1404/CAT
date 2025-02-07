@@ -3,7 +3,7 @@ const qs = require('qs');
 const jwt = require('jsonwebtoken');
 const { generateToken } = require('../../utils/jwtGenerate');
 const User = require('../../models/client/user.model');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
 // [GET] /api/v1/oauth/google

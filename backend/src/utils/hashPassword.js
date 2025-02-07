@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 require('dotenv').config();
 
 module.exports.hash = async (password) => {
