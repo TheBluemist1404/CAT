@@ -1,6 +1,6 @@
 const User = require('../../models/client/user.model');
 const hashPassword = require('../../utils/hashPassword');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { generateToken, otpToken } = require('../../utils/jwtGenerate');
 const Token = require('../../models/client/token.model');
 const Otp = require('../../models/client/otp.model');
