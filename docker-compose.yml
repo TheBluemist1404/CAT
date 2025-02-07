@@ -1,4 +1,32 @@
 version: "3"
 services:
+  backend:
+    build: ./backend
+    container_name: backend-container
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock  # ✅ Allows backend to run Docker commands
+    depends_on:
+      - sandbox
+      - redis
+
   sandbox:
     build: ./sandbox
+    container_name: sandbox-container
+    stdin_open: true
+    tty: true
+
+  redis:
+    image: redis:latest
+    container_name: redis-container
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:

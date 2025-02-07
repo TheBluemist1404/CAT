@@ -16,9 +16,10 @@ if (isMainThread) {
 
                 eval(\`${code}\`); // Execute JS safely
 
-                parentPort.postMessage(
-                    logOutput.length > 0 ? { logs: logOutput } : {}
-                );
+                setTimeout(()=>{
+                    parentPort.postMessage(
+                    logOutput.length > 0 ? { logs: logOutput } : {});
+                }, 1000)
             } catch (error) {
                 parentPort.postMessage({ error: error.message });
             }

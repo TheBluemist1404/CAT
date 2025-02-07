@@ -14,7 +14,7 @@ function CodeEditor () {
   const execute = async () => {
     const code = editorRef.current.getValue();
     const response = await axios.post('http://localhost:3000/execute', {code: code})
-    console.log(response.data.logs)
+    console.log(response.data)
   }
 
   return (
