@@ -6,8 +6,9 @@ import './forgot.scss'
 function Forgot() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [getOtp, setGetOtp] = useState(false)
-  const [otpMatch, setOtpMatch] = useState(true)
+  const [validMail, setValidMail] = useState(true);
+  const [getOtp, setGetOtp] = useState(false);
+  const [otpMatch, setOtpMatch] = useState(true);
   const [otp, setOtp] = useState("");
   const [reset, setReset] = useState(false);
   const [otpToken, setOtpToken] = useState();
@@ -19,7 +20,6 @@ function Forgot() {
   const handleMail = async (e) => {
     e.preventDefault();
     try {
-      console.log(email);
       const response = await axios.post('http://localhost:3000/api/v1/auth/forgot', { email: email })
       if (response.status === 200) {
         setGetOtp(true);
@@ -27,6 +27,9 @@ function Forgot() {
       console.log(response.data)
       return;
     } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setValidMail(false)
+      }
       console.error("fail to send email", error)
     }
   }
@@ -74,6 +77,7 @@ function Forgot() {
         <p>To reset your password, please enter the email address associated with your account</p>
         <label htmlFor="email">Email</label>
         <input id="email" type="text" required={true} placeholder="cat@example.com" onChange={(e) => { setEmail(e.target.value) }} />
+        {!validMail && <span style={{color: 'var(--highlight-red)', fontSize: '14px  '}}>Cannot find your email</span>}
         <button type="submit" style={{ width: '100%' }} >Get OTP</button>
       </form>) : (<form className="verify-otp" onSubmit={handleOTP}>
         <label htmlFor="otp">Enter your OTP here</label>

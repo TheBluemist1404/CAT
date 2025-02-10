@@ -80,6 +80,41 @@ function Post({ post, token, update }) {
   };
   //Also note that we should retrive comments from db, and add comment should make update to db, as well as cause rerender, not adding it manually to fe like this
 
+  const [activeReply, setActiveReply] = useState(null); // Track which comment's reply editor is open
+  // Function to handle showing the reply editor
+  const toggleReplyEditor = (commentId) => {
+    setActiveReply(activeReply === commentId ? null : commentId); // Toggle reply editor for the comment
+  };
+
+  // Handle adding a reply to a comment
+  const handleAddReply = async (commentId) => {
+    const editorContent = editorRef.current[commentId]?.getContent();
+    if (!editorContent.trim()) return;
+
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/forum/reply/${commentId}`,
+        { content: editorContent },
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
+      console.log("Reply posted:", response.data);
+
+      // Refresh post or update replies locally
+      const updatedPost = { ...post };
+      const commentIndex = updatedPost.comments.findIndex((c) => c._id === commentId);
+      updatedPost.comments[commentIndex].replies.push(response.data);
+      setPost(updatedPost);
+
+      // Clear editor and hide it
+      editorRef.current[commentId]?.setContent("");
+      setActiveReply(null);
+    } catch (error) {
+      console.error("Error posting reply:", error);
+    }
+    update();
+  };
+
+
   const toggleCommentBox = () => {
     setIsCommentBoxVisible(!isCommentBoxVisible);
   };
@@ -217,14 +252,15 @@ function Post({ post, token, update }) {
     </div>
   );
   useEffect(() => {
-    if (user.savedPost) {
-      setIsSaved((savedPost) => savedPost.toString() === post._id.toString())
+    console.log(post._id); // Debugging post._id value
+    if (user.savedPosts && Array.isArray(user.savedPosts)) {
+      const isPostSaved = user.savedPosts.some(
+        (savedPost) => savedPost._id.toString() === post._id.toString() // Updated comparison
+      );
+      setIsSaved(isPostSaved);
     }
-    // const isPostSaved = user.savedPosts.some(
-    //   (savedPost) => savedPost.toString() === post._id.toString()
-    // );
   }, [post._id, user.savedPosts]);
-
+  
   const handleSavePost = async () => {
     try {
       const response = await axios.post(
@@ -232,9 +268,10 @@ function Post({ post, token, update }) {
         {},
         { headers: { Authorization: `Bearer ${token.accessToken}` } }
       );
-
+  
+      console.log(response.data); // Debugging the response
       if (response.status === 200) {
-        setIsSaved(!isSaved); 
+        setIsSaved(!isSaved); // Toggle the save status
       } else {
         console.error("Error updating save status:", response.data.message);
       }
@@ -264,6 +301,7 @@ function Post({ post, token, update }) {
     <div className="comments-list">
       {comments.map((comment) => {
         const sanitizedContent = DOMPurify.sanitize(comment.content); // Sanitize the comment content
+        const isReplyEditorOpen = activeReply === comment._id;
         return (
           <div key={comment.id} className="comment">
             <div className="comment-header">
@@ -283,8 +321,8 @@ function Post({ post, token, update }) {
               dangerouslySetInnerHTML={{ __html: sanitizedContent }} // Use sanitized HTML content
             ></div>
             <div className="comment-footer">
-              <button className="comment-reply">
-                <img 
+            <button className="comment-reply"  onClick={() => {if (!isLoggedIn) {navigate('/auth/login'); } else {toggleReplyEditor(comment._id);}}}>
+            <img 
                   src="/src/pages/forum/assets/Comment Icon.svg" 
                   className="comment-action" 
                   alt="Reply" 
@@ -292,6 +330,45 @@ function Post({ post, token, update }) {
                 Reply
               </button>
             </div>
+            {isReplyEditorOpen && (
+              <div className="create-comment-header">
+                <div style={{ width: '40px', height: '40px', borderRadius: '20px', overflow: 'hidden' }}><img src={user.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
+                <Editor
+                  apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+                  onInit={(_, editor) => {
+                    editorRef.current[comment._id] = editor;
+                  }}
+                  init={{
+                    height: 150,
+                    width: 850,
+                    menubar: false,
+                    plugins: [
+                      "advlist autolink lists link image charmap preview anchor",
+                      "searchreplace visualblocks code fullscreen",
+                      "insertdatetime media table code help wordcount",
+                    ],
+                    toolbar:
+                      "undo redo | code | formatselect | bold italic underline forecolor backcolor | \
+                      alignleft aligncenter alignright alignjustify | \
+                      bullist numlist outdent indent | removeformat | help",
+                    placeholder: "Write your reply here...",
+                    content_style: `
+                      body { font-family:Helvetica,Arial,sans-serif; font-size:14px;color: white;}
+                      .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+                        color: grey;
+                        opacity: 0.8;
+                      }
+                    `,
+                  }}
+                />
+                <button
+                  className="submit-comment"
+                  onClick={() => handleAddReply(comment._id)}
+                >
+                  Post
+                </button>
+              </div>
+            )}
             <hr className="post-line" style={{ marginTop: '10px' }} />
           </div>
         );
@@ -312,6 +389,14 @@ function Post({ post, token, update }) {
   }, []);
 
   const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
+
+  const handleFocus = () => {
+    if (!isLoggedIn) {
+      navigate("/auth/login");
+    }
+  };
+
+  const defaultAvatar = "https://res.cloudinary.com/cat-project/image/upload/v1735743336/coder-sign-icon-programmer-symbol-vector-2879989_ecvn23.webp";
 
   return (
     <div className="post">
@@ -349,33 +434,34 @@ function Post({ post, token, update }) {
           {renderComments()}
           <div className="create-comment">
             <div className="create-comment-header">
-              <div style={{ width: '40px', height: '40px', borderRadius: '20px', overflow: 'hidden' }}><img src={user.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
+              <div style={{ width: '40px', height: '40px', borderRadius: '20px', overflow: 'hidden' }}><img src={!isLoggedIn ? defaultAvatar : user.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
               <Editor
-                  apiKey={textEditorAPI}
-                  onInit={(_, editor) => (editorRef.current = editor)}
-                  init={{
-                    height: 150,
-                    width: 800,
-                    menubar: false,
-                    plugins: [
-                      "advlist autolink lists link image charmap preview anchor",
-                      "searchreplace visualblocks code fullscreen",
-                      "insertdatetime media table code help wordcount",
-                    ],
-                    toolbar:
-                      "undo redo | code | formatselect | bold italic underline forecolor backcolor | \
-                      alignleft aligncenter alignright alignjustify | \
-                      bullist numlist outdent indent | removeformat | help",
-                    placeholder: "Write your comment here...",
-                    content_style: `
-                      body { font-family:Helvetica,Arial,sans-serif; font-size:14px;color: white;}
-                      .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
-                        color: grey;
-                        opacity: 0.8;
-                      }
-                    `,
-                  }}
-                />
+                apiKey={textEditorAPI}
+                onInit={(_, editor) => (editorRef.current = editor)}
+                onFocus={handleFocus}
+                init={{
+                  height: 150,
+                  width: 800,
+                  menubar: false,
+                  plugins: [
+                    "advlist autolink lists link image charmap preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "insertdatetime media table code help wordcount",
+                  ],
+                  toolbar:
+                    "undo redo | code | formatselect | bold italic underline forecolor backcolor | \
+                    alignleft aligncenter alignright alignjustify | \
+                    bullist numlist outdent indent | removeformat | help",
+                  placeholder: "Write your comment here...",
+                  content_style: `
+                    body { font-family:Helvetica,Arial,sans-serif; font-size:14px;color: white;}
+                    .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+                      color: grey;
+                      opacity: 0.8;
+                    }
+                  `,
+                }}
+              />
               <button className="submit-comment" onClick={handleAddComment}>Post</button>
             </div>
           </div>

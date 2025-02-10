@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../../authentication/AuthProvider';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Content from './Content';
@@ -9,6 +10,7 @@ import axios from 'axios';
 import Detail from './Detail_post';
 
 const Forum = ({ token, render }) => {
+  const { isLoggedIn } = useContext(AuthContext);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const location = useLocation();
@@ -19,7 +21,7 @@ const Forum = ({ token, render }) => {
       const response = await axios.get(`http://localhost:3000/api/v1/forum?offset=0&limit=0`);
       const posts = response.data[0].metadata[0].total;
       console.log(posts)
-      setTotalPages(posts/10 + 1);
+      setTotalPages(posts / 10 + 1);
       console.log(totalPages);
     } catch (error) {
       console.error("Failed to fetch posts:", error);
@@ -52,7 +54,11 @@ const Forum = ({ token, render }) => {
   };
 
   const handleCreatePostToggle = () => {
-    setIsCreatePostOpen(!isCreatePostOpen);
+    if (!isLoggedIn) {
+      navigate('/auth/login');
+    } else {
+      setIsCreatePostOpen(!isCreatePostOpen);
+    }
   };
 
   return (
@@ -73,20 +79,20 @@ const Forum = ({ token, render }) => {
           totalPages={totalPages}
           currentPage={currentPage}
           onPageChange={handlePageChange}
-        />): (<></>)}
-      </div>): (<div className="forum">
+        />) : (<></>)}
+      </div>) : (<div className="forum">
         <Header />
         <div className="main-layout">
           <Sidebar handleCreatePostToggle={handleCreatePostToggle} token={token} />
           <div className='content'>
-            <Detail token={token}/>
+            <Detail token={token} />
           </div>
         </div>
         {render === "forum" ? (<Pagination
           totalPages={totalPages}
           currentPage={currentPage}
           onPageChange={handlePageChange}
-        />): (<></>)}
+        />) : (<></>)}
       </div>)}
     </div>
   );

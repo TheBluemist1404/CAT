@@ -11,6 +11,7 @@ import Header from "../Header";
 
 const Signup = () => {
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
+  const [error, setError] = useState(null);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,6 +23,12 @@ const Signup = () => {
       const response = await axios.post('http://localhost:3000/api/v1/auth/signup', { fullName: fullName, email: email, password: password })
       navigate('/auth/login') 
     } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setError("invalid email format!")
+      } else if 
+      (error.response && error.response.status === 409) {
+        setError("email already used!")
+      }
       console.error("Signup failed", error)
     }
   }
@@ -35,6 +42,7 @@ const Signup = () => {
             <div className="auth-con">
               <auth>
                 <div className="heading">Join The CATs</div>
+                {error && <div style={{position: 'absolute', width:'100%', left: '0', transform: 'translateY(10px)', color: 'var(--highlight-red)', fontSize: '16px'}}>{error}</div>}
                 <div className="name">
                   <div className="wave-group">
                     <a className="user">

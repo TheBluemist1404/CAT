@@ -20,10 +20,11 @@ function TypingEffect({text, decor, loop, speed=100, delay=500}) {
                 if (index<text.length) {
                     setDisplayText(text.slice(0, index+1));
                     setIndex(index+1);
-                } else {
-                    setTypeForward(false);
-                    setTimeout(()=> setIndex(index-1), delay);
-                }
+                } 
+                // else {
+                //     setTypeForward(false);
+                //     setTimeout(()=> setIndex(index-1), delay);
+                // }
             } else{
                 if (loop) {
                     if (index>=0) {

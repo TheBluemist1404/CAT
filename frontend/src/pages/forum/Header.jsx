@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../../authentication/AuthProvider';
 import axios from 'axios';
@@ -7,65 +7,94 @@ const Header = () => {
     const { isLoggedIn, user } = useContext(AuthContext);
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedQuery, setDebouncedQuery] = useState('');
     const [filteredResults, setFilteredResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [showResults, setShowResults] = useState(false);
 
-    const handleInputChange = async (e) => {
-        const query = e.target.value;
-        setSearchQuery(query);
+    const searchbarRef = useRef(null);
+    const resultsRef = useRef(null);
 
-        if (!query.trim()) {
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedQuery(searchQuery);
+        }, 400);
+
+        return () => clearTimeout(handler); 
+    }, [searchQuery]);
+
+    useEffect(() => {
+        if (!debouncedQuery.trim()) {
             setFilteredResults([]);
             return;
         }
 
-        const queryType = query.startsWith("user:")
-            ? "users"
-            : query.startsWith("title:")
-            ? "posts"
-            : query.startsWith("tag:")
-            ? "tags"
-            : "posts";
+        const fetchResults = async () => {
+            const queryType = debouncedQuery.startsWith("user:")
+                ? "users"
+                : debouncedQuery.startsWith("title:")
+                ? "posts"
+                : debouncedQuery.startsWith("tag:")
+                ? "tags"
+                : "posts";
 
-        const trimmedQuery = query.replace(/^(user:|title:|tag:)/, '').trim();
-        console.log(queryType);
-        console.log(trimmedQuery);
-        setIsLoading(true);
+            const trimmedQuery = debouncedQuery.replace(/^(user:|title:|tag:)/, '').trim();
+            setIsLoading(true);
 
-        try {
-            const response = await axios.get('http://localhost:3000/api/v1/forum/search', {
-                params: {
-                    type: queryType,
-                    q: trimmedQuery,
-                    limit: 10,
-                },
-            });
-            console.log(response);
-            if (queryType === "users") {
-                setFilteredResults(response.data || []);
+            try {
+                const response = await axios.get('http://localhost:3000/api/v1/forum/search', {
+                    params: {
+                        type: queryType,
+                        q: trimmedQuery,
+                        limit: 10,
+                    },
+                });
+                if (queryType === "users") {
+                    setFilteredResults(response.data || []);
+                } else if (queryType === "posts" || queryType === "tags") {
+                    setFilteredResults(response.data[0].posts || []);
+                }
+            } catch (error) {
+                console.error("Error fetching search results:", error);
+                setFilteredResults([]);
+            } finally {
+                setIsLoading(false);
             }
-            else if (queryType === "posts") {
-                setFilteredResults(response.data[0].posts || []);
+        };
+
+        fetchResults();
+    }, [debouncedQuery]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                searchbarRef.current &&
+                !searchbarRef.current.contains(event.target) &&
+                resultsRef.current &&
+                !resultsRef.current.contains(event.target)
+            ) {
+                setShowResults(false);
             }
-            else {
-                setFilteredResults(response.data[0].posts || []);
-            }
-        } catch (error) {
-            console.error("Error fetching search results:", error);
-            setFilteredResults([]);
-        } finally {
-            setIsLoading(false);
-        }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
+
+    const handleInputChange = (e) => {
+        setSearchQuery(e.target.value);
+        setShowResults(true); // Show results when the user types
     };
 
     const handleResultClick = (result, queryType) => {
         if (queryType === "users") {
             navigate(`/profile/${result._id}`);
-        } else if (queryType === "posts") {
-            navigate(`/forum/${result._id}`);
-        } else if (queryType === "tags") {
+        } else if (queryType === "posts" || queryType === "tags") {
             navigate(`/forum/${result._id}`);
         }
+        setShowResults(false); // Hide results after a result is clicked
     };
 
     return (
@@ -78,43 +107,46 @@ const Header = () => {
                     style={{ cursor: 'pointer' }}
                 />
             </div>
-            <div className="searchbar">
+            <div className="searchbar" ref={searchbarRef}>
                 <div className="search-icon"></div>
                 <input
                     type="text"
                     placeholder="Search C.A.T... (e.g., user:abc, title:help, tag:c++)"
                     value={searchQuery}
                     onChange={handleInputChange}
+                    onFocus={() => setShowResults(true)} // Show results when the search bar gains focus
                 />
-                <div className="search-results">
-                    {isLoading ? (
-                        <div>Loading...</div>
-                    ) : filteredResults.length > 0 ? (
-                        <ul style={{ listStyleType: 'none', margin: 0, padding: 0 }}>
-                            {filteredResults.map((result, index) => (
-                                <li
-                                    key={index}
-                                    className="search-result-item"
-                                    onClick={() =>
-                                        handleResultClick(
-                                            result,
-                                            searchQuery.startsWith("user:")
-                                                ? "users"
-                                                : searchQuery.startsWith("tag:")
-                                                ? "tags"
-                                                : "posts"
-                                        )
-                                    }
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    {result.title || result.fullName || result.slug || "Untitled"}
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        searchQuery.trim() && <div>No results found.</div>
-                    )}
-                </div>
+                {showResults && (
+                    <div className="search-results" ref={resultsRef}>
+                        {isLoading ? (
+                            <div>Loading...</div>
+                        ) : filteredResults.length > 0 ? (
+                            <ul style={{ listStyleType: 'none', margin: 0, padding: 0 }}>
+                                {filteredResults.map((result, index) => (
+                                    <li
+                                        key={index}
+                                        className="search-result-item"
+                                        onClick={() =>
+                                            handleResultClick(
+                                                result,
+                                                searchQuery.startsWith("user:")
+                                                    ? "users"
+                                                    : searchQuery.startsWith("tag:")
+                                                    ? "tags"
+                                                    : "posts"
+                                            )
+                                        }
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        {result.title || result.fullName || result.slug || "Untitled"}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            searchQuery.trim() && <div>No results found.</div>
+                        )}
+                    </div>
+                )}
             </div>
             {!isLoggedIn ? (
                 <div className="header-button">

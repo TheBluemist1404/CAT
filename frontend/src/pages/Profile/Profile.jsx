@@ -466,7 +466,7 @@ const handleAddCompany = async () => {
                             <h1 style={{ margin: "20px" }}>Bio</h1>
                             <div style={{marginLeft:'30px'}}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <div onClick={() =>{setShowSchoolInput(!showSchoolInput)} } style={{ cursor: "pointer" }}>
+                            <div style={{ cursor: "pointer" }}>
                                 <img src="/src/assets/school.svg" alt="" width={30} height={30}/>
                             </div>
                             {schools.length > 0 && (
@@ -524,7 +524,7 @@ const handleAddCompany = async () => {
                             {/* companies */}
                             <div style={{marginLeft:'30px',marginTop:'10px',marginBottom:'20px'}}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <div onClick={()=>setShowCompanyInput(!showCompanyInput)} style={{ cursor: "pointer" }}>
+                                    <div  style={{ cursor: "pointer" }}>
                                         <img src="/src/assets/company.svg" alt="" width={30} height={30} />
                                     </div>
                                     {companies.length > 0 && (
@@ -700,21 +700,21 @@ const handleAddCompany = async () => {
                                         <div >
                                             <div dangerouslySetInnerHTML={{ __html: newDescription }} />
 
-                                    <Editor 
-                apiKey = {textEditorAPI} // Thay bằng API Key của bạn nếu cần
-                value={newDescription}
-                onEditorChange={handleEditorChange}
-                
-                init={{
-                    height: 300,
-                    menubar: true,
-                      plugins: [
-                        "advlist autolink lists link image charmap preview anchor",
-                        "searchreplace visualblocks code fullscreen",
-                        "insertdatetime media table code help wordcount",
-                      ],
-                      toolbar:
-                        "undo redo | formatselect | bold italic underline forecolor backcolor | \
+                                            <Editor
+                                                apiKey={textEditorAPI} // Thay bằng API Key của bạn nếu cần
+                                                value={newDescription}
+                                                onEditorChange={handleEditorChange}
+
+                                                init={{
+                                                    height: 300,
+                                                    menubar: true,
+                                                    plugins: [
+                                                        "advlist autolink lists link image charmap preview anchor",
+                                                        "searchreplace visualblocks code fullscreen",
+                                                        "insertdatetime media table code help wordcount",
+                                                    ],
+                                                    toolbar:
+                                                        "undo redo | formatselect | bold italic underline forecolor backcolor | \
                         alignleft aligncenter alignright alignjustify | \
                         bullist numlist outdent indent | removeformat | help",
                       content_style:

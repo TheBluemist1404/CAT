@@ -5,7 +5,6 @@ import { AuthContext } from "../../authentication/AuthProvider";
 import { useParams, useNavigate } from "react-router-dom";
 import DOMPurify from 'dompurify';
 
-
 function Detail({ token }) {
   const navigate = useNavigate();
   const { isLoggedIn, user } = useContext(AuthContext)
@@ -19,7 +18,6 @@ function Detail({ token }) {
   const [dropdownVisible, setDropdownVisible] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const editorRef = useRef(null);
-
 
 
   const { id } = useParams();
@@ -93,27 +91,61 @@ function Detail({ token }) {
             { content: commentContent, user: { id: user._id } },
             { headers: { "Authorization": `Bearer ${token.accessToken}` } },);
           console.log(response);
-          if (editorRef.current) editorRef.current.setCommentContent('');
+          if (editorRef.current) editorRef.current.setContent('');
+          
+          // Refetch the post data to get the updated comments
+          fetchData();  // This triggers the re-render
+  
         } catch (error) {
           if (error.response && error.response.status === 403) {
             const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
             const newAccessToken = getToken.data.accessToken
             token.accessToken = newAccessToken;
             localStorage.setItem('token', JSON.stringify(token))
-
+  
             const response = await axios.post(`http://localhost:3000/api/v1/forum/comment/${post._id}`,
               { content: commentContent, user: { id: user._id } },
-              { headers: { "Authorization": `Bearer ${newAccessToken}` } },)
+              { headers: { "Authorization": `Bearer ${newAccessToken}` } })
             console.log(response)
+  
+            fetchData();  // Refetch to get the updated post with comments
           }
         }
         setCommentInput('');
-        console.log(comments);
-        update();
       }
     }
   };
 
+  const [activeReply, setActiveReply] = useState(null); // Track which comment's reply editor is open
+  // Function to handle showing the reply editor
+  const toggleReplyEditor = (commentId) => {
+    setActiveReply(activeReply === commentId ? null : commentId); // Toggle reply editor for the comment
+  };
+
+  // Handle adding a reply to a comment
+  const handleAddReply = async (commentId) => {
+    const editorContent = editorRef.current[commentId]?.getContent();
+    if (!editorContent.trim()) return;
+  
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/forum/reply/${commentId}`,
+        { content: editorContent },
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
+      console.log("Reply posted:", response.data);
+  
+      editorRef.current[commentId]?.setContent("");
+      setActiveReply(null);
+  
+      // Refetch the post data to get the updated replies
+      fetchData();  // This triggers the re-render
+  
+    } catch (error) {
+      console.error("Error posting reply:", error);
+    }
+  };
+  
 
   const updateUpvote = async () => {
     try {
@@ -231,11 +263,48 @@ function Detail({ token }) {
     </div>
   );
 
-  // Save post
-  const handleSavePost = () => {
-    setIsSaved(!isSaved);
-  }
-
+  useEffect(() => {
+    // Ensure post is defined before proceeding
+    if (!post || !post._id) {
+      console.error("Post is undefined or missing _id.");
+      return;
+    }
+  
+    console.log(post._id); // Debugging post._id value
+  
+    if (user.savedPosts && Array.isArray(user.savedPosts)) {
+      const isPostSaved = user.savedPosts.some(
+        (savedPost) => savedPost._id.toString() === post._id.toString() // Updated comparison
+      );
+      setIsSaved(isPostSaved);
+    }
+  }, [post, user.savedPosts]); // Make sure post is also included in the dependencies
+  
+  const handleSavePost = async () => {
+    // Ensure post is defined before making the API call
+    if (!post || !post._id) {
+      console.error("Post is undefined, can't save the post.");
+      return;
+    }
+  
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/forum/save/${post._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
+  
+      console.log(response.data); // Debugging the response
+      if (response.status === 200) {
+        setIsSaved(!isSaved); // Toggle the save status
+      } else {
+        console.error("Error updating save status:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error saving the post:", error);
+    }
+  };
+  
   const renderDropdown = (index) => (
     <div
       className="post-navigate-dropdown"
@@ -258,8 +327,9 @@ function Detail({ token }) {
   const sortComments = [...comments].reverse();
   const renderComments = () => (
     <div className="comments-list">
-      {comments.map((comment) => {
+      {sortComments.map((comment) => {
         const sanitizedContent = DOMPurify.sanitize(comment.content); // Sanitize the comment content
+        const isReplyEditorOpen = activeReply === comment._id;
         return (
           <div key={comment.id} className="comment">
             <div className="comment-header">
@@ -279,7 +349,10 @@ function Detail({ token }) {
               dangerouslySetInnerHTML={{ __html: sanitizedContent }} // Use sanitized HTML content
             ></div>
             <div className="comment-footer">
-              <button className="comment-reply">
+              <button
+                className="comment-reply"
+                onClick={() => toggleReplyEditor(comment._id)}
+              >
                 <img 
                   src="/src/pages/forum/assets/Comment Icon.svg" 
                   className="comment-action" 
@@ -287,6 +360,72 @@ function Detail({ token }) {
                 /> 
                 Reply
               </button>
+            </div>
+            {isReplyEditorOpen && (
+              <div className="create-comment-header">
+                <div style={{ width: '40px', height: '40px', borderRadius: '20px', overflow: 'hidden' }}><img src={user.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
+                <Editor
+                  apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+                  onInit={(_, editor) => {
+                    editorRef.current[comment._id] = editor;
+                  }}
+                  init={{
+                    height: 150,
+                    width: 850,
+                    menubar: false,
+                    plugins: [
+                      "advlist autolink lists link image charmap preview anchor",
+                      "searchreplace visualblocks code fullscreen",
+                      "insertdatetime media table code help wordcount",
+                    ],
+                    toolbar:
+                      "undo redo | code | formatselect | bold italic underline forecolor backcolor | \
+                      alignleft aligncenter alignright alignjustify | \
+                      bullist numlist outdent indent | removeformat | help",
+                    placeholder: "Write your reply here...",
+                    content_style: `
+                      body { font-family:Helvetica,Arial,sans-serif; font-size:14px;color: white;}
+                      .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+                        color: grey;
+                        opacity: 0.8;
+                      }
+                    `,
+                  }}
+                />
+                <button
+                  className="submit-comment"
+                  onClick={() => handleAddReply(comment._id)}
+                >
+                  Post
+                </button>
+              </div>
+            )}
+
+            {/* Render Replies */}
+            <div className="replies-list">
+              {comment.replies.map((reply) => (
+                <div key={reply._id} className="reply">
+                  <div className="comment-header">
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden' }}>
+                      <img
+                        src={reply.userDetails.avatar}
+                        alt="Avatar"
+                        className="comment-avatar"
+                        style={{ width: '40px' }} 
+                      />
+                    </div>
+                    <span className="comment-user-name">
+                      {reply.userDetails.fullName}
+                    </span>
+                  </div>
+                  <div
+                    className="comment-body"
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(reply.content),
+                    }}
+                  ></div>
+                </div>
+              ))}
             </div>
             <hr className="post-line" style={{ marginTop: '10px' }} />
           </div>
@@ -312,7 +451,7 @@ function Detail({ token }) {
   const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
 
   return (
-    <div className="post" style={{ height: 'calc(100vh - 60px)' }}>
+    <div className="post" style={{ minheight: 'calc(100vh - 60px)' }}>
       <div className="post-header">
         <img src={post ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" />
         <div className="user-name">{post ? post.userCreated.fullName : "unknown"}</div>
@@ -350,7 +489,7 @@ function Detail({ token }) {
                   onInit={(_, editor) => (editorRef.current = editor)}
                   init={{
                     height: 150,
-                    width: 800,
+                    width: 850,
                     menubar: false,
                     plugins: [
                       "advlist autolink lists link image charmap preview anchor",
@@ -374,7 +513,7 @@ function Detail({ token }) {
           <button className="submit-comment" onClick={handleAddComment}>Post</button>
         </div>
       </div>
-      <div className="comment-section" style={{ padding: '10px' }}>
+      <div className="comment-section-detail" style={{ padding: '10px' }}>
         {renderComments()}
       </div>
     </div>
@@ -382,3 +521,4 @@ function Detail({ token }) {
 }
 
 export default Detail;
+

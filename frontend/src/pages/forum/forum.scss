@@ -3,13 +3,13 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
 }
 
 .forum {
     background-color: #000000; 
     color: white;
     padding-top: 60px; 
+    font-family: monospace;
 
     header.header-guest {
         position: fixed;
@@ -337,8 +337,10 @@
     .post-tags {
         color: #FFFFFF;
         border-radius: 5px;
-        font-size: 18px;
-        text-decoration: underline;
+        font-size: 15px;
+        background-color: #3E3E5A;
+        padding: 2px 5px;
+        display: inline-block;
     }
     
     
@@ -422,6 +424,15 @@
         flex-direction: column;
         gap: 10px; /* Space between the comment section and footer */
         padding: 10px;
+    }
+
+    .comment-section-detail{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+        margin-top: 10px;
+        min-height: 400px;
     }
     
     

@@ -5,6 +5,7 @@
 
 .profile {
   background-color: black;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
   .image {
     position: relative;
@@ -45,7 +46,7 @@
     background-color: transparent;
     position: absolute;
     color: var(--text-color);
-    font-family: var(--code);
+    font-family: var(--heading-font);
     font-size: 50px;
 
     margin-top: 50px;
@@ -438,7 +439,8 @@
     text-align: center; /* Căn giữa văn bản (nếu cần) */
     border-radius: 10px;
   }
-  .editbut:hover{
+
+  .editbut:hover {
     background-color: #131313;
     transition: 0.3s;
   }
