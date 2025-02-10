@@ -10,7 +10,7 @@ import "./profile.scss"
 import Header from "../../Header";
 import DOMPurify from "dompurify";
 
-const Profile = ({ token, post }) => {
+const Profile = ({ token, post}) => {
 
     const navigate = useNavigate();
     const { isLoggedIn, user } = useContext(AuthContext);
@@ -332,9 +332,66 @@ const handleAddCompany = async () => {
             }
         };
     };
+    const [showModal, setShowModal] = useState(false);
     const [showDeleteButtons, setShowDeleteButtons] = useState(false);
     const id = useParams();
     console.log(id.id, user._id)
+
+
+    //update avatar
+    
+    const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState(user.avatar);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreview(URL.createObjectURL(file)); // Hiển thị preview ảnh
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert("Vui lòng chọn ảnh để tải lên!");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append("avatar", selectedFile); // Thêm file vào formData
+    formData.append("fullName", user.fullName);
+    formData.append("description", description);
+    formData.append("schools", JSON.stringify(schools));
+    formData.append("companies", JSON.stringify(companies));
+  
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token.accessToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        alert("Cập nhật avatar thành công!");
+      
+        const updatedAvatar = response.data.avatar; // URL mới từ backend
+        setUser((prevUser) => ({
+          ...prevUser,
+          avatar: updatedAvatar,
+        }));
+        setPreview(updatedAvatar); // Hiển thị preview mới
+      }
+    } catch (error) {
+      console.error("Lỗi khi upload ảnh:", error.response?.data?.message || error.message);
+    }
+  };
+  
+    //update avatar
 
     if (id.id === user._id) {
         return (
@@ -524,9 +581,108 @@ const handleAddCompany = async () => {
                                               }}>Delete</button>)}
                             </div>
 
-                                <div className='editbut' onClick={() =>{setShowDeleteButtons(!showDeleteButtons),setShowSchoolInput(!showSchoolInput),setShowCompanyInput(!showCompanyInput)} }>
+                                <button className='editbut' onClick={() => setShowModal(true)}>
                                     Edit personal details 
-                                </div>
+                                </button>
+                                {showModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              width: "50%",
+              height: "80%",
+              
+              borderRadius: "16px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              
+              textAlign: "center",
+              display: "block"
+            }}
+          >
+            <h1 style={{ color: "#4b5563",marginTop:"10px"}}>Editing Details</h1>
+            <h2 style={{ color: "#4b5563",marginLeft: "20px",textAlign: "left"  }}>Company</h2>
+            <div style={{ display: 'flex', alignItems: 'center',marginLeft: "20px",marginTop:"15px" }}>
+                                        <div tabindex="0" class="plusButton" onClick={handleAddCompany}>
+                                        <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+                                            <g mask="url(#mask0_21_345)">
+                                            <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
+                                            </g>
+                                        </svg>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            className='input'
+                                            value={newCompany}
+                                            onChange={(e) => setNewCompany(e.target.value)}
+                                            placeholder="type..."
+                                        />
+                                        <button className='back' onClick={() => handleRemoveCompany(companies[0])}>
+                                        <svg height="16" width="16" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024"><path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z" fill="white"></path></svg>
+                                        
+                                        </button>
+                                        
+                                        
+                                    </div>
+                                    <div style={{ color: "#4b5563",marginLeft: "20px",textAlign: "left"  }}>{`{${companies.join(', ')}}`}</div>
+
+
+            <h2 style={{ color: "#4b5563",marginLeft: "20px",textAlign: "left",marginTop:"20px"  }}>School</h2>
+            <div style={{display: 'flex', alignItems: 'center', marginLeft: "20px",marginTop:"15px" }}>
+            <div tabindex="0" class="plusButton" onClick={handleAddSchool}>
+                                        <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+                                            <g mask="url(#mask0_21_345)">
+                                            <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
+                                            </g>
+                                        </svg>
+                            </div>
+                            <input
+                            type="text"
+                            className='input'
+                            value={newSchool}
+                            onChange={(e) => setNewSchool(e.target.value)}
+                            placeholder="type..."
+                            />
+                            <button className='back' onClick={() => handleRemoveSchool(schools[0])}>
+                                        <svg height="16" width="16" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024"><path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z" fill="white"></path></svg>
+                                        
+                                        </button>
+                            </div>
+                            <div style={{ color: "#4b5563",marginLeft: "20px",textAlign: "left"  }}>{`{${schools.join(', ')}}`}</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid gray",marginTop:"10px"}}>
+            <div style={{ color: "#4b5563" }}>Update information</div>
+            <button
+              onClick={() => setShowModal(false)}
+              style={{
+                
+                padding: "10px 20px",
+                backgroundColor: "#ef4444",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer"
+              }}
+            >
+              Đóng
+            </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
                             </div>
                             <div className='about' >
                                 <div style={{ margin: "20px" }}>
@@ -615,6 +771,39 @@ const handleAddCompany = async () => {
                             </div>
                             ))}
                             </div>
+                            <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Cập Nhật Avatar</h2>
+
+      {/* Button chọn ảnh */}
+      <input
+        type="file"
+        accept="image/*"
+        id="file-input"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+      <label htmlFor="file-input">
+        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          Chọn Ảnh
+        </button>
+      </label>
+
+      {/* Hiển thị preview ảnh */}
+      {preview && (
+        <div className="mt-4">
+          <img src={preview} alt="Avatar Preview" className="w-32 h-32 object-cover rounded-full" />
+        </div>
+      )}
+
+      {/* Button tải lên */}
+      <button
+        onClick={handleUpload}
+        className="bg-green-500 text-white px-4 py-2 rounded mt-4 hover:bg-green-600"
+      >
+        Tải lên Avatar
+      </button>
+    </div>
+
                         </div>
                         <div className='Post'>
                             <h1 style={{ margin: "20px" }}>Posts</h1>

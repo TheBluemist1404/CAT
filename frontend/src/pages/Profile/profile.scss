@@ -468,4 +468,36 @@
   .but{
     color: #000;
   }
+  /* From Uiverse.io by Jedi-hongbin */ 
+.back {
+  display: flex;
+  height: 3em;
+  width: 40px;
+  align-items: center;
+  justify-content: center;
+  background-color: #eeeeee4b;
+  border-radius: 3px;
+  letter-spacing: 1px;
+  transition: all 0.2s linear;
+  cursor: pointer;
+  border: none;
+  background: #000000;
+ }
+ 
+ .back > svg {
+  margin-right: 5px;
+  margin-left: 5px;
+  font-size: 20px;
+  transition: all 0.1s ease-in;
+ }
+ 
+ .back:hover > svg {
+  font-size: 1.2em;
+  transform: translateX(-1px);
+ }
+ 
+ .back:hover {
+  box-shadow: 9px 9px 33px #d1d1d1, -2px -2px  #ffffff;
+  
+ }
 }
