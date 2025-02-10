@@ -8,18 +8,14 @@ if (isMainThread) {
             const { parentPort } = require('worker_threads');
 
             try {
-                let logOutput = [];
                 const originalLog = console.log;
                 console.log = (...args) => {
-                    logOutput.push(args.join(" "));
+                    const logMessage = args.join(" ");
+                    parentPort.postMessage({ log: logMessage }); // ✅ Send logs immediately
                 };
 
-                eval(\`${code}\`); // Execute JS safely
+                eval(\`${code}\`); // ✅ Execute user code safely
 
-                setTimeout(()=>{
-                    parentPort.postMessage(
-                    logOutput.length > 0 ? { logs: logOutput } : {});
-                }, 1000)
             } catch (error) {
                 parentPort.postMessage({ error: error.message });
             }
@@ -27,6 +23,16 @@ if (isMainThread) {
 
         worker.on("message", (msg) => {
             console.log(JSON.stringify(msg));
+        });
+
+        worker.on("error", (err) => {
+            console.error("🚨 Worker Thread Error:", err.message);
+        });
+
+        worker.on("exit", (code) => {
+            if (code !== 0) {
+                console.error(`🚨 Worker stopped with exit code ${code}`);
+            }
         });
     });
 }

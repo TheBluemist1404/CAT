@@ -2,7 +2,7 @@ const redis = require('redis');
 
 const redisClient = redis.createClient({
   socket: {
-    host: "redis",  // Use the service name from docker-compose
+    host: "localhost"||"redis",  // redis is when running in docker
     port: 6379
   }
 });
