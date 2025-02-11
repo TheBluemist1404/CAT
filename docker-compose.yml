@@ -1,22 +1,36 @@
 version: "3"
 services:
-  backend:
-    build: ./backend
-    container_name: backend-container
-    restart: always
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-      - /var/run/docker.sock:/var/run/docker.sock  # ✅ Allows backend to run Docker commands
-    depends_on:
-      - sandbox
-      - redis
+  # backend:
+  #   build: ./backend
+  #   container_name: backend-container
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./backend:/app
+  #     - /app/node_modules
+  #     - /var/run/docker.sock:/var/run/docker.sock  # ✅ Allow backend to run Docker commands
+  #   depends_on:
+  #     - sandbox-js
+  #     - sandbox-python
+  #     - sandbox-cpp
+  #     - redis
 
-  sandbox:
-    build: ./sandbox
-    container_name: sandbox-container
+  sandbox-js:
+    build: ./sandbox-js
+    container_name: sandbox-js
+    stdin_open: true
+    tty: true
+
+  sandbox-python:
+    build: ./sandbox-python
+    container_name: sandbox-python
+    stdin_open: true
+    tty: true
+
+  sandbox-cpp:
+    build: ./sandbox-cpp
+    container_name: sandbox-cpp
     stdin_open: true
     tty: true
 
