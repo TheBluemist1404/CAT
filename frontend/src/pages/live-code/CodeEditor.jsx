@@ -18,7 +18,7 @@ function CodeEditor() {
       setCodeDisplay([])
       setErrorDisplay("")
       const code = editorRef.current.getValue();
-      const response = await axios.post('http://localhost:3000/execute', { code: code })
+      const response = await axios.post('http://localhost:3000/execute', { code: code, language: lang })
       const executionId = response.data.executionId
       console.log("✅ Execution started. Connecting WebSocket...");
 
@@ -57,15 +57,36 @@ function CodeEditor() {
     }
   }
 
+  const [lang, setLang] = useState("javascript"); // Default language is JavaScript
+
+  const handleLanguage = (event) => {
+    event.preventDefault(); // ✅ Prevent form reload
+
+    const selectedLang = event.target.value; // ✅ Get selected value
+    setLang(selectedLang); // ✅ Update state
+
+    console.log("Selected Language:", selectedLang); // ✅ Debugging log
+  };
+
   return (
     <div className="code-editor">
-      <button className='run-code' onClick={execute}>Run code</button>
+      <div className="run-code">
+        <button className='run-button' onClick={execute}>Run code</button>
+        <div style={{padding: '10px'}}>
+          <label htmlFor="language">Language:</label>
+          <select name="language" id="lang" value={lang} onChange={handleLanguage}>
+            <option value="javascript">Javascript</option>
+            <option value="python">Python</option>
+            <option value="cpp">C++</option>
+          </select>
+        </div>
+      </div>
       <div className="codespace">
         <div className="text-editor">
           <Editor
             height="100%"
-            defaultLanguage="javascript"
-            defaultValue="// some comment"
+            language={lang}
+            // defaultValue="// some comment"
             onMount={handleEditorDidMount}
             options={{
               fontSize: 20
@@ -74,7 +95,7 @@ function CodeEditor() {
         </div>
         <div className="display">
           <div className="code-display">
-            {codeDisplay ? codeDisplay.join('\n'): []}
+            {codeDisplay ? codeDisplay.join('\n') : []}
           </div>
           <div className="error-display">
             {errorDisplay}

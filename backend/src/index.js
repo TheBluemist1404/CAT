@@ -19,21 +19,29 @@ const wss = new WebSocket.Server({ port: 3001 }); // ✅ WebSocket Server
 
 const executions = {}; // Stores active WebSocket connections
 
+// ✅ Sandbox mapping
+const SANDBOXES = {
+    javascript: "cat-sandbox-js",
+    python: "cat-sandbox-python",
+    cpp: "cat-sandbox-cpp",
+};
+
 // ✅ POST request to execute code
 app.post("/execute", (req, res) => {
-    const { code } = req.body;
+    const { code, language } = req.body;
 
-    if (!code) {
-        return res.status(400).json({ error: "No code provided" });
+    if (!code || !language || !SANDBOXES[language]) {
+        return res.status(400).json({ error: "Invalid language or no code provided" });
     }
 
     const executionId = Date.now().toString(); // ✅ Unique ID for tracking logs
     executions[executionId] = []; // Store logs
 
-    console.log(`🚀 Running sandbox for ID: ${executionId}`);
+    console.log(`🚀 Running ${language} sandbox for ID: ${executionId}`);
 
-    // ✅ Run the sandbox inside Docker
-    const process = spawn("docker", ["run", "--rm", "-i", "cat-sandbox"]);
+    // ✅ Run the appropriate sandbox container inside Docker
+    const sandboxName = SANDBOXES[language];
+    const process = spawn("docker", ["run", "--rm", "-i", sandboxName]);
 
     process.stdout.on("data", (data) => {
         const logs = data.toString().trim().split("\n"); // ✅ Produces an array of JSON strings
@@ -52,16 +60,15 @@ app.post("/execute", (req, res) => {
         });
     });
     
-
     process.stderr.on("data", (data) => {
         console.error("🚨 Error:", data.toString().trim());
         if (executions[executionId].ws) {
-            executions[executionId].ws.send(JSON.stringify( data.toString().trim() ));
+            executions[executionId].ws.send(JSON.stringify({ error: data.toString().trim() }));
         }
     });
 
     process.on("close", () => {
-        console.log("✅ Execution complete.");
+        console.log(`✅ Execution complete for ${language}.`);
         if (executions[executionId].ws) {
             executions[executionId].ws.send(JSON.stringify({ done: true }));
             executions[executionId].ws.close();
@@ -69,7 +76,7 @@ app.post("/execute", (req, res) => {
         delete executions[executionId]; // Clean up
     });
 
-    process.stdin.write(code + "\n");
+    process.stdin.write(JSON.stringify({ code }) + "\n");
     process.stdin.end();
 
     // ✅ Return execution ID to the frontend
@@ -96,18 +103,3 @@ router(app);
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
 });
-
-// const rootURL = 'https://accounts.google.com/o/oauth2/v2/auth';
-// const options = {
-//   redirect_uri: process.env.REDIRECT_URI,
-//   client_id: process.env.CLIENT_ID,
-//   access_type: 'offline',
-//   response_type: 'code',
-//   prompt: 'consent',
-//   scope: [
-//     'https://www.googleapis.com/auth/userinfo.profile',
-//     'https://www.googleapis.com/auth/userinfo.email',
-//   ].join(' '),
-// };
-// const qs = new URLSearchParams(options);
-// console.log(`${rootURL}?${qs.toString()}`);
