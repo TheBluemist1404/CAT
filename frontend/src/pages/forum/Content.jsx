@@ -46,6 +46,23 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     );
   };
 
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState(user.avatar);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreview(URL.createObjectURL(file)); 
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert("Upload");
+      return;
+    }
+  }
 
   const createPost = async () => {
     if (title.trim() === '') {
@@ -67,6 +84,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
           userCreated: user._id,
           status: visibility,
           tags: selectedTags,
+          images: selectedFile,
         },
         {
           headers: {

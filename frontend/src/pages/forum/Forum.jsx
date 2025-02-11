@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './forum.scss';
 import axios from 'axios';
 import Detail from './Detail_post';
+import Search from './SearchResults';
 
 const Forum = ({ token, render }) => {
   const { isLoggedIn } = useContext(AuthContext);
@@ -21,7 +22,7 @@ const Forum = ({ token, render }) => {
       const response = await axios.get(`http://localhost:3000/api/v1/forum?offset=0&limit=0`);
       const posts = response.data[0].metadata[0].total;
       console.log(posts)
-      setTotalPages(posts / 10 + 1);
+      setTotalPages(Math.floor(posts / 10) + 1);
       console.log(totalPages);
     } catch (error) {
       console.error("Failed to fetch posts:", error);
@@ -63,17 +64,21 @@ const Forum = ({ token, render }) => {
 
   return (
     <div>
-      {render === "forum" ? (<div className="forum">
+      {render === "forum" || render === "search" ? (<div className="forum">
         <Header />
         <div className="main-layout">
           <Sidebar handleCreatePostToggle={handleCreatePostToggle} token={token} />
-          <Content
-            isCreatePostOpen={isCreatePostOpen}
-            handleCreatePostToggle={handleCreatePostToggle}
-            token={token}
-            currentPage={currentPage}
-            render={render}
-          />
+          {render === "forum" ? (
+              <Content
+                isCreatePostOpen={isCreatePostOpen}
+                handleCreatePostToggle={handleCreatePostToggle}
+                token={token}
+                currentPage={currentPage}
+                render={render}
+              />
+            ) : (
+              <Search token={token} />
+            )}
         </div>
         {render === "forum" ? (<Pagination
           totalPages={totalPages}
