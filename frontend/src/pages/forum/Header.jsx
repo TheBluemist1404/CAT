@@ -97,6 +97,25 @@ const Header = () => {
         setShowResults(false); // Hide results after a result is clicked
     };
 
+    const handleSearchSubmit = (e) => {
+        if (e.key === "Enter") {
+            if (!searchQuery.trim()) return;
+    
+            const queryType = searchQuery.startsWith("user:")
+                ? "users"
+                : searchQuery.startsWith("title:")
+                ? "posts"
+                : searchQuery.startsWith("tag:")
+                ? "tags"
+                : "posts";
+    
+            const trimmedQuery = searchQuery.replace(/^(user:|title:|tag:)/, '').trim();
+            
+            navigate(`/forum/search?type=${queryType}&q=${encodeURIComponent(trimmedQuery)}`);
+            setShowResults(false);
+        }
+    };
+
     return (
         <header className="header-guest">
             <div className="logo">
@@ -114,6 +133,7 @@ const Header = () => {
                     placeholder="Search C.A.T... (e.g., user:abc, title:help, tag:c++)"
                     value={searchQuery}
                     onChange={handleInputChange}
+                    onKeyDown={handleSearchSubmit}
                     onFocus={() => setShowResults(true)} // Show results when the search bar gains focus
                 />
                 {showResults && (

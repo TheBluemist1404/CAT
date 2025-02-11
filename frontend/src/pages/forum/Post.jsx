@@ -21,7 +21,8 @@ function Post({ post, token, update }) {
   const [isCommentBoxVisible, setIsCommentBoxVisible] = useState(false);
   const sanitizedContent = DOMPurify.sanitize(post.content);
   const editorRef = useRef(null);
-
+  const dropdownRef = useRef(null);
+  const postRef = useRef(null);
   //Handle time display
   const timestamp = post.createdAt;
   const createdDate = new Date(timestamp);
@@ -296,6 +297,27 @@ function Post({ post, token, update }) {
       </div>
     </div>
   );
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        postRef.current &&
+        !postRef.current.contains(event.target) && // Check if clicked outside of the post
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) // Check if clicked outside of the dropdown
+      ) {
+        setDropdownVisible(null); // Close the dropdown
+      }
+    };
+
+    // Add event listener for clicks
+    document.addEventListener('click', handleClickOutside);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
   const renderComments = () => (
     <div className="comments-list">
