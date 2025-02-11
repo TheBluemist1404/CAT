@@ -5,7 +5,7 @@ const fs = require("fs");
 if (isMainThread) {
     process.stdin.on("data", (data) => {
         const parsedData = JSON.parse(data.toString().trim()); // ✅ Parse JSON input
-        const code = parsedData.code; // ✅ Extract only the code string
+        const code = parsedData.code; // ✅ Extract code
 
         const worker = new Worker(__filename, { workerData: code });
 
@@ -16,24 +16,50 @@ if (isMainThread) {
     const filename = "/tmp/code.cpp";
     const outputBinary = "/tmp/code.out";
 
+    // ✅ Write user's original code to file
     fs.writeFileSync(filename, workerData);
 
-    try {
-        execSync(`g++ ${filename} -o ${outputBinary}`);
+    // ✅ Read the file, modify it, and then write it back
+    fs.readFile(filename, "utf8", (err, data) => {
+        if (err) {
+            console.error("Error reading file:", err);
+            return;
+        }
 
-        const execution = spawn(outputBinary);
-        execution.stdout.on("data", (data) => {
-            parentPort.postMessage({ log: data.toString().trim() });
-        });
+        // ✅ Insert `setbuf(stdout, NULL);` inside `main()`
+        const modifiedContent = data.replace(
+            "int main() {",
+            "int main() {\n    setbuf(stdout, NULL);"
+        );
 
-        execution.stderr.on("data", (data) => {
-            parentPort.postMessage({ error: data.toString().trim() });
-        });
+        // ✅ Write the modified content back to the file
+        fs.writeFile(filename, modifiedContent, (err) => {
+            if (err) {
+                console.error("Error writing file:", err);
+                return;
+            }
 
-        execution.on("exit", () => {
-            parentPort.postMessage({ done: true });
+            try {
+                // ✅ Compile the modified C++ file
+                execSync(`g++ ${filename} -o ${outputBinary} -std=c++17`);
+
+                // ✅ Run the compiled C++ program
+                const execution = spawn(outputBinary);
+
+                execution.stdout.on("data", (data) => {
+                    parentPort.postMessage({ log: data.toString().trim() });
+                });
+
+                execution.stderr.on("data", (data) => {
+                    parentPort.postMessage({ error: data.toString().trim() });
+                });
+
+                execution.on("exit", () => {
+                    parentPort.postMessage({ done: true });
+                });
+            } catch (error) {
+                parentPort.postMessage({ error: "Compilation failed" });
+            }
         });
-    } catch (error) {
-        parentPort.postMessage({ error: "Compilation failed" });
-    }
+    });
 }

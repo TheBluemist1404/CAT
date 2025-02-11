@@ -12,7 +12,7 @@ if (isMainThread) {
         worker.on("error", (err) => console.error(JSON.stringify({ error: err.message })));
     });
 } else {
-    const python = spawn("python3", ["-c", workerData]);
+    const python = spawn("python3", [ "-u" ,"-c", workerData]);
 
     python.stdout.on("data", (data) => {
         parentPort.postMessage({ log: data.toString().trim() });
