@@ -90,6 +90,7 @@ function App() {
                 <Route path='forum'>
                     <Route index element={<Forum token={token} render="forum"/>} />
                     <Route path=":id" element={<Forum token={token} render="post"/>} />
+                    <Route path="search" element={<Forum token={token} render="search"/>} />
                 </Route>
                 <Route path='/profile/:id/*' element={<Profile token={token} />}>
                     <Route path='post' element={<></>} />
