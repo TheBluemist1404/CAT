@@ -1,10 +1,11 @@
 const { Worker, isMainThread, workerData, parentPort } = require("worker_threads");
+const vm = require("vm");
 
 if (isMainThread) {
     process.stdin.on("data", (data) => {
         try {
-            const parsedData = JSON.parse(data.toString().trim()); // ✅ Parse JSON input
-            const code = parsedData.code; // ✅ Extract only the code string
+            const parsedData = JSON.parse(data.toString().trim());
+            const code = parsedData.code;
 
             const worker = new Worker(__filename, { workerData: code });
 
@@ -17,14 +18,21 @@ if (isMainThread) {
     });
 } else {
     try {
-        const originalLog = console.log; //Store orignal console.log, we gonna overwrite it
-        console.log = (...args) => {
-            const logMessage = args.join(" ");
-            console.log(logMessage)
-            parentPort.postMessage({ log: logMessage }); // ✅ Send logs immediately
+        // ✅ Secure the execution environment with a sandbox
+        const sandbox = {
+            console: {
+                log: (...args) => {
+                    const logMessage = args.join(" ");
+                    parentPort.postMessage({ log: logMessage });
+                }
+            },
+            require: require, // ✅ Allow `require()` for CommonJS modules
         };
 
-        eval(workerData); // ✅ Run only the extracted JavaScript code
+        const context = vm.createContext(sandbox); // ✅ Create secure execution context
+
+        // ✅ Execute the user code safely
+        new vm.Script(workerData).runInContext(context);
 
     } catch (error) {
         parentPort.postMessage({ error: error.message });

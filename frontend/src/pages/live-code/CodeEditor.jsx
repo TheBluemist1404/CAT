@@ -70,35 +70,40 @@ function CodeEditor() {
 
   return (
     <div className="code-editor">
-      <div className="run-code">
-        <button className='run-button' onClick={execute}>Run code</button>
-        <div style={{padding: '10px'}}>
-          <label htmlFor="language">Language:</label>
-          <select name="language" id="lang" value={lang} onChange={handleLanguage}>
-            <option value="javascript">Javascript</option>
-            <option value="python">Python</option>
-            <option value="cpp">C++</option>
-          </select>
-        </div>
+      <div className="sidebar">
+        
       </div>
-      <div className="codespace">
-        <div className="text-editor">
-          <Editor
-            height="100%"
-            language={lang}
-            // defaultValue="// some comment"
-            onMount={handleEditorDidMount}
-            options={{
-              fontSize: 20
-            }}
-          />
-        </div>
-        <div className="display">
-          <div className="code-display">
-            {codeDisplay ? codeDisplay.join('\n') : []}
+      <div className="text-editor">
+        <div className="run-code">
+          <button className='run-button' onClick={execute}>Run code</button>
+          <div style={{padding: '10px'}}>
+            <label htmlFor="language">Language:</label>
+            <select name="language" id="lang" value={lang} onChange={handleLanguage}>
+              <option value="javascript">Javascript</option>
+              <option value="python">Python</option>
+              <option value="cpp">C++</option>
+            </select>
           </div>
-          <div className="error-display">
-            {errorDisplay}
+        </div>
+        <div className="codespace">
+          <div className="text-editor">
+            <Editor
+              height="100%"
+              language={lang}
+              // defaultValue="// some comment"
+              onMount={handleEditorDidMount}
+              options={{
+                fontSize: 20
+              }}
+            />
+          </div>
+          <div className="display">
+            <div className="code-display">
+              {codeDisplay ? codeDisplay.join('\n') : []}
+            </div>
+            <div className="error-display">
+              {errorDisplay}
+            </div>
           </div>
         </div>
       </div>
