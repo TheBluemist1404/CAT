@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@homepage-assets': path.resolve(__dirname, 'src/assets/homepage'),
+      '@homepage-assets': path.resolve(__dirname, 'src/pages/homepage/assets'),
     },
   },
 });
