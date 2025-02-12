@@ -17,14 +17,14 @@ if (isMainThread) {
     });
 } else {
     try {
-        let logOutput = [];
+        const originalLog = console.log; //Store orignal console.log, we gonna overwrite it
         console.log = (...args) => {
-            logOutput.push(args.join(" "));
-            parentPort.postMessage({ log: logOutput.join(" ") });
+            const logMessage = args.join(" ");
+            console.log(logMessage)
+            parentPort.postMessage({ log: logMessage }); // ✅ Send logs immediately
         };
 
         eval(workerData); // ✅ Run only the extracted JavaScript code
-        parentPort.postMessage({ done: true });
 
     } catch (error) {
         parentPort.postMessage({ error: error.message });
