@@ -5,19 +5,20 @@ const fs = require("fs");
 if (isMainThread) {
     process.stdin.on("data", (data) => {
         const parsedData = JSON.parse(data.toString().trim()); // ✅ Parse JSON input
-        const code = parsedData.code; // ✅ Extract code
+        const {code, input} = parsedData; // ✅ Extract code
 
-        const worker = new Worker(__filename, { workerData: code });
+        const worker = new Worker(__filename, { workerData: {code, input} });
 
         worker.on("message", (msg) => console.log(JSON.stringify(msg)));
         worker.on("error", (err) => console.error(JSON.stringify({ error: err.message })));
     });
 } else {
+    const {code, input} = workerData;
     const filename = "/tmp/code.cpp";
     const outputBinary = "/tmp/code.out";
 
     // ✅ Write user's original code to file
-    fs.writeFileSync(filename, workerData);
+    fs.writeFileSync(filename, code);
 
     // ✅ Read the file, modify it, and then write it back
     fs.readFile(filename, "utf8", (err, data) => {
@@ -44,7 +45,10 @@ if (isMainThread) {
                 execSync(`g++ ${filename} -o ${outputBinary} -std=c++17`);
 
                 // ✅ Run the compiled C++ program
-                const execution = spawn(outputBinary);
+                const execution = spawn(outputBinary, [], {stdio: ["pipe", "pipe", "pipe"]});
+
+                execution.stdin.write(input + '\n')
+                execution.stdin.end()
 
                 execution.stdout.on("data", (data) => {
                     parentPort.postMessage({ log: data.toString().trim() });
