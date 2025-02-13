@@ -28,7 +28,7 @@ const SANDBOXES = {
 
 // ✅ POST request to execute code
 app.post("/execute", (req, res) => {
-    const { code, language } = req.body;
+    const { code, input, language } = req.body;
 
     if (!code || !language || !SANDBOXES[language]) {
         return res.status(400).json({ error: "Invalid language or no code provided" });
@@ -76,7 +76,7 @@ app.post("/execute", (req, res) => {
         delete executions[executionId]; // Clean up
     });
 
-    process.stdin.write(JSON.stringify({ code }) + "\n");
+    process.stdin.write(JSON.stringify({ code, input }) + "\n");
     process.stdin.end();
 
     // ✅ Return execution ID to the frontend

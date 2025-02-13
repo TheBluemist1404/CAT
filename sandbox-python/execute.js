@@ -3,25 +3,40 @@ const { spawn } = require("child_process");
 
 if (isMainThread) {
     process.stdin.on("data", (data) => {
-        const parsedData = JSON.parse(data.toString().trim()); // ✅ Parse JSON input
-        const code = parsedData.code; // ✅ Extract only the code string
+        try {
+            const parsedData = JSON.parse(data.toString().trim());
+            const { code, input } = parsedData; // ✅ Accept both `code` & `input`
 
-        const worker = new Worker(__filename, { workerData: code });
+            const worker = new Worker(__filename, { workerData: { code, input } });
 
-        worker.on("message", (msg) => console.log(JSON.stringify(msg)));
-        worker.on("error", (err) => console.error(JSON.stringify({ error: err.message })));
+            worker.on("message", (msg) => console.log(JSON.stringify(msg)));
+            worker.on("error", (err) => console.error(JSON.stringify({ error: err.message })));
+
+        } catch (error) {
+            console.error("⚠️ Error parsing JSON input:", error.message);
+        }
     });
 } else {
-    const python = spawn("python3", [ "-u" ,"-c", workerData]);
+    const { code, input } = workerData;
 
+    // ✅ Run Python code dynamically with unbuffered output
+    const python = spawn("python3", ["-u", "-c", code], { stdio: ["pipe", "pipe", "pipe"] });
+
+    // ✅ Send user input to Python script
+    python.stdin.write(input + "\n");
+    python.stdin.end();
+
+    // ✅ Capture & send real-time logs
     python.stdout.on("data", (data) => {
         parentPort.postMessage({ log: data.toString().trim() });
     });
 
+    // ✅ Capture & send errors
     python.stderr.on("data", (data) => {
         parentPort.postMessage({ error: data.toString().trim() });
     });
 
+    // ✅ Notify when execution is done
     python.on("exit", () => {
         parentPort.postMessage({ done: true });
     });
