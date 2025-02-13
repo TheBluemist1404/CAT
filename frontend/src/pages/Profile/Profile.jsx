@@ -9,6 +9,9 @@ import { Editor } from "@tinymce/tinymce-react";
 import "./profile.scss"
 import Header from "../../Header";
 import DOMPurify from "dompurify";
+import Cropper from "react-easy-crop";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
 
 const Profile = ({ token, post}) => {
 
@@ -333,6 +336,7 @@ const handleAddCompany = async () => {
         };
     };
     const [showModal, setShowModal] = useState(false);
+    const [showAvatarChange, setShowAvatarChange] = useState(false);
     const [showDeleteButtons, setShowDeleteButtons] = useState(false);
     const id = useParams();
     console.log(id.id, user._id)
@@ -400,7 +404,91 @@ const handleAddCompany = async () => {
 
                 <div style={{ zIndex: 1, position: 'relative' }}>
                     <div className='image' >
-                        <div className="profile-avatar"><img src={user.avatar} alt="" /></div>
+                
+                        <div className="profile-avatar">
+                            <img className='ava' src={user.avatar} alt="" />
+                            <img className='cam' src="/src/assets/camera.svg" onClick={() => setShowAvatarChange(true)} alt="" width={30} height={30} style={{ position: "absolute", bottom: "5px", left: "90px", zIndex: 1000 }} />
+                        </div>
+                        {showAvatarChange && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999
+          }}
+        >
+          <div
+            style={{
+              width: "50%",
+              height: "80%",
+              borderRadius: "16px",
+              textAlign: "center",
+              display: "block"
+            }}
+            className='detail'
+          >
+            <h1 style={{ color: "#FFFFFFA3",marginTop:"10px"}}>Editing Details</h1>
+            <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Cập Nhật Avatar</h2>
+
+      {/* Button chọn ảnh */}
+      <input
+        type="file"
+        accept="image/*"
+        id="file-input"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+      {/* <label htmlFor="file-input">
+        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          Chọn Ảnh
+        </button>
+      </label> */}
+
+      {/* Hiển thị preview ảnh */}
+      {preview && (
+        <div className="mt-4">
+          <img src={preview} width={100} height={100}  alt="Avatar Preview" className="w-32 h-32 object-cover rounded-full" />
+        </div>
+      )}
+
+      {/* Button tải lên */}
+      <button
+        onClick={handleUpload}
+        className="bg-green-500 text-white px-4 py-2 rounded mt-4 hover:bg-green-600"
+      >
+        Tải lên Avatar
+      </button>
+    </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid gray",marginTop:"10px"}}>
+            <div style={{ color: "#4b5563" }}>Update information</div>
+            <button
+              onClick={() => setShowAvatarChange(false)}
+              style={{
+                
+                padding: "10px 20px",
+                backgroundColor: "#ef4444",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer"
+              }}
+            >
+              Đóng
+            </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
                         <h1 className='profile-username'>{user.fullName}</h1>
                         <div className='social'>
                             <img src="/src/assets/facebook.svg" alt="" width={30} height={30} />
@@ -601,19 +689,16 @@ const handleAddCompany = async () => {
         >
           <div
             style={{
-              backgroundColor: "white",
               width: "50%",
               height: "80%",
-              
               borderRadius: "16px",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-              
               textAlign: "center",
               display: "block"
             }}
+            className='detail'
           >
-            <h1 style={{ color: "#4b5563",marginTop:"10px"}}>Editing Details</h1>
-            <h2 style={{ color: "#4b5563",marginLeft: "20px",textAlign: "left"  }}>Company</h2>
+            <h1 style={{ color: "#FFFFFFA3",marginTop:"10px"}}>Editing Details</h1>
+            <h2 style={{ color: "#FFFFFFA3",marginLeft: "20px",textAlign: "left"  }}>Company</h2>
             <div style={{ display: 'flex', alignItems: 'center',marginLeft: "20px",marginTop:"15px" }}>
                                         <div tabindex="0" class="plusButton" onClick={handleAddCompany}>
                                         <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
@@ -639,7 +724,7 @@ const handleAddCompany = async () => {
                                     <div style={{ color: "#4b5563",marginLeft: "20px",textAlign: "left"  }}>{`{${companies.join(', ')}}`}</div>
 
 
-            <h2 style={{ color: "#4b5563",marginLeft: "20px",textAlign: "left",marginTop:"20px"  }}>School</h2>
+            <h2 style={{ color: "#FFFFFFA3",marginLeft: "20px",textAlign: "left",marginTop:"20px"  }}>School</h2>
             <div style={{display: 'flex', alignItems: 'center', marginLeft: "20px",marginTop:"15px" }}>
             <div tabindex="0" class="plusButton" onClick={handleAddSchool}>
                                         <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">

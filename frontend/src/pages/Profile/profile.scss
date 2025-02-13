@@ -30,15 +30,20 @@
     padding: 0;
     width: 150px;
     height: 150px;
-    border-radius: 50%;
-    background-color: transparent;
-    overflow: hidden;
-    top: 50px;
+    
+    
+    clip-path: circle(50% at 50% 50%);
+    top: 45px;
 
 
-    img {
+    .ava {
       width: 150px;
-      transform: translate(-1px, -1px);
+      height: 150px;
+      
+    }
+    
+    .cam:hover{
+      transform: scale(1.1);
     }
   }
 
@@ -49,7 +54,7 @@
     font-family: var(--heading-font);
     font-size: 50px;
 
-    margin-top: 50px;
+    margin-top: 70px;
   }
 
   .social {
@@ -501,5 +506,13 @@
  .back:hover {
   box-shadow: 9px 9px 33px #d1d1d1, -2px -2px  #ffffff;
   
+ }
+ .detail{
+  background: rgba(88, 88, 88, 0.64);
+border-radius: 16px;
+box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+backdrop-filter: blur(15.3px);
+-webkit-backdrop-filter: blur(15.3px);
+border: 1px solid rgba(88, 62, 62, 0.43);
  }
 }

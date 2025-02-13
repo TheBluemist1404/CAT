@@ -1,4 +1,4 @@
-const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+
 
 const multer = require('multer');
 
