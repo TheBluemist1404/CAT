@@ -9,9 +9,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import "./profile.scss"
 import Header from "../../Header";
 import DOMPurify from "dompurify";
-import Cropper from "react-easy-crop";
-import { Slider } from "@/components/ui/slider";
-import { Button } from "@/components/ui/button";
+
 
 const Profile = ({ token, post}) => {
 
@@ -264,77 +262,73 @@ const handleAddCompany = async () => {
   const handleClose = () => {
     setIsVisible(false);
   };
-  const handleRemoveSchool = async () => {
-    if (schools.length >= 1) {
-        
-        const indexToRemove = schools.length - 1;
+  const handleRemoveSchool = async (indexToRemove) => {
+    if (schools.length > 0) {
+        // Lọc ra danh sách mới mà không có phần tử bị xóa
+        const updatedSchools = schools.filter((_, index) => index !== indexToRemove);
+        setSchools(updatedSchools);
 
-
-            const updatedSchools = schools.filter((_, index) => index !== indexToRemove);
-            setSchools(updatedSchools);
-            try {
-                const response = await axios.patch(
-                    `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-                    {
-                        schools: updatedSchools,
-                        user: { id: user._id },
-                        fullName: user.fullName,
-                        companies,
-                        description,
-                        avatar: user.avatar,
+        try {
+            const response = await axios.patch(
+                `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+                {
+                    schools: updatedSchools,
+                    user: { id: user._id },
+                    fullName: user.fullName,
+                    companies,
+                    description,
+                    avatar: user.avatar,
+                },
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token.accessToken}`,
                     },
-                    {
-                        headers: {
-                            "Authorization": `Bearer ${token.accessToken}`,
-                        },
-                    }
-                );
-
-
-                if (response.status === 200) {
-                    console.log("School removed successfully");
                 }
-            } catch (err) {
-                console.error("Error removing school:", err.response?.data?.message || err.message);
+            );
+
+            if (response.status === 200) {
+                console.log("School removed successfully");
             }
-        };
-    };
-
-  const handleRemoveCompany = async () => {
-    if (companies.length >= 1) {
-        
-        const indexToRemove = companies.length - 1;
+        } catch (err) {
+            console.error("Error removing school:", err.response?.data?.message || err.message);
+        }
+    }
+};
 
 
-            const updatedCompany = companies.filter((_, index) => index !== indexToRemove);
-            setCompanies(updatedCompany);
-            try {
-                const response = await axios.patch(
-                    `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-                    {
-                        companies: updatedCompany,
-                        user: { id: user._id },
-                        fullName: user.fullName,
-                        schools,
-                        description,
-                        avatar: user.avatar,
+const handleRemoveCompany = async (indexToRemove) => {
+    if (companies.length > 0) {
+        // Lọc ra danh sách mới mà không có phần tử bị xóa
+        const updatedCompanies = companies.filter((_, index) => index !== indexToRemove);
+        setCompanies(updatedCompanies);
+
+        try {
+            const response = await axios.patch(
+                `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+                {
+                    companies: updatedCompanies,
+                    user: { id: user._id },
+                    fullName: user.fullName,
+                    schools,
+                    description,
+                    avatar: user.avatar,
+                },
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token.accessToken}`,
                     },
-                    {
-                        headers: {
-                            "Authorization": `Bearer ${token.accessToken}`,
-                        },
-                    }
-                );
-
-
-                if (response.status === 200) {
-                    console.log("Company removed successfully");
                 }
-            } catch (err) {
-                console.error("Error removing company:", err.response?.data?.message || err.message);
+            );
+
+            if (response.status === 200) {
+                console.log("Company removed successfully");
             }
-        };
-    };
+        } catch (err) {
+            console.error("Error removing company:", err.response?.data?.message || err.message);
+        }
+    }
+};
+
     const [showModal, setShowModal] = useState(false);
     const [showAvatarChange, setShowAvatarChange] = useState(false);
     const [showDeleteButtons, setShowDeleteButtons] = useState(false);
@@ -689,16 +683,20 @@ const handleAddCompany = async () => {
         >
           <div
             style={{
-              width: "50%",
-              height: "80%",
-              borderRadius: "16px",
-              textAlign: "center",
-              display: "block"
+                width: "50%",
+                height: "80%",
+                borderRadius: "16px",
+                textAlign: "center",
+                display: "block",
+                overflowY: "auto", // ✅ Cho phép cuộn nếu nội dung vượt quá chiều cao
+                maxHeight: "80vh", // ✅ Giới hạn chiều cao tối đa
+                backgroundColor: "#333", // (Giữ màu nền nếu cần)
+                padding: "20px",
             }}
             className='detail'
           >
-            <h1 style={{ color: "#FFFFFFA3",marginTop:"10px"}}>Editing Details</h1>
-            <h2 style={{ color: "#FFFFFFA3",marginLeft: "20px",textAlign: "left"  }}>Company</h2>
+            <h1 style={{ color: "#FFFFFF",marginTop:"10px"}}>Editing Details</h1>
+            <h2 style={{ color: "#FFFFFF",marginLeft: "20px",textAlign: "left"  }}>Company</h2>
             <div style={{ display: 'flex', alignItems: 'center',marginLeft: "20px",marginTop:"15px" }}>
                                         <div tabindex="0" class="plusButton" onClick={handleAddCompany}>
                                         <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
@@ -714,17 +712,71 @@ const handleAddCompany = async () => {
                                             onChange={(e) => setNewCompany(e.target.value)}
                                             placeholder="type..."
                                         />
-                                        <button className='back' onClick={() => handleRemoveCompany(companies[0])}>
-                                        <svg height="16" width="16" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024"><path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z" fill="white"></path></svg>
-                                        
-                                        </button>
-                                        
                                         
                                     </div>
-                                    <div style={{ color: "#4b5563",marginLeft: "20px",textAlign: "left"  }}>{`{${companies.join(', ')}}`}</div>
+                                    
+                                    {companies.map((company, index) => (
+    <div 
+        key={index} 
+        style={{ 
+            display: "flex", 
+            alignItems: "center",  
+            marginBottom: "10px", 
+            marginLeft: "20px",
+            height: "30px",
+            position: "relative"
+        }}
+        className="company-item"
+    >
+        <div style={{ 
+            fontSize: "16px", 
+            lineHeight: "1", 
+            display: "flex", 
+            alignItems: "center",
+        }}>
+            {company}
+        </div>
+        <button 
+            onClick={() => handleRemoveCompany(index)} 
+            className="delete-button"
+        >
+            x
+        </button>
+    </div>
+))}
+
+<style>
+    {`
+        .company-item {
+            position: relative;
+        }
+        .delete-button {
+            margin-left: 10px;
+            color: red;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            height: 24px;
+            width: 24px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+        }
+        .company-item:hover .delete-button {
+            display: flex;
+        }
+    `}
+</style>
 
 
-            <h2 style={{ color: "#FFFFFFA3",marginLeft: "20px",textAlign: "left",marginTop:"20px"  }}>School</h2>
+
+
+
+
+            <h2 style={{ color: "#FFFFFF",marginLeft: "20px",textAlign: "left",marginTop:"20px"  }}>School</h2>
             <div style={{display: 'flex', alignItems: 'center', marginLeft: "20px",marginTop:"15px" }}>
             <div tabindex="0" class="plusButton" onClick={handleAddSchool}>
                                         <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
@@ -740,14 +792,72 @@ const handleAddCompany = async () => {
                             onChange={(e) => setNewSchool(e.target.value)}
                             placeholder="type..."
                             />
-                            <button className='back' onClick={() => handleRemoveSchool(schools[0])}>
-                                        <svg height="16" width="16" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024"><path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z" fill="white"></path></svg>
-                                        
-                                        </button>
+                            
                             </div>
-                            <div style={{ color: "#4b5563",marginLeft: "20px",textAlign: "left"  }}>{`{${schools.join(', ')}}`}</div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid gray",marginTop:"10px"}}>
-            <div style={{ color: "#4b5563" }}>Update information</div>
+                            
+                            {schools.map((school, index) => (
+    <div 
+        key={index} 
+        style={{ 
+            display: "flex", 
+            alignItems: "center",  
+            marginBottom: "10px", 
+            marginLeft: "20px",
+            height: "30px",
+            position: "relative"
+        }}
+        className="school-item"
+    >
+        <div style={{ 
+            fontSize: "16px", 
+            lineHeight: "1", 
+            display: "flex", 
+            alignItems: "center",
+        }}>
+            {school}
+        </div>
+        <button 
+            onClick={() => handleRemoveSchool(index)} 
+            className="delete-button"
+        >
+            x
+        </button>
+    </div>
+))}
+
+<style>
+    {`
+        .school-item {
+            position: relative;
+        }
+        .delete-button {
+            margin-left: 10px;
+            color: red;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            height: 24px;
+            width: 24px;
+            display: none; /* Mặc định ẩn */
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+            
+        }
+        .school-item:hover .delete-button {
+            display: flex; /* Hiện khi hover */
+        }
+    `}
+</style>
+
+
+
+
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid gray",borderBottom: "1px solid gray",marginTop:"10px",height:"50px"}}>
+            <div style={{ color: "#FFFFFF" }}>Update information</div>
             <button
               onClick={() => setShowModal(false)}
               style={{
@@ -760,7 +870,7 @@ const handleAddCompany = async () => {
                 cursor: "pointer"
               }}
             >
-              Đóng
+              Close
             </button>
             </div>
           </div>
@@ -856,38 +966,7 @@ const handleAddCompany = async () => {
                             </div>
                             ))}
                             </div>
-                            <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Cập Nhật Avatar</h2>
-
-      {/* Button chọn ảnh */}
-      <input
-        type="file"
-        accept="image/*"
-        id="file-input"
-        className="hidden"
-        onChange={handleFileChange}
-      />
-      <label htmlFor="file-input">
-        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          Chọn Ảnh
-        </button>
-      </label>
-
-      {/* Hiển thị preview ảnh */}
-      {preview && (
-        <div className="mt-4">
-          <img src={preview} alt="Avatar Preview" className="w-32 h-32 object-cover rounded-full" />
-        </div>
-      )}
-
-      {/* Button tải lên */}
-      <button
-        onClick={handleUpload}
-        className="bg-green-500 text-white px-4 py-2 rounded mt-4 hover:bg-green-600"
-      >
-        Tải lên Avatar
-      </button>
-    </div>
+                            
 
                         </div>
                         <div className='Post'>
