@@ -8,6 +8,9 @@ import { useNavigate } from 'react-router-dom'
 import logo from '@code-editor-assets/logo.svg'
 
 function CodeEditor() {
+  const url = window.location.href
+  console.log(url.split("/").pop()) //get sessionID
+
   const navigate = useNavigate()
   const editorRef = useRef(null);
   const inputRef = useRef(null);
@@ -58,7 +61,7 @@ function CodeEditor() {
       setErrorDisplay("")
       const code = editorRef.current.getValue()
       const input = inputRef.current ? inputRef.current.value: ""
-      const response = await axios.post('http://localhost:3000/execute', { code: code, input: input, language: lang })
+      const response = await axios.post('http://localhost:3000/api/v1/code/execute', { code: code, input: input, language: lang })
       const executionId = response.data.executionId
       console.log("✅ Execution started. Connecting WebSocket...");
 

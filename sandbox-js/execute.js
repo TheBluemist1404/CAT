@@ -20,6 +20,7 @@ if (isMainThread) {
     try {
         // ✅ Secure the execution environment with a sandbox
         const sandbox = {
+            global: global, ...global,
             console: {
                 log: (...args) => {
                     const logMessage = args.join(" ");
