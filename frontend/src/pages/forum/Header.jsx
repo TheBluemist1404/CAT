@@ -178,7 +178,7 @@ const Header = () => {
                     </button>
                 </div>
             ) : (
-                <div
+                <div className='avatar'
                     style={{
                         width: '40px',
                         height: '40px',
@@ -188,7 +188,7 @@ const Header = () => {
                     }}
                     onClick={() => navigate(`/profile/${user._id}`)}
                 >
-                    <img src={user.avatar} alt="User Avatar" style={{ width: '40px' }} />
+                    <img src={user.avatar} alt="User Avatar" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
                 </div>
             )}
         </header>

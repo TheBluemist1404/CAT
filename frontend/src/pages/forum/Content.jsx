@@ -64,46 +64,56 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     }
   }
 
+  const [image, setImage] = useState(null);
+
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+
   const createPost = async () => {
     if (title.trim() === '') {
       setError('Need title to create post');
       return;
     }
-
-    const content = editorRef.current?.getContent();
-
-    setError(''); 
-    console.log(user.savedPosts);
-
+  
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", editorRef.current?.getContent());
+    formData.append("userCreated", user._id);
+    formData.append("status", visibility);
+    selectedTags.forEach(tag => formData.append("tags", tag));
+  
+    if (image) {
+      formData.append("images", image); // Backend expects "images"
+    }
+  
+    setError('');
+  
     try {
       const response = await axios.post(
         'http://localhost:3000/api/v1/forum/create',
-        {
-          title,
-          content,
-          userCreated: user._id,
-          status: visibility,
-          tags: selectedTags,
-          images: selectedFile,
-        },
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token.accessToken}`,
-            Type: 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         }
       );
-
+  
       setTitle('');
       if (editorRef.current) editorRef.current.setContent('');
       setSelectedTags([]);
       setVisibility('public');
+      setImage(null);
       handleCreatePostToggle();
       fetchPosts(currentPage);
     } catch (error) {
       console.error('Failed to create post:', error.response?.data || error.message);
     }
   };
+  
 
   useEffect(() => {
     fetchPosts(currentPage);
@@ -151,6 +161,8 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                     `,
                   }}
                 />
+                <input type="file" accept="image/*" onChange={handleImageChange} />
+
                 <div className="tags-container" style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: 10 }}>
                   {tags.map((tag) => (
                     <div

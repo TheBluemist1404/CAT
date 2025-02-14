@@ -9,7 +9,9 @@ import { Editor } from "@tinymce/tinymce-react";
 import "./profile.scss"
 import Header from "../../Header";
 import DOMPurify from "dompurify";
-
+import Cropper from "react-easy-crop";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
 
 const Profile = ({ token, post}) => {
 
