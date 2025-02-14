@@ -161,8 +161,15 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                     `,
                   }}
                 />
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-
+                <input  style={{
+                        padding: "5px 10px",
+                        borderRadius: "5px",
+                        backgroundColor:"#2B2B3B",
+                        color: "#FFFFFF",
+                        cursor: "pointer",}} 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleImageChange} />
                 <div className="tags-container" style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: 10 }}>
                   {tags.map((tag) => (
                     <div

@@ -35,7 +35,7 @@ const Sidebar = ({ handleCreatePostToggle }) => {
         </div>
       </button>
       <hr className="line" />
-      <button className="create-post-button" style={{ backgroundColor: '#FF4B5C' }} onClick={handleCreatePostToggle}>
+      <button className="create-post-button" style={{ backgroundColor: '#FF4B5C', cursor:'pointer' }} onClick={handleCreatePostToggle} >
         <div className="sidebar-icon">
           <img src="/src/pages/forum/assets/Create Icon.svg" alt="Create Post" />
         </div>
