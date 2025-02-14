@@ -288,13 +288,19 @@ function Post({ post, token, update }) {
     >
       <div className="dropdown-item" onClick={handleSavePost}>{isSaved ? "Unsave" : "Save"}</div> {/*Placeholder, but replace with some api call later */}
       <hr className="post-navigate-line" />
-      <div
+      {post.userCreated._id === user._id ? (
+        <div
         className="dropdown-item"
         style={{ color: '#FF4B5C' }}
-        onClick={() => console.log('Post reported')} //Placeholder, just ignore it
-      >
+        >
+        Delete
+        </div>):(
+        <div
+        className="dropdown-item"
+        style={{ color: '#FF4B5C' }}
+        >
         Report
-      </div>
+        </div>)}
     </div>
   );
 
@@ -423,16 +429,16 @@ function Post({ post, token, update }) {
   return (
     <div className="post">
       <div className="post-header">
-        <img src={post.userCreated ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" />
-        <div className="user-name">{post.userCreated ? post.userCreated.fullName : "unknown"}</div>
-        <div className="post-time">{timeDisplay}</div>
+        <img src={post.userCreated ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" onClick={()=>{navigate(`/profile/${post.userCreated._id}`)}} style={{cursor:'pointer'}}/>
+        <div className="user-name" onClick={()=>{navigate(`/profile/${post.userCreated._id}`)}} style={{cursor:'pointer'}}>{post.userCreated ? post.userCreated.fullName : "unknown"}</div>
+        <div className="post-time" onMouseDown={() => { navigate(`/forum/${post._id}`) }} style={{cursor:'pointer'}}>{timeDisplay}</div>
         <div className="post-navigate-button" onClick={() => toggleDropdown(1)}>
           <span className="post-navigate-icon">...</span>
         </div>
         {renderDropdown(1)}
       </div>
       <div className="post-body">
-        <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post.title}</h1>
+        <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }} style={{cursor:'pointer'}}>{post.title}</h1>
         <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
         <div className="tag-box">
           {tag.map((tag, index) => (
