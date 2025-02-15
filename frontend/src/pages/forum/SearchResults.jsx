@@ -45,7 +45,7 @@ const SearchResults = ({ token }) => {
             <div className="search-results-container">
                 {postFeed.length > 0 ? 
                     (<div>{queryT==="posts" || queryT==="tags" ? (
-                        <section className="post-feed">
+                        <section className="post-feed" style={{ minHeight: `${screenHeight}px` }}>
                             {postFeed.map((post, index) => (
                                 <Post key={index} post={post} token={token} />
                             ))}
