@@ -446,7 +446,6 @@ function Post({ post, token, update }) {
             <a href={post.images} target="_blank" rel="noopener noreferrer">
               <img 
                 src={post.images} 
-                alt="Post Image" 
                 style={{ marginTop:"10px", width: "90%", height: "auto", display: "block", margin: "0 auto" }} 
               />
             </a>
@@ -468,7 +467,6 @@ function Post({ post, token, update }) {
           <img src="/src/pages/forum/assets/Share Icon.svg" className="post-action" alt="Share" /> Share
         </button>
       </div>
-      <hr className="post-line" />
       {isCommentBoxVisible && (
         <div className="comment-section" style={{ padding: '10px' }}>
           {renderComments()}

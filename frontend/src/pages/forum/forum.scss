@@ -277,17 +277,17 @@
     .container-user {
         width: 100%;
         display: flex;
-        justify-content: center; /* Center the content */
+        justify-content: center;
     }
     
     .post-feed-user {
         display: flex;
         flex-wrap: wrap;
-        gap: 20px; /* Space between posts */
-        justify-content: center; /* Distribute items evenly */
-        align-items: flex-start;
-        max-width: 1200px; /* Adjust width based on your layout */
+        gap: 20px;
+        align-content: flex-start; /* Prevents rows from stretching */
+        max-width: 1200px;
         margin: 0 auto;
+        padding: 20px 0; /* Adds spacing at the top and bottom */
     }
     
     .post-user {
@@ -295,11 +295,9 @@
         padding: 15px;
         border-radius: 10px;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-        width: calc(33.333% - 20px); /* Adjust for 3 per row */
-        min-width: 250px; /* Prevents posts from getting too small */
+        width: calc(33.333% - 20px);
+        min-width: 250px;
     }
-    
-    
     
     .post {
         background-color: #1E1E2F;
