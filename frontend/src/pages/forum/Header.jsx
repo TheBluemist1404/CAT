@@ -116,6 +116,30 @@ const Header = () => {
         }
     };
 
+    const [dropdown, setDropdown] = useState(false);
+    const dropdownRef = useRef(null);
+
+    const logout = async () => {
+        try {
+            const refreshToken = token.refreshToken;
+            await axios.delete('http://localhost:3000/api/v1/auth/logout', {data: {refreshToken: refreshToken}}) 
+            setIsLoggedIn(false)
+            localStorage.removeItem('token')
+        } catch (error) {
+            console.error('logout failed', error)
+        }
+    }
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setDropdown(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     return (
         <header className="header-guest">
             <div className="logo">
@@ -178,17 +202,20 @@ const Header = () => {
                     </button>
                 </div>
             ) : (
-                <div className='avatar'
-                    style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        marginRight: '20px',
-                    }}
-                    onClick={() => navigate(`/profile/${user._id}`)}
-                >
-                    <img src={user.avatar} alt="User Avatar" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
+                <div className="userinfo" ref={dropdownRef} onClick={() => setDropdown((prev) => !prev)}>
+                    <div 
+                        className="avatar" 
+                    >
+                        <img src={user.avatar} alt="User Avatar" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
+                    </div>
+                    <div className="username">{user.fullName}</div>
+
+                    <div className={`action ${dropdown ? "open" : ""}`}>
+                        <div className="container">
+                            <div className="to-profile" onClick={() => navigate(`/profile/${user._id}`)}>Profile</div>
+                            <div className="logout" style={{ color: '#FF4B5C' }} onClick={logout}>Logout</div>
+                        </div>
+                    </div>
                 </div>
             )}
         </header>
