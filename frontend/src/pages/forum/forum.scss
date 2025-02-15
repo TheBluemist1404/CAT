@@ -112,6 +112,76 @@
         background-color: #f72d41;
     }
     
+    .userinfo {
+        height: 40px;
+        min-width: max-content;
+        padding: 0 20px 0 0;
+        border-radius: 25px;
+        background-color: #2B2B3B;
+    
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        cursor: pointer;
+        position: relative; /* Ensure the dropdown is positioned correctly */
+    }
+    
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: transparent;
+        overflow: hidden;
+    }
+    
+    .username {
+        line-height: 40px;
+        color: var(--text-color);
+        font-family: var(--code-font);
+        font-size: 14px;
+    }
+    
+    .action {
+        position: absolute;
+        top: 50px; /* Position dropdown below the user info */
+        right: 0;
+        width: 150px; /* Adjust width to fit content */
+        background-color: #2B2B3B;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        overflow: hidden;
+        
+        max-height: 0;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    }
+    
+    .action.open {
+        max-height: 100px;
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .to-profile, .logout {
+        padding: 10px;
+        cursor: pointer;
+        text-align: center;
+        color: var(--text-color);
+        font-family: var(--code-font);
+        font-size: 14px;
+        transition: background 0.2s;
+    }
+    
+    .to-profile:hover, .logout:hover {
+        background: #3B3B4B;
+    }
+    
     
     .sidebar {
         width: 160px;
@@ -201,6 +271,14 @@
         gap: 20px;
         width: 100%;
         height: max-content;
+        padding: 20px;
+    }
+    .post-feed-user {
+        display: flex;
+        flex-wrap: wrap; /* Ensures items wrap when needed */
+        gap: 20px; /* Adds spacing between posts */
+        width: 100%; /* Ensures full width usage */
+        max-width: 800px; /* Adjust this based on your layout */
         padding: 20px;
     }
     

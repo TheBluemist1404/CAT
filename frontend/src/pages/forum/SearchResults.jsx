@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Post from './Post';  // Make sure to import your Post component
+import User from'./PostUserList';
 
 const SearchResults = ({ token }) => {
     const [postFeed, setPostFeed] = useState([]);
@@ -19,7 +20,7 @@ const SearchResults = ({ token }) => {
                         params: {
                             type: queryType,
                             q: query,
-                            limit: 50,  // Adjust limit as per your need
+                            limit: 10000,
                         },
                     });
                     // Check the response format to ensure you're getting the right data
@@ -36,18 +37,26 @@ const SearchResults = ({ token }) => {
             fetchSearchResults();
         }
     }, [location.search]);  
+    const para = new URLSearchParams(location.search);
+    const queryT = para.get('type') || 'posts';
     return (
         <main className="content">
             <div className="search-results-container">
-                {postFeed.length > 0 ? (
-                    <section className="post-feed">
+                {postFeed.length > 0 ? 
+                    (<div>{queryT==="posts" || queryT==="tags" ? (
+                        <section className="post-feed">
+                            {postFeed.map((post, index) => (
+                                <Post key={index} post={post} token={token} />
+                            ))}
+                        </section>):(
+                        <section className="post-feed-user">
                         {postFeed.map((post, index) => (
-                            <Post key={index} post={post} token={token} />
+                            <User key={index} post={post} token={token} />
                         ))}
-                    </section>
-                ) : (
-                    <div>No results found for your search.</div>
-                )}
+                    </section>)}</div>                          
+                    ) : (
+                        <div>No results found for your search.</div>
+                    )}
             </div>
         </main>
     );
