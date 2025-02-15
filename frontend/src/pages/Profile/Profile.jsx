@@ -23,10 +23,10 @@ const Profile = ({ token, post}) => {
 
     useEffect(() => {
         if (userId) {
-            fetch(`http://localhost:5000/users/${userId}`, {
+            fetch(`http://localhost:3000/api/v1/profile/detail/${userId}`, {
                 method: 'GET',
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token.accessToken}`,
                     'Content-Type': 'application/json'
                 }
             })
