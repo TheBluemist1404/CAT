@@ -49,10 +49,12 @@ const SearchResults = ({ token }) => {
                                 <Post key={index} post={post} token={token} />
                             ))}
                         </section>):(
-                        <section className="post-feed-user">
-                        {postFeed.map((post, index) => (
-                            <User key={index} post={post} token={token} />
-                        ))}
+                        <section className="container-user">
+                            <div className="post-feed-user">
+                            {postFeed.map((post, index) => (
+                                <User key={index} post={post} token={token} />
+                            ))}
+                            </div>
                     </section>)}</div>                          
                     ) : (
                         <div>No results found for your search.</div>

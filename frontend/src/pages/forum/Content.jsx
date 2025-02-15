@@ -85,7 +85,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     selectedTags.forEach(tag => formData.append("tags", tag));
   
     if (image) {
-      formData.append("images", image); // Backend expects "images"
+      formData.append("images", image); 
     }
   
     setError('');
@@ -119,7 +119,17 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     fetchPosts(currentPage);
     fetchTags();
   }, [currentPage]);
+  
+  const [fileName, setFileName] = useState("");
 
+  const handleImgChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setFileName(file.name); // Set file name to display
+      handleImageChange(event); // Call the parent function if needed
+    }
+  };
+  
   const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
 
   return (
@@ -161,15 +171,42 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                     `,
                   }}
                 />
-                <input  style={{
-                        padding: "5px 10px",
-                        borderRadius: "5px",
-                        backgroundColor:"#2B2B3B",
-                        color: "#FFFFFF",
-                        cursor: "pointer",}} 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleImageChange} />
+
+                <div style={{ textAlign: "center" }}>
+                  <input
+                    id="fileInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImgChange}
+                    style={{ display: "none" }}
+                  />
+
+                  <label 
+                    htmlFor="fileInput" 
+                    style={{
+                      display: "inline-block",
+                      marginTop: "10px",
+                      padding: "8px 15px",
+                      borderRadius: "5px",
+                      backgroundColor: "#2B2B3B",
+                      color: "#FFFFFF",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      border: "1px solid #FFFFFF",
+                    }}
+                  >
+                    Upload Image
+                  </label>
+
+                  {fileName && (
+                    <p style={{ marginTop: "10px", color: "#FFFFFF", fontSize: "14px" }}>
+                      Selected: {fileName}
+                    </p>
+                  )}
+                </div>
+
                 <div className="tags-container" style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: 10 }}>
                   {tags.map((tag) => (
                     <div
@@ -188,6 +225,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                     </div>
                   ))}
                 </div>
+                
                 <div className="visibility-options">
                   <label htmlFor="visibility">Who can see this post?</label>
                   <select id="visibility" className="visibility-dropdown" value={visibility} onChange={(e) => setVisibility(e.target.value)}>

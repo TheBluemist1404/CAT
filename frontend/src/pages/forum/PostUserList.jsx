@@ -12,7 +12,7 @@ function Post({ post, token, update }) {
   const defaultAvatar = "https://res.cloudinary.com/cat-project/image/upload/v1735743336/coder-sign-icon-programmer-symbol-vector-2879989_ecvn23.webp";
 
   return (
-    <div className="post" onClick={()=>{navigate(`/profile/${post._id}`)}} style={{cursor:'pointer'}}>
+    <div className="post-user" onClick={()=>{navigate(`/profile/${post._id}`)}} style={{cursor:'pointer'}}>
       <div className="post-header">
         <img src={post.avatar ? post.avatar : defaultAvatar} alt="User Avatar" className="user-avatar" />
         <div className="user-name">{post.fullName}</div>
@@ -25,7 +25,6 @@ function Post({ post, token, update }) {
         <button className="share-button">
         </button>
       </div>
-      <hr className="post-line" />
     </div>
   )
 }

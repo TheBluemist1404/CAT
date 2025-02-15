@@ -206,7 +206,7 @@ const Header = () => {
                     <div 
                         className="avatar" 
                     >
-                        <img src={user.avatar} alt="User Avatar" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
+                        <img src={user.avatar} alt="User Avatar" style={{ width: "40px", height: "40px", objectFit: 'cover', cursor: "pointer" }} />
                     </div>
                     <div className="username">{user.fullName}</div>
 
