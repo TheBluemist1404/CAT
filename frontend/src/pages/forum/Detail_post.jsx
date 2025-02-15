@@ -448,10 +448,13 @@ function Detail({ token }) {
     handleSubmit();
   }, [post]); 
 
+  const screenHeight = window.innerHeight;
+
   const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
 
   return (
-    <div className="post" style={{ minheight: 'calc(100vh - 60px)' }}>
+    <section className="detail-post-box" style={{ minHeight: `${screenHeight}px` }}>
+    <div className="post">
       <div className="post-header">
         <img src={post ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" />
         <div className="user-name">{post ? post.userCreated.fullName : "unknown"}</div>
@@ -517,6 +520,7 @@ function Detail({ token }) {
         {renderComments()}
       </div>
     </div>
+    </section>
   )
 }
 
