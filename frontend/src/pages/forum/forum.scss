@@ -273,14 +273,33 @@
         height: max-content;
         padding: 20px;
     }
+
+    .container-user {
+        width: 100%;
+        display: flex;
+        justify-content: center; /* Center the content */
+    }
+    
     .post-feed-user {
         display: flex;
-        flex-wrap: wrap; /* Ensures items wrap when needed */
-        gap: 20px; /* Adds spacing between posts */
-        width: 100%; /* Ensures full width usage */
-        max-width: 800px; /* Adjust this based on your layout */
-        padding: 20px;
+        flex-wrap: wrap;
+        gap: 20px; /* Space between posts */
+        justify-content: center; /* Distribute items evenly */
+        align-items: flex-start;
+        max-width: 1200px; /* Adjust width based on your layout */
+        margin: 0 auto;
     }
+    
+    .post-user {
+        background-color: #1E1E2F;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        width: calc(33.333% - 20px); /* Adjust for 3 per row */
+        min-width: 250px; /* Prevents posts from getting too small */
+    }
+    
+    
     
     .post {
         background-color: #1E1E2F;
