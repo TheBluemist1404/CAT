@@ -15,5 +15,5 @@ module.exports = app => {
   app.use(version + '/forum', postRoutes);
   app.use(version + '/profile', profileRoutes);
   app.use(version + '/code', codeRoutes);
-  app.use(version+ 'projects', projectRoutes);
+  app.use(version+ '/projects', projectRoutes);
 };
