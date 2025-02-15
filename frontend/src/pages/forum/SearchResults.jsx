@@ -39,6 +39,7 @@ const SearchResults = ({ token }) => {
     }, [location.search]);  
     const para = new URLSearchParams(location.search);
     const queryT = para.get('type') || 'posts';
+    const screenHeight = window.innerHeight;
     return (
         <main className="content">
             <div className="search-results-container">
@@ -49,7 +50,7 @@ const SearchResults = ({ token }) => {
                                 <Post key={index} post={post} token={token} />
                             ))}
                         </section>):(
-                        <section className="container-user">
+                        <section className="container-user" style={{ minHeight: `${screenHeight}px` }}> 
                             <div className="post-feed-user">
                             {postFeed.map((post, index) => (
                                 <User key={index} post={post} token={token} />
@@ -57,7 +58,7 @@ const SearchResults = ({ token }) => {
                             </div>
                     </section>)}</div>                          
                     ) : (
-                        <div>No results found for your search.</div>
+                        <div style={{ minHeight: `${screenHeight}px` }}>No results found for your search.</div>
                     )}
             </div>
         </main>
