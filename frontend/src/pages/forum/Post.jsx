@@ -424,6 +424,7 @@ function Post({ post, token, update }) {
     }
   };
 
+
   const defaultAvatar = "https://res.cloudinary.com/cat-project/image/upload/v1735743336/coder-sign-icon-programmer-symbol-vector-2879989_ecvn23.webp";
 
   return (
@@ -440,6 +441,16 @@ function Post({ post, token, update }) {
       <div className="post-body">
         <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }} style={{cursor:'pointer'}}>{post.title}</h1>
         <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
+        <div style={{ textAlign: "center" }}>
+          {post.images && (
+            <a href={post.images} target="_blank" rel="noopener noreferrer">
+              <img 
+                src={post.images} 
+                style={{ marginTop:"10px", width: "90%", height: "auto", display: "block", margin: "0 auto" }} 
+              />
+            </a>
+          )}
+        </div>
         <div className="tag-box">
           {tag.map((tag, index) => (
             <div className="post-tags" key={index}>{tag}</div>
@@ -456,7 +467,6 @@ function Post({ post, token, update }) {
           <img src="/src/pages/forum/assets/Share Icon.svg" className="post-action" alt="Share" /> Share
         </button>
       </div>
-      <hr className="post-line" />
       {isCommentBoxVisible && (
         <div className="comment-section" style={{ padding: '10px' }}>
           {renderComments()}

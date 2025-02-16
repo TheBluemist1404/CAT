@@ -7,14 +7,43 @@ import { useNavigate } from 'react-router-dom'
 
 import logo from '@code-editor-assets/logo.svg'
 
-function CodeEditor() {
-  const url = window.location.href
-  console.log(url.split("/").pop()) //get sessionID
+function CodeEditor({ token }) {
+  //Get Project info
+  const projectId = window.location.href.split('/').pop();
+  const [project, setProject] = useState({})
+  const [projectName, setProjectName] = useState("")
+  const [projectContent, setProjectContent] = useState({})
+
+  useEffect(() => {
+    async function fetchProject() {
+      const response = await axios.get(`http://localhost:3000/api/v1/projects/${projectId}`, { headers: { Authorization: `Bearer ${token.accessToken}` } })
+      console.log(response.data)
+      setProject(response.data)
+    }
+    fetchProject()
+  }, [])
+
+  useEffect(() => {
+    setProjectName(project.name);
+    if (project.files && project.files.length) {
+      setProjectContent(project.files[0])
+    }
+  }, [project])
+
+  useEffect(() => {
+    if (!projectContent) {
+      console.log("content not updated yet")
+    } else {
+      console.log(projectContent.content);
+    }
+  }, [projectContent])
+
+  // -------------------------------
+  //Setup code editor
 
   const navigate = useNavigate()
   const editorRef = useRef(null);
   const inputRef = useRef(null);
-  const [projectName, setProjectName] = useState("Project")
   const [mode, setMode] = useState("default")
   const [codeDisplay, setCodeDisplay] = useState([])
   const [errorDisplay, setErrorDisplay] = useState("")
@@ -60,7 +89,7 @@ function CodeEditor() {
       setCodeDisplay([])
       setErrorDisplay("")
       const code = editorRef.current.getValue()
-      const input = inputRef.current ? inputRef.current.value: ""
+      const input = inputRef.current ? inputRef.current.value : ""
       const response = await axios.post('http://localhost:3000/api/v1/code/execute', { code: code, input: input, language: lang })
       const executionId = response.data.executionId
       console.log("✅ Execution started. Connecting WebSocket...");
@@ -108,9 +137,9 @@ function CodeEditor() {
   }
 
   const [lang, setLang] = useState("javascript"); // Default language is JavaScript
-  useEffect(()=>{
+  useEffect(() => {
     setLang(defaultLang[String(mode)])
-  },[mode])
+  }, [mode])
 
   const handleLanguage = (event) => {
     event.preventDefault(); // ✅ Prevent form reload
@@ -130,6 +159,25 @@ function CodeEditor() {
     console.log("Selected Mode:", selectedMode); // ✅ Debugging log
   };
 
+  // Update code in real-time
+  const handleChange = async () => {
+    const ws = new WebSocket('ws://localhost:3003')
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      console.log(data)
+      if (data.type === "update_project") {
+        setProject(data.project)
+      }
+    }
+
+    const code = editorRef.current.getValue();
+    const response = await axios.patch(`http://localhost:3000/api/v1/projects/${projectId}`, { "files": [{ "name": "main", "content": code, "language": lang }] }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
+    console.log(response.data)
+  }
+
+
+
   return (
     <div className="live-code">
       <div className="sidebar">
@@ -138,7 +186,7 @@ function CodeEditor() {
           <div className='language'>
             <label htmlFor="language">Language:</label>
             <select name="language" id="lang" value={lang} onChange={handleLanguage}>
-              {(mode=="default") && <option value="javascript">Javascript</option>}
+              {(mode == "default") && <option value="javascript">Javascript</option>}
               <option value="cpp">C++</option>
               <option value="python">Python</option>
             </select>
@@ -163,8 +211,10 @@ function CodeEditor() {
               <Editor
                 height={getHeight(mode)}
                 language={lang}
+                value={projectContent ? projectContent.content : ""}
                 theme='vs-dark'
                 onMount={handleEditorDidMount}
+                onChange={handleChange}
                 options={{
                   fontSize: 20
                 }}

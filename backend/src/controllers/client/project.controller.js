@@ -1,4 +1,7 @@
+const mongoose = require('mongoose')
 const { Project } = require('../../models/client/project.model');
+const wss = require('../../index')
+
 
 // [POST] /api/v1/projects
 module.exports.createProject = async (req, res) => {
@@ -14,6 +17,13 @@ module.exports.createProject = async (req, res) => {
     });
 
     const savedProject = await project.save();
+
+    // wss.clients.forEach((client) => {
+    //   if (client.readyState === WebSocket.OPEN) {
+    //     client.send(JSON.stringify({type: 'new_project', project: savedProject}))
+    //   }
+    // })
+
     res.status(201).json(savedProject);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -41,9 +51,19 @@ module.exports.updateProject = async (req, res) => {
     }
 
     const updates = req.body;
-    const savedProject = await project.updateOne(updates, {
-      new: true,
-    });
+    const savedProject = await Project.findByIdAndUpdate(
+      project._id,
+      updates,
+      { new: true }
+    );
+
+    if (wss.wss) {
+      wss.wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({type: "update_project", project: savedProject}))
+        }
+      })
+    }
 
     res.status(200).json({
       message: 'Update successfully',
@@ -95,6 +115,7 @@ module.exports.getProject = async (req, res) => {
           name: { $first: '$name' },
           description: { $first: '$description' },
           owner: { $first: '$owner' },
+          collaborators: {$first: '$collaborators'},
           files: { $first: '$files' },
           createdAt: { $first: '$createdAt' },
           updatedAt: { $first: '$updatedAt' },

@@ -16,16 +16,31 @@ const Profile = ({ token, post}) => {
     const navigate = useNavigate();
     const { isLoggedIn, user } = useContext(AuthContext);
 
-    const [profile, setProfile] = useState(null);
+    console.log(user.post);
+    const { id: userId } = useParams();
+    const [profileData, setProfileData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (id) => {
-    try {
-      const response = await axios.get(`/api/profile/${id}`);
-      setProfile(response.data);
-    } catch (error) {
-      console.error('Lỗi khi lấy profile:', error);
-    }
-  };
+    useEffect(() => {
+        if (userId) {
+            fetch(`http://localhost:5000/users/${userId}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                setProfileData(data);
+                setLoading(false);
+            })
+            .catch(error => {
+                console.error('Error fetching profile:', error);
+                setLoading(false);
+            });
+        }
+    }, [userId]);
 
     useEffect(() => {
         if (!isLoggedIn) {
