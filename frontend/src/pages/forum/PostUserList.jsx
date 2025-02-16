@@ -22,8 +22,22 @@ function Post({ post, token, update }) {
       </div>
       <hr className="post-line" />
       <div className="post-footer">
-        <button className="share-button">
-        </button>
+      <div className="box-u" style={{ top: '85%' }}>
+                            <div className="box-item">
+                                <span className="number">{post.posts.length}</span>
+                                <span className="label">Posts</span>
+                            </div>
+                            <div className="divider"></div>
+                            <div className="box-item">
+                                <span className="number">15h</span>
+                                <span className="label">Coding</span>
+                            </div>
+                            <div className="divider"></div>
+                            <div className="box-item">
+                                <span className="number">150</span>
+                                <span className="label">Followers</span>
+                            </div>
+                        </div>
       </div>
     </div>
   )

@@ -467,6 +467,16 @@ function Detail({ token }) {
       <div className="post-body">
         <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post ? post.title : ""}</h1>
         <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
+        <div style={{ textAlign: "center" }}>
+          {post ? (
+            <a href={post.images} target="_blank" rel="noopener noreferrer">
+              <img 
+                src={post.images} 
+                style={{ marginTop:"10px", width: "90%", height: "auto", display: "block", margin: "0 auto" }} 
+              />
+            </a>
+          ):(<div></div>)}
+        </div>
         <div className="tag-box">
           {tag.map((tag, index) => (
             <div className="post-tags" key={index}>{tag}</div>
