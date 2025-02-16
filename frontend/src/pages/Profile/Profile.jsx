@@ -23,10 +23,10 @@ const Profile = ({ token, post}) => {
 
     useEffect(() => {
         if (userId) {
-            fetch(`http://localhost:5000/users/${userId}`, {
+            fetch(`http://localhost:3000/api/v1/profile/detail/${userId}`, {
                 method: 'GET',
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token.accessToken}`,
                     'Content-Type': 'application/json'
                 }
             })
@@ -374,59 +374,66 @@ const handleRemoveCompany = async (indexToRemove) => {
   
     const handleUpload = async () => {
         if (!selectedFile) {
-          alert("Choose an image!");
-          return;
+            alert("Choose an image!");
+            return;
         }
-      
+    
         if (editorRef.current) {
-          const canvas = editorRef.current.getImageScaledToCanvas();
-          canvas.toBlob(async (blob) => {
-            const formData = new FormData();
-            formData.append("avatar", blob, "avatar.png");
-            formData.append("fullName", user.fullName);
-            formData.append("description", user.description || "");
-            formData.append("companies", JSON.stringify(user.companies || []));
-            formData.append("schools", JSON.stringify(user.schools || []));
-      
-            try {
-              const response = await axios.patch(
-                `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-                formData,
-                {
-                  headers: {
-                    Authorization: `Bearer ${token.accessToken}`,
-                    "Content-Type": "multipart/form-data",
-                  },
+            const canvas = editorRef.current.getImageScaledToCanvas();
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append("avatar", blob, "avatar.png");
+                formData.append("fullName", user.fullName);
+                formData.append("description", user.description || "");
+    
+                // Gửi từng phần tử của companies và schools thay vì stringify
+                user.companies.forEach(company => formData.append("companies[]", company));
+                user.schools.forEach(school => formData.append("schools[]", school));
+    
+                try {
+                    const response = await axios.patch(
+                        `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+                        formData,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token.accessToken}`
+                            }
+                        }
+                    );
+    
+                    console.log("Response from API:", response.data);
+    
+                    if (response.status === 200) {
+                        alert("Update avatar successfully!");
+                        const updatedData = response.data;
+    
+                        setUser((prevUser) => ({
+                            ...prevUser,
+                            avatar: updatedData.avatar || prevUser.avatar,
+                            fullName: updatedData.fullName || prevUser.fullName,
+                            description: updatedData.description || prevUser.description,
+                            companies: Array.isArray(updatedData.companies) 
+                                ? updatedData.companies 
+                                : [updatedData.companies],
+                            schools: Array.isArray(updatedData.schools) 
+                                ? updatedData.schools 
+                                : [updatedData.schools],
+                        }));
+                    }
+                } catch (error) {
+                    console.error("Error:", error.response?.data?.message || error.message);
                 }
-              );
-      
-              console.log("Response from API:", response.data);
-      
-              if (response.status === 200) {
-                alert("Update avatar successfully!");
-                const updatedData = response.data;
-      
-                setUser((prevUser) => ({
-                  ...prevUser,
-                  avatar: updatedData.avatar || prevUser.avatar,
-                  fullName: updatedData.fullName || prevUser.fullName,
-                  companies: updatedData.companies ?? prevUser.companies,
-                  schools: updatedData.schools ?? prevUser.schools,
-                  description: updatedData.description ?? prevUser.description,
-                }));
-              }
-            } catch (error) {
-              console.error("Lỗi khi upload ảnh:", error.response?.data?.message || error.message);
-            }
-          }, "image/png");
+            }, "image/png");
         }
-      };
+    };
+    
+    
       
   
     
 
   
-
+      console.log(post);
   
     //update avatar
 
