@@ -9,40 +9,23 @@ import { Editor } from "@tinymce/tinymce-react";
 import "./profile.scss"
 import Header from "../../Header";
 import DOMPurify from "dompurify";
-import Cropper from "react-easy-crop";
-import { Slider } from "@/components/ui/slider";
-import { Button } from "@/components/ui/button";
+import AvatarEditor from "react-avatar-editor";
 
 const Profile = ({ token, post}) => {
 
     const navigate = useNavigate();
     const { isLoggedIn, user } = useContext(AuthContext);
 
-    console.log(user.post);
-    const { id: userId } = useParams();
-    const [profileData, setProfileData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [profile, setProfile] = useState(null);
 
-    useEffect(() => {
-        if (userId) {
-            fetch(`http://localhost:5000/users/${userId}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                setProfileData(data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('Error fetching profile:', error);
-                setLoading(false);
-            });
-        }
-    }, [userId]);
+  const fetchProfile = async (id) => {
+    try {
+      const response = await axios.get(`/api/profile/${id}`);
+      setProfile(response.data);
+    } catch (error) {
+      console.error('Lỗi khi lấy profile:', error);
+    }
+  };
 
     useEffect(() => {
         if (!isLoggedIn) {
@@ -375,44 +358,55 @@ const handleRemoveCompany = async (indexToRemove) => {
     };
   
     const handleUpload = async () => {
-      if (!selectedFile) {
-        alert("Choose an image!");
-        return;
-      }
-  
+        if (!selectedFile) {
+          alert("Choose an image!");
+          return;
+        }
       
-      if (editorRef.current) {
-        const canvas = editorRef.current.getImageScaledToCanvas();
-        canvas.toBlob(async (blob) => {
-          const formData = new FormData();
-          formData.append("avatar", blob, "avatar.png"); 
-          formData.append("fullName", user.fullName);
-  
-          try {
-            const response = await axios.patch(
-              `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-              formData,
-              {
-                headers: {
-                  Authorization: `Bearer ${token.accessToken}`,
-                  "Content-Type": "multipart/form-data",
-                },
+        if (editorRef.current) {
+          const canvas = editorRef.current.getImageScaledToCanvas();
+          canvas.toBlob(async (blob) => {
+            const formData = new FormData();
+            formData.append("avatar", blob, "avatar.png");
+            formData.append("fullName", user.fullName);
+            formData.append("description", user.description || "");
+            formData.append("companies", JSON.stringify(user.companies || []));
+            formData.append("schools", JSON.stringify(user.schools || []));
+      
+            try {
+              const response = await axios.patch(
+                `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+                formData,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token.accessToken}`,
+                    "Content-Type": "multipart/form-data",
+                  },
+                }
+              );
+      
+              console.log("Response from API:", response.data);
+      
+              if (response.status === 200) {
+                alert("Update avatar successfully!");
+                const updatedData = response.data;
+      
+                setUser((prevUser) => ({
+                  ...prevUser,
+                  avatar: updatedData.avatar || prevUser.avatar,
+                  fullName: updatedData.fullName || prevUser.fullName,
+                  companies: updatedData.companies ?? prevUser.companies,
+                  schools: updatedData.schools ?? prevUser.schools,
+                  description: updatedData.description ?? prevUser.description,
+                }));
               }
-            );
-  
-            if (response.status === 200) {
-              alert("Update avatar successfully!");
-              setUser((prevUser) => ({
-                ...prevUser,
-                avatar: response.data.avatar,
-              }));
+            } catch (error) {
+              console.error("Lỗi khi upload ảnh:", error.response?.data?.message || error.message);
             }
-          } catch (error) {
-            console.error("Lỗi khi upload ảnh:", error.response?.data?.message || error.message);
-          }
-        }, "image/png");
-      }
-    };
+          }, "image/png");
+        }
+      };
+      
   
     
 
@@ -1077,7 +1071,8 @@ const handleRemoveCompany = async (indexToRemove) => {
             </div>
         );
     } else {
-        //Profile view by other user
+        console.log('Đây là profile của người khác:', id);
+        fetchProfile(id);
         return (
             <div className="profile" style={{ position: 'relative' }}>
                 <div style={{ zIndex: 2, position: 'relative' }}><Header token={token} isAuth={false} /></div>
@@ -1086,7 +1081,7 @@ const handleRemoveCompany = async (indexToRemove) => {
                     <div className='image' >
                 
                         <div className="profile-avatar">
-                            <img className='ava' src={profileData?.avatar} alt="" />
+                            <img className='ava' src={user.avatar} alt="" />
                             <img className='cam' src="/src/assets/camera.svg" onClick={() => setShowAvatarChange(true)} alt="" width={30} height={30} style={{ position: "absolute", bottom: "5px", left: "90px", zIndex: 1000 }} />
                         </div>
                         {showAvatarChange && (
@@ -1176,7 +1171,7 @@ const handleRemoveCompany = async (indexToRemove) => {
       )}
 
 
-                        <h1 className='profile-username'>{profileData?.fullName}</h1>
+                        <h1 className='profile-username'>{user.fullName}</h1>
                         <div className='social'>
                             <img src="/src/assets/facebook.svg" alt="" width={30} height={30} />
                             <img src="/src/assets/github.svg" alt="" width={30} height={30} />
