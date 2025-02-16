@@ -298,6 +298,38 @@
         width: calc(33.333% - 20px);
         min-width: 250px;
     }
+
+    .user-name{
+        margin-top: 10px;
+        font-size:1.8em;
+    }
+
+    .box-u {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        margin: 0 auto;
+      }
+    
+      .box-item {
+        text-align: center;
+        flex: 1;
+      }
+    
+      .number {
+        display: block;
+        font-weight: bold;
+        font-size: 1.5em;
+        color: #ffffff;
+      }
+    
+      .label {
+        display: block;
+        margin-top: 5px;
+        font-size: 1.2em;
+        color: #ffffff;
+      }
     
     .post {
         background-color: #1E1E2F;
