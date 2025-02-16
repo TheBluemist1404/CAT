@@ -1,6 +1,10 @@
 import './code-editor.scss'
 
+import * as Y from "yjs";
+import { WebrtcProvider } from "y-webrtc";
+// import { MonacoBinding } from "y-monaco";
 import Editor from "@monaco-editor/react";
+
 import axios from 'axios';
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom'
@@ -39,10 +43,34 @@ function CodeEditor({ token }) {
   }, [projectContent])
 
   // -------------------------------
-  //Setup code editor
+  //Setup monaco editor with Yjs binding
+  const ydoc = useRef(new Y.Doc()); // Shared Yjs document, useRef so it would remain after re-render
+  const provider = useRef(null);
+  const ytext = ydoc.current.getText("monaco"); // Shared text model
+  const editorRef = useRef(null);
+
+  useEffect(() => {
+    // Create WebRTC provider (no backend required)
+    provider.current = new WebrtcProvider("my-room-name", ydoc.current);
+
+    return () => {
+      provider.current.destroy(); // Cleanup on unmount
+    };
+  }, []);
+
+  async function handleEditorDidMount(editor) {
+    editorRef.current = editor;
+
+    const {MonacoBinding} = await import("y-monaco");
+
+    // Bind Monaco Editor with Yjs for live collaboration
+    new MonacoBinding(ytext, editor.getModel(), new Set([editor])); //Lazy load prevents Vite from trying to pre-load Monaco CSS files
+  }
+
+
+  // -------------------------------
 
   const navigate = useNavigate()
-  const editorRef = useRef(null);
   const inputRef = useRef(null);
   const [mode, setMode] = useState("default")
   const [codeDisplay, setCodeDisplay] = useState([])
@@ -79,10 +107,6 @@ function CodeEditor({ token }) {
   }
 
   // ----------------------
-
-  function handleEditorDidMount(editor, monaco) {
-    editorRef.current = editor;
-  }
 
   const execute = async () => {
     try {
@@ -158,25 +182,12 @@ function CodeEditor({ token }) {
 
     console.log("Selected Mode:", selectedMode); // ✅ Debugging log
   };
-
-  // Update code in real-time
-  const handleChange = async () => {
-    const ws = new WebSocket('ws://localhost:3003')
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-      console.log(data)
-      if (data.type === "update_project") {
-        setProject(data.project)
-      }
-    }
-
+  // ---------------------------------
+  async function handleChange() {
     const code = editorRef.current.getValue();
     const response = await axios.patch(`http://localhost:3000/api/v1/projects/${projectId}`, { "files": [{ "name": "main", "content": code, "language": lang }] }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
     console.log(response.data)
   }
-
-
 
   return (
     <div className="live-code">
