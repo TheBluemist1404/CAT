@@ -2,7 +2,7 @@ import './code-editor.scss'
 
 import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
-// import { MonacoBinding } from "y-monaco";
+import { Awareness } from "y-protocols/awareness";
 import Editor from "@monaco-editor/react";
 
 import axios from 'axios';
@@ -47,24 +47,64 @@ function CodeEditor({ token }) {
   const ydoc = useRef(new Y.Doc()); // Shared Yjs document, useRef so it would remain after re-render
   const provider = useRef(null);
   const ytext = ydoc.current.getText("monaco"); // Shared text model
+  const awareness = new Awareness(ydoc.current); // Awareness API for cursors
   const editorRef = useRef(null);
 
   useEffect(() => {
-    // Create WebRTC provider (no backend required)
-    provider.current = new WebrtcProvider("my-room-name", ydoc.current);
+    // Initialize WebRTC provider (or WebSocket)
+    provider.current = new WebrtcProvider("my-room-name", ydoc.current, { awareness });
 
     return () => {
-      provider.current.destroy(); // Cleanup on unmount
+      provider.current.destroy();
     };
   }, []);
 
   async function handleEditorDidMount(editor) {
     editorRef.current = editor;
 
-    const {MonacoBinding} = await import("y-monaco");
+    const {MonacoBinding} = await import("y-monaco")
+    // Bind Yjs text syncing to Monaco
+    new MonacoBinding(ytext, editor.getModel(), new Set([editor]));
 
-    // Bind Monaco Editor with Yjs for live collaboration
-    new MonacoBinding(ytext, editor.getModel(), new Set([editor])); //Lazy load prevents Vite from trying to pre-load Monaco CSS files
+    // Bind cursor awareness
+    awareness.setLocalStateField("cursor", { position: 0, color: getRandomColor() });
+
+    editor.onDidChangeCursorPosition((event) => {
+      awareness.setLocalStateField("cursor", { position: event.position, color: getRandomColor() });
+    });
+
+    awareness.on("change", () => {
+      updateCursorDecorations(editor);
+    });
+  }
+
+  function updateCursorDecorations(editor) {
+    const decorations = [];
+    for (const user of awareness.getStates().values()) {
+      if (user.cursor) {
+        decorations.push({
+          range: new monaco.Range(
+            user.cursor.position.lineNumber,
+            user.cursor.position.column,
+            user.cursor.position.lineNumber,
+            user.cursor.position.column
+          ),
+          options: {
+            className: "remoteCursor",
+            isWholeLine: false,
+            overviewRuler: {
+              color: user.cursor.color,
+              position: monaco.editor.OverviewRulerLane.Right,
+            },
+          },
+        });
+      }
+    }
+    editor.deltaDecorations([], decorations);
+  }
+
+  function getRandomColor() {
+    return "#" + Math.floor(Math.random() * 16777215).toString(16); // Generate random color
   }
 
 

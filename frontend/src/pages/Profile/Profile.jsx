@@ -17,30 +17,34 @@ const Profile = ({ token, post}) => {
     const { isLoggedIn, user } = useContext(AuthContext);
 
     console.log(user.post);
-    const { id: userId } = useParams();
+    const { id } = useParams();
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (userId) {
-            fetch(`http://localhost:3000/api/v1/profile/detail/${userId}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${token.accessToken}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                setProfileData(data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('Error fetching profile:', error);
-                setLoading(false);
-            });
+        function fetchProfile() {
+            if (id) {
+                fetch(`http://localhost:3000/api/v1/profile/detail/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token.accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    setProfileData(data);
+                    setLoading(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching profile:', error);
+                    setLoading(false);
+                });
+            }
         }
-    }, [userId]);
+        
+        fetchProfile()
+    });
 
     useEffect(() => {
         if (!isLoggedIn) {
@@ -355,8 +359,8 @@ const handleRemoveCompany = async (indexToRemove) => {
     const [showModal, setShowModal] = useState(false);
     const [showAvatarChange, setShowAvatarChange] = useState(false);
     const [showDeleteButtons, setShowDeleteButtons] = useState(false);
-    const id = useParams();
-    console.log(id.id, user._id)
+    // const id = useParams();
+    // console.log(id.id, user._id)
 
 
     //update avatar
@@ -1094,7 +1098,6 @@ const handleRemoveCompany = async (indexToRemove) => {
         );
     } else {
         console.log('Đây là profile của người khác:', id);
-        fetchProfile(id);
         return (
             <div className="profile" style={{ position: 'relative' }}>
                 <div style={{ zIndex: 2, position: 'relative' }}><Header token={token} isAuth={false} /></div>
