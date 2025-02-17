@@ -109,7 +109,7 @@ module.exports.logout = async (req, res) => {
 // [POST] /api/v1/auth/forgot
 module.exports.forgot = async (req, res) => {
   try {
-    // const email = req.body.email;
+    const email = req.body.email;
     // const data = {
     //   api_key: process.env.EMAIL_VERIFY_API_KEY,
     //   email_address: email

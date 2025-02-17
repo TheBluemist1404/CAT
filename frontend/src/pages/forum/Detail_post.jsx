@@ -162,7 +162,7 @@ function Detail({ token }) {
       if (error.response && error.response.status === 403) {
         const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
         const newAccessToken = getToken.data.accessToken
-        token.accessToken = newAccessToken;
+        token.accessToken = newAccessToken;  
         localStorage.setItem('token', JSON.stringify(token))
 
         await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`,
