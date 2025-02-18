@@ -292,6 +292,7 @@ function Post({ post, token, update }) {
         <div
         className="dropdown-item"
         style={{ color: '#FF4B5C' }}
+        onClick={handleDeletePost}
         >
         Delete
         </div>):(
@@ -424,6 +425,20 @@ function Post({ post, token, update }) {
     }
   };
 
+  const handleDeletePost = async () => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/api/v1/forum/delete/${post._id}`, {
+        headers: { "Authorization": `Bearer ${token.accessToken}` },
+      });
+      if (response.status === 200) {
+        update();  
+      }
+    } catch (error) {
+      console.error("Error deleting the post:", error);
+    }
+  };
+  
+
 
   const defaultAvatar = "https://res.cloudinary.com/cat-project/image/upload/v1735743336/coder-sign-icon-programmer-symbol-vector-2879989_ecvn23.webp";
 
@@ -442,13 +457,18 @@ function Post({ post, token, update }) {
         <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }} style={{cursor:'pointer'}}>{post.title}</h1>
         <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
         <div style={{ textAlign: "center" }}>
-          {post.images && (
-            <a href={post.images} target="_blank" rel="noopener noreferrer">
-              <img 
-                src={post.images} 
-                style={{ marginTop:"10px", width: "90%", height: "auto", display: "block", margin: "0 auto" }} 
-              />
-            </a>
+          {post.images && post.images.length > 0 && (
+            <div>
+              {post.images.map((image, index) => (
+                <a key={index} href={image} target="_blank" rel="noopener noreferrer" style={{ marginTop: "10px" }}>
+                  <img 
+                    src={image} 
+                    alt={`Post Image ${index + 1}`} 
+                    style={{width: "90%", height: "auto", display: "block", margin: "0 auto" }} 
+                  />
+                </a>
+              ))}
+            </div>
           )}
         </div>
         <div className="tag-box">
