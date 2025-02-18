@@ -11,6 +11,14 @@ import { useNavigate } from 'react-router-dom'
 
 import logo from '@code-editor-assets/logo.svg'
 
+function getRandomColor() {
+  // Generate a random color only once per client.
+  return "#" + Math.floor(Math.random() * 16777215).toString(16);
+}
+
+const clientColor = getRandomColor(); // Static color for this client
+
+
 function CodeEditor({ token }) {
   //Get Project info
   const projectId = window.location.href.split('/').pop();
@@ -44,69 +52,193 @@ function CodeEditor({ token }) {
 
   // -------------------------------
   //Setup monaco editor with Yjs binding
-  const ydoc = useRef(new Y.Doc()); // Shared Yjs document, useRef so it would remain after re-render
+  // Create a Yjs document and keep it in a ref so it persists.
+  const ydoc = useRef(new Y.Doc());
   const provider = useRef(null);
-  const ytext = ydoc.current.getText("monaco"); // Shared text model
-  const awareness = new Awareness(ydoc.current); // Awareness API for cursors
+  const ytext = ydoc.current.getText("monaco"); // Shared Yjs text model
+
+  // Create awareness instance (using Yjs document)
+  const awareness = new Awareness(ydoc.current);
   const editorRef = useRef(null);
+  const decorationsRef = useRef([]); // to track remote decorations
 
   useEffect(() => {
-    // Initialize WebRTC provider (or WebSocket)
+    // Initialize the WebRTC provider with awareness
     provider.current = new WebrtcProvider("my-room-name", ydoc.current, { awareness });
 
     return () => {
       provider.current.destroy();
+      ydoc.current.destroy();
     };
   }, []);
 
   async function handleEditorDidMount(editor) {
     editorRef.current = editor;
+    const { MonacoBinding } = await import("y-monaco");
+    // Bind Yjs text syncing to Monaco editor model
+    new MonacoBinding(ytext, editor.getModel(), new Set([editor]), awareness);
 
-    const {MonacoBinding} = await import("y-monaco")
-    // Bind Yjs text syncing to Monaco
-    new MonacoBinding(ytext, editor.getModel(), new Set([editor]));
+    // Here we store a relative position that initially points to index 0.
+    const initialRelPos = Y.createRelativePositionFromTypeIndex(ytext, 0);
+    awareness.setLocalStateField("cursor", { relPos: initialRelPos, color: clientColor });
 
-    // Bind cursor awareness
-    awareness.setLocalStateField("cursor", { position: 0, color: getRandomColor() });
+    awareness.setLocalStateField("selection", {
+      relPosStart: initialRelPos,
+      relPosEnd: initialRelPos
+    })
 
+    // Listen to local cursor changes
     editor.onDidChangeCursorPosition((event) => {
-      awareness.setLocalStateField("cursor", { position: event.position, color: getRandomColor() });
+      console.log("Local cursor change!");
+      const position = event.position;
+      const model = editor.getModel();
+      // Convert Monaco position to document offset.
+      const index = model.getOffsetAt(position);
+      const relPos = Y.createRelativePositionFromTypeIndex(ytext, index);
+      // Update the local awareness state with the new relative position.
+      awareness.setLocalStateField("cursor", { relPos, color: clientColor });
     });
 
+    editor.onDidChangeCursorSelection((event)=> {
+      const model = editor.getModel();
+      const selection = event.selection;
+      // Convert the selection range to offsets.
+      const startOffset = model.getOffsetAt(selection.getStartPosition());
+      const endOffset = model.getOffsetAt(selection.getEndPosition());
+      const relPosStart = Y.createRelativePositionFromTypeIndex(ytext, startOffset);
+      const relPosEnd = Y.createRelativePositionFromTypeIndex(ytext, endOffset);
+      // Update awareness with the selection data.
+      awareness.setLocalStateField("selection", {
+        relPosStart,
+        relPosEnd,
+        color: clientColor  // Optionally use a color for selection (or different from the cursor color)
+      });
+    })
+
+    // Listen for remote awareness changes to update remote cursor decorations.
     awareness.on("change", () => {
+      console.log("Remote awareness change - updating cursor decorations.");
       updateCursorDecorations(editor);
+      updateSelectionDecorations(editor);
     });
   }
 
   function updateCursorDecorations(editor) {
     const decorations = [];
-    for (const user of awareness.getStates().values()) {
-      if (user.cursor) {
-        decorations.push({
-          range: new monaco.Range(
-            user.cursor.position.lineNumber,
-            user.cursor.position.column,
-            user.cursor.position.lineNumber,
-            user.cursor.position.column
-          ),
-          options: {
-            className: "remoteCursor",
-            isWholeLine: false,
-            overviewRuler: {
-              color: user.cursor.color,
-              position: monaco.editor.OverviewRulerLane.Right,
+    // Loop through all remote awareness states.
+    awareness.getStates().forEach((state, clientId) => {
+      // Skip our own state.
+      if (clientId === awareness.clientID) return;
+      if (state.cursor && state.cursor.relPos) {
+        // Convert the relative position back into an absolute position in our document.
+        const absolutePos = Y.createAbsolutePositionFromRelativePosition(state.cursor.relPos, ydoc.current);
+        if (absolutePos && absolutePos.type === ytext) {
+          const model = editor.getModel();
+          // Convert the document offset (absolute position index) back to a Monaco position.
+          const position = model.getPositionAt(absolutePos.index);
+
+          const remoteColor = state.cursor.color || "red"
+          const className = "remoteCursor-" + remoteColor.replace("#", "");
+          addDynamicCursorStyle(className, remoteColor);
+          decorations.push({
+            range: new monaco.Range(
+              position.lineNumber,
+              position.column,
+              position.lineNumber,
+              position.column
+            ),
+            options: {
+              className: className,
+              isWholeLine: false,
+              overviewRuler: {
+                color: remoteColor,
+                position: monaco.editor.OverviewRulerLane.Right,
+              },
             },
-          },
-        });
+          });
+        }
       }
+    });
+    // Update decorations (pass the previous decorations for proper cleanup)
+    decorationsRef.current = editor.deltaDecorations(decorationsRef.current, decorations);
+  }
+
+  // Helper function to inject a CSS rule if it doesn't exist yet.
+  function addDynamicCursorStyle(className, color) {
+    // Check if the style for this class already exists.
+    if (!document.getElementById(className)) {
+      const style = document.createElement("style");
+      style.id = className;
+      style.innerHTML = `
+      .${className} {
+        border-left: 2px solid ${color};
+        margin-left: -1px; /* Adjust so the marker is visible */
+        height: 100%;
+      }
+    `;
+      document.head.appendChild(style);
     }
-    editor.deltaDecorations([], decorations);
   }
 
-  function getRandomColor() {
-    return "#" + Math.floor(Math.random() * 16777215).toString(16); // Generate random color
+  const selectionDecorationsRef = useRef([]);
+
+  function updateSelectionDecorations(editor) {
+    const decorations = [];
+    // Loop through all remote awareness states.
+    awareness.getStates().forEach((state, clientId) => {
+      // Skip our own state.
+      if (clientId === awareness.clientID) return;
+      if (state.selection && state.selection.relPosStart && state.selection.relPosEnd) {
+        // Convert the relative position back into an absolute position in our document.
+        const absStart = Y.createAbsolutePositionFromRelativePosition(state.selection.relPosStart, ydoc.current);
+        const absEnd = Y.createAbsolutePositionFromRelativePosition(state.selection.relPosEnd, ydoc.current);
+
+        if (absStart && absEnd && absStart.type === ytext && absEnd.type === ytext) {
+          const model = editor.getModel();
+          const startPos = model.getPositionAt(absStart.index);
+          const endPos = model.getPositionAt(absEnd.index);
+
+          const remoteColor = state.selection.color || "red"
+          const className = "remoteSelection-" + remoteColor.replace("#", "");
+          addDynamicSelectionStyle(className, remoteColor);
+          decorations.push({
+            range: new monaco.Range(
+              startPos.lineNumber,
+              startPos.column,
+              endPos.lineNumber,
+              endPos.column
+            ),
+            options: {
+              className: className,
+              isWholeLine: false,
+              overviewRuler: {
+                color: remoteColor,
+                position: monaco.editor.OverviewRulerLane.Right,
+              },
+            },
+          });
+        }
+      }
+    });
+    // Update decorations (pass the previous decorations for proper cleanup)
+    selectionDecorationsRef.current = editor.deltaDecorations(selectionDecorationsRef.current, decorations);
   }
 
+  // Helper function to inject a CSS rule if it doesn't exist yet.
+  function addDynamicSelectionStyle(className, color) {
+    // Check if the style for this class already exists.
+    if (!document.getElementById(className)) {
+      const style = document.createElement("style");
+      style.id = className;
+      style.innerHTML = `
+      .${className} {
+        background-color: ${color};
+        opacity: 0.3;
+      }
+    `;
+      document.head.appendChild(style);
+    }
+  }
 
   // -------------------------------
 
