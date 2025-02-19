@@ -37,6 +37,7 @@ module.exports.execute = (req, res) => {
       try {
         const parsedLog = JSON.parse(log); // ✅ Convert string to JSON object
         executions[executionId].push(parsedLog); // ✅ Store parsed object
+        console.log(parsedLog)
 
         if (executions[executionId].ws) {
           executions[executionId].ws.send(JSON.stringify(parsedLog)); // ✅ Send correct JSON format
@@ -62,7 +63,7 @@ module.exports.execute = (req, res) => {
     }
     delete executions[executionId]; // Clean up
   });
-
+  
   process.stdin.write(JSON.stringify({ code, input }) + "\n");
   process.stdin.end();
 
