@@ -285,6 +285,9 @@ function CodeEditor({ token }) {
       setCodeDisplay([])
       setErrorDisplay("")
       const code = editorRef.current.getValue()
+      if (code) {
+        console.log(code)
+      }
       const input = inputRef.current ? inputRef.current.value : ""
       const response = await axios.post('http://localhost:3000/api/v1/code/execute', { code: code, input: input, language: lang })
       const executionId = response.data.executionId
