@@ -1,15 +1,11 @@
-* {
-  margin: 0;
-  padding: 0;
-}
-
 .profile {
   background-color: black;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: monospace;
+  font-size: 16px;
+  min-height: fit-content;
 
   .image {
     position: relative;
-    left: 0%;
     width: 100%;
     height: 400px;
 
@@ -30,8 +26,8 @@
     padding: 0;
     width: 150px;
     height: 150px;
-    
-    
+
+
     clip-path: circle(50% at 50% 50%);
     top: 45px;
 
@@ -39,19 +35,19 @@
     .ava {
       width: 150px;
       height: 150px;
-      
+
     }
-    
-    .cam:hover{
+
+    .cam:hover {
       transform: scale(1.1);
     }
   }
 
   .profile-username {
-    background-color: transparent;
+    // background-color: #d9d9d988;
     position: absolute;
     color: var(--text-color);
-    font-family: var(--heading-font);
+    font-family: var(--code-font);
     font-size: 50px;
 
     margin-top: 70px;
@@ -82,7 +78,7 @@
     height: 100px;
     margin: 0 auto;
     z-index: 2;
-    background: rgba(255, 255, 255, 0.89);
+    background: #d9d9d9df;
     border-radius: 50px;
     box-shadow: 3px 8px 25px -1px rgba(253, 253, 253, 0.63);
     -webkit-box-shadow: 3px 8px 25px -1px rgba(255, 255, 255, 0.63);
@@ -115,18 +111,16 @@
 
   .divider {
     width: 1px;
-    background-color: #ccc;
+    background-color: #a1a1a1ec;
     /* Màu sắc của line dọc */
     height: 50px;
     /* Chiều cao của line */
   }
 
   .tabs {
-
-    background-color: rgb(0, 0, 0);
     height: 50px;
-    margin-top: 70px;
-    border-bottom: 2px solid rgb(107, 94, 117);
+    margin: 70px 5px 0 5px;
+    border-bottom: 1px solid #d9d9d988;
     display: flex;
     gap: 0px;
     align-items: center;
@@ -135,14 +129,19 @@
 
   }
 
+  .tab-container {
+    margin-left: 10%;
+    min-width: min(400px, 20%);
+    display: flex;
+    justify-content: space-between;
+  }
+
   .tabs button {
     left: 0;
     height: 100%;
     background-color: rgb(0, 0, 0);
     color: beige;
     text-align: center;
-    padding: 0px 20px;
-    margin: 0 5px;
     border: none;
     cursor: pointer;
     font-size: 30px;
@@ -155,78 +154,75 @@
   .v:hover {
     background-color: rgb(0, 0, 0);
 
-    color: red;
+    color: var(--highlight-red);
   }
 
   .main {
     position: relative;
-    background-color: rgb(45, 43, 43);
+    background-color: black;
     display: inline-grid;
     grid-template-columns: 30% 1fr;
-    column-gap: 20px;
-    row-gap: 20px;
-    margin-top: 0px;
-    width: 100%;
-
+    gap: 15px;
+    margin: 0 8%;
     grid-template-rows: 1fr;
-    padding-top: 20px;
+    padding-top: 15px;
     padding-bottom: 10px;
 
   }
 
   .bio {
 
-    background-color: rgb(0, 0, 0);
+    background-color: var(--primary-color);
 
     margin-left: 20px;
     padding: 10px;
-    border-radius: 20px;
+    border-radius: 8px;
     max-height: 500px;
-    
-    
+
+
   }
 
   .about {
 
-    background-color: rgb(0, 0, 0);
+    background-color: var(--primary-color);
     margin-right: 20px;
     padding: 10px;
-    border-radius: 20px;
+    border-radius: 8px;
 
   }
 
   .im {
-    background-color: rgb(0, 0, 0);
+    background-color: var(--primary-color);
     margin-left: 20px;
     padding: 10px;
-    border-radius: 20px;
+    border-radius: 8px;
     height: 500px;
-    
-    
+
+
   }
 
   .Post {
-    background-color: rgb(0, 0, 0);
+    background-color: var(--primary-color);
     margin-right: 20px;
     padding: 10px;
-    border-radius: 20px;
+    border-radius: 8px;
   }
 
-  .main2 {
-    position: relative;
-    background-color: rgb(45, 43, 43);
-    margin: 0;
-    height: 400px;
-  }
+  // .main2 {
+  //   position: relative;
+  //   background-color: rgb(45, 43, 43);
+  //   margin: 0;
+  //   height: 400px;
+  // }
 
-  .post {
-    background-color: black;
-    height: 200px;
-    margin-left: 10px;
-    margin-right: 10px;
-    padding: 10px;
-    border-radius: 20px;
-  }
+  // .post {
+  //   background-color: black;
+  //   height: 200px;
+  //   margin-left: 10px;
+  //   margin-right: 10px;
+  //   padding: 10px;
+  //   border-radius: 20px;
+  // }
 
   .text {
     color: black;
@@ -287,27 +283,16 @@
 
   .posts-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    padding: 20px;
-    background-color: #f9f9f9;
-  }
-
-
-  .posts-container {
-    display: flex;
     flex-direction: column;
     gap: 30px;
     justify-content: flex-start;
     padding: 20px;
-    background-color: #000000;
     width: 100%;
   }
 
 
   .post-card {
-
+    background-color: var(--box-color);
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -435,16 +420,20 @@
   }
 
   .editbut {
-    background-color: #424242;
-    width: 50%;
-    height: 40px;
+    background-color: var(--box-color);
+    padding: 10px;
+    min-width: 50%;
 
     margin: 0 auto;
     margin-bottom: 10px;
-    display: flex; /* Kích hoạt flexbox */
-    justify-content: center; /* Căn giữa theo chiều ngang */
-    align-items: center; /* Căn giữa theo chiều dọc */
-    text-align: center; /* Căn giữa văn bản (nếu cần) */
+    display: flex;
+    /* Kích hoạt flexbox */
+    justify-content: center;
+    /* Căn giữa theo chiều ngang */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+    text-align: center;
+    /* Căn giữa văn bản (nếu cần) */
     border-radius: 10px;
   }
 
@@ -454,20 +443,27 @@
   }
 
   .mainS {
-    position: relative;
-    background-color: #2b2b2b;
-    width: 100%;
-
+    margin: 0 10%;
   }
 
   .spost {
     display: flex;
     flex-direction: column;
     gap: 20px;
+
+    .post-card {
+      background-color: var(--box-color);
+    }
+
+    .post-card:hover {
+      transform: translateY(-5px);
+      background-color: #131313;
+      box-shadow: 0 8px 16px rgba(187, 187, 187, 0.2);
+    }
   }
 
   button.active {
-    color: red;
+    color: var(--highlight-red);
     /* Khi được chọn thì đổi thành màu đỏ */
   }
 
@@ -475,49 +471,19 @@
     color: white;
     /* Những nút không được chọn */
   }
-  .but{
+
+  .but {
     color: #000;
   }
-  /* From Uiverse.io by Jedi-hongbin */ 
-.back {
-  display: flex;
-  height: 3em;
-  width: 40px;
-  align-items: center;
-  justify-content: center;
-  background-color: #eeeeee4b;
-  border-radius: 3px;
-  letter-spacing: 1px;
-  transition: all 0.2s linear;
-  cursor: pointer;
-  border: none;
-  background: #000000;
- }
- 
- .back > svg {
-  margin-right: 5px;
-  margin-left: 5px;
-  font-size: 20px;
-  transition: all 0.1s ease-in;
- }
- 
- .back:hover > svg {
-  font-size: 1.2em;
-  transform: translateX(-1px);
- }
- 
- .back:hover {
-  box-shadow: 9px 9px 33px #d1d1d1, -2px -2px  #ffffff;
-  
- }
- .detail{
-  background: rgba(88, 88, 88, 0.64);
-border-radius: 16px;
-box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-backdrop-filter: blur(15.3px);
--webkit-backdrop-filter: blur(15.3px);
-border: 1px solid rgba(88, 62, 62, 0.43);
 
- }
- 
+  .detail {
+    background: rgba(88, 88, 88, 0.64);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(15.3px);
+    -webkit-backdrop-filter: blur(15.3px);
+    border: 1px solid rgba(88, 62, 62, 0.43);
+
+  }
+
 }
