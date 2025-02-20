@@ -5,15 +5,15 @@ const fs = require("fs");
 if (isMainThread) {
     process.stdin.on("data", (data) => {
         const parsedData = JSON.parse(data.toString().trim()); // ✅ Parse JSON input
-        const {code, input} = parsedData; // ✅ Extract code
+        const { code, input } = parsedData; // ✅ Extract code
 
-        const worker = new Worker(__filename, { workerData: {code, input} });
+        const worker = new Worker(__filename, { workerData: { code, input } });
 
         worker.on("message", (msg) => console.log(JSON.stringify(msg)));
         worker.on("error", (err) => console.error(JSON.stringify({ error: err.message })));
     });
 } else {
-    const {code, input} = workerData;
+    const { code, input } = workerData;
     const filename = "/tmp/code.cpp";
     const outputBinary = "/tmp/code.out";
 
@@ -22,6 +22,7 @@ if (isMainThread) {
 
     // ✅ Read the file, modify it, and then write it back
     fs.readFile(filename, "utf8", (err, data) => {
+
         if (err) {
             console.error("Error reading file:", err);
             return;
@@ -45,10 +46,7 @@ if (isMainThread) {
                 execSync(`g++ ${filename} -o ${outputBinary} -std=c++17`);
 
                 // ✅ Run the compiled C++ program
-                const execution = spawn(outputBinary, [], {stdio: ["pipe", "pipe", "pipe"]});
-
-                execution.stdin.write(input + '\n')
-                execution.stdin.end()
+                const execution = spawn(outputBinary, [], { stdio: ["pipe", "pipe", "pipe"] });
 
                 execution.stdout.on("data", (data) => {
                     parentPort.postMessage({ log: data.toString().trim() });
@@ -59,8 +57,15 @@ if (isMainThread) {
                 });
 
                 execution.on("exit", () => {
-                    parentPort.postMessage({ done: true });
+                    parentPort.postMessage({done: true})
                 });
+                
+                if (input) {
+                    execution.stdin.write(input + '\n')
+                }
+                execution.stdin.end();
+                
+
             } catch (error) {
                 parentPort.postMessage({ error: "Compilation failed" });
             }

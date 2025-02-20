@@ -22,10 +22,6 @@ if (isMainThread) {
     // ✅ Run Python code dynamically with unbuffered output
     const python = spawn("python3", ["-u", "-c", code], { stdio: ["pipe", "pipe", "pipe"] });
 
-    // ✅ Send user input to Python script
-    python.stdin.write(input + "\n");
-    python.stdin.end();
-
     // ✅ Capture & send real-time logs
     python.stdout.on("data", (data) => {
         parentPort.postMessage({ log: data.toString().trim() });
@@ -40,4 +36,10 @@ if (isMainThread) {
     python.on("exit", () => {
         parentPort.postMessage({ done: true });
     });
+
+    // ✅ Send user input to Python script
+    if (input) {
+        execution.stdin.write(input + '\n')
+    }
+    execution.stdin.end();
 }

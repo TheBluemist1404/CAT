@@ -10,7 +10,6 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
   const [postFeed, setPostFeed] = useState(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [images, setImages] = useState([]);
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [visibility, setVisibility] = useState('public');
@@ -46,31 +45,13 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     );
   };
 
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [preview, setPreview] = useState(user.avatar);
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      setPreview(URL.createObjectURL(file)); 
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      alert("Upload");
-      return;
-    }
-  }
-
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState([]);
 
   const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+    const files = Array.from(e.target.files);
+    setImages((prevImages) => [...prevImages, ...files]);
   };
-
-
+  
   const createPost = async () => {
     if (title.trim() === '') {
       setError('Need title to create post');
@@ -84,9 +65,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     formData.append("status", visibility);
     selectedTags.forEach(tag => formData.append("tags", tag));
   
-    if (image) {
-      formData.append("images", image); 
-    }
+    images.forEach(image => formData.append("images", image));
   
     setError('');
   
@@ -106,13 +85,14 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
       if (editorRef.current) editorRef.current.setContent('');
       setSelectedTags([]);
       setVisibility('public');
-      setImage(null);
+      setImages([]); 
       handleCreatePostToggle();
       fetchPosts(currentPage);
     } catch (error) {
       console.error('Failed to create post:', error.response?.data || error.message);
     }
   };
+  
   
 
   useEffect(() => {
@@ -177,6 +157,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                     id="fileInput"
                     type="file"
                     accept="image/*"
+                    multiple
                     onChange={handleImgChange}
                     style={{ display: "none" }}
                   />
@@ -199,6 +180,24 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                   >
                     Upload Image
                   </label>
+
+                  <button
+                      style={{
+                      marginLeft: "10px",
+                      display: "inline-block",
+                      marginTop: "10px",
+                      padding: "8px 15px",
+                      borderRadius: "5px",
+                      backgroundColor: "#2B2B3B",
+                      color: "#FFFFFF",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      border: "1px solid #FFFFFF",}}
+                  >
+                    Preview
+                  </button>
 
                   {fileName && (
                     <p style={{ marginTop: "10px", color: "#FFFFFF", fontSize: "14px" }}>

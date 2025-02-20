@@ -162,7 +162,7 @@ function Detail({ token }) {
       if (error.response && error.response.status === 403) {
         const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
         const newAccessToken = getToken.data.accessToken
-        token.accessToken = newAccessToken;  
+        token.accessToken = newAccessToken;
         localStorage.setItem('token', JSON.stringify(token))
 
         await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`,
@@ -304,6 +304,19 @@ function Detail({ token }) {
       console.error("Error saving the post:", error);
     }
   };
+
+  const handleDeletePost = async () => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/api/v1/forum/delete/${post._id}`, {
+        headers: { "Authorization": `Bearer ${token.accessToken}` },
+      });
+      if (response.status === 200) {
+        navigate(`/forum`);
+      }
+    } catch (error) {
+      console.error("Error deleting the post:", error);
+    }
+  };
   
   const renderDropdown = (index) => (
     <div
@@ -312,13 +325,20 @@ function Detail({ token }) {
     >
       <div className="dropdown-item" onClick={handleSavePost}>{isSaved ? "Unsave" : "Save"}</div>
       <hr className="post-navigate-line" />
-      <div
+      {post?.userCreated._id === user._id ? (
+        <div
         className="dropdown-item"
         style={{ color: '#FF4B5C' }}
-        onClick={() => console.log('Post reported')}
-      >
+        onClick={handleDeletePost}
+        >
+        Delete
+        </div>):(
+        <div
+        className="dropdown-item"
+        style={{ color: '#FF4B5C' }}
+        >
         Report
-      </div>
+        </div>)}
     </div>
   );
 
@@ -468,14 +488,19 @@ function Detail({ token }) {
         <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post ? post.title : ""}</h1>
         <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
         <div style={{ textAlign: "center" }}>
-          {post ? (
-            <a href={post.images} target="_blank" rel="noopener noreferrer">
-              <img 
-                src={post.images} 
-                style={{ marginTop:"10px", width: "90%", height: "auto", display: "block", margin: "0 auto" }} 
-              />
-            </a>
-          ):(<div></div>)}
+          {post?.images && post?.images.length > 0 && (
+            <div>
+              {post.images.map((image, index) => (
+                <a key={index} href={image} target="_blank" rel="noopener noreferrer" style={{ marginTop: "10px" }}>
+                  <img 
+                    src={image} 
+                    alt={`Post Image ${index + 1}`} 
+                    style={{width: "90%", height: "auto", display: "block", margin: "0 auto" }} 
+                  />
+                </a>
+              ))}
+            </div>
+          )}
         </div>
         <div className="tag-box">
           {tag.map((tag, index) => (
