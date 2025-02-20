@@ -3,7 +3,8 @@ import { useState, useRef } from "react";
 import AvatarEditor from "react-avatar-editor";
 
 
-function ProfileAvatar({ user }) {
+function ProfileAvatar({ user, profileData, token, id }) {
+  console.log(profileData);
   const [avatar, setAvatar] = useState(user?.avatar || '');
 
   const [showAvatarChange, setShowAvatarChange] = useState(false);
@@ -35,7 +36,7 @@ function ProfileAvatar({ user }) {
         formData.append("fullName", user.fullName);
         formData.append("description", user.description || "");
 
-        // Gửi từng phần tử của companies và schools thay vì stringify
+        
         user.companies.forEach(company => formData.append("companies[]", company));
         user.schools.forEach(school => formData.append("schools[]", school));
 
@@ -75,13 +76,13 @@ function ProfileAvatar({ user }) {
       }, "image/png");
     }
   };
-
+  console.log(user._id);
   return (
     <div className='image' >
 
       <div className="profile-avatar">
-        <img className='ava' src={user.avatar} alt="" />
-        <img className='cam' src="/src/assets/camera.svg" onClick={() => setShowAvatarChange(true)} alt="" width={30} height={30} style={{ position: "absolute", bottom: "5px", left: "90px", zIndex: 1000 }} />
+        <img className='ava' src={profileData?.avatar} alt="" />
+        { id === user._id && (<img className='cam' src="/src/assets/camera.svg" onClick={() => setShowAvatarChange(true)} alt="" width={30} height={30} style={{ position: "absolute", bottom: "5px", left: "90px", zIndex: 1000 }} />)}
       </div>
       {showAvatarChange && (
         <div
@@ -184,7 +185,7 @@ function ProfileAvatar({ user }) {
       )}
 
 
-      <h1 className='profile-username'>{user.fullName}</h1>
+      <h1 className='profile-username'>{profileData?.fullName}</h1>
       <div className='social'>
         <img src="/src/assets/facebook.svg" alt="" width={30} height={30} />
         <img src="/src/assets/github.svg" alt="" width={30} height={30} />

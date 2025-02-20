@@ -6,7 +6,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import DOMPurify from "dompurify";
 
 
-function ProfileMain({ user, token }) {
+function ProfileMain({ user, token, profileData, id }) {
   // edit school and company modal
   const [showModal, setShowModal] = useState(false);
 
@@ -289,16 +289,16 @@ function ProfileMain({ user, token }) {
             <div style={{ cursor: "pointer" }}>
               <img src="/src/assets/school.svg" alt="" width={30} height={30} />
             </div>
-            {schools.length > 0 && (
+            {profileData?.schools.length > 0 && (
               <div style={{ marginLeft: "10px" }}>
-                <div>{schools.length === 1 && schools[0]}</div>
+                <div>{profileData?.schools.length === 1 && profileData?.schools[0]}</div>
 
-                <div>{schools[schools.length - 2]}</div>
+                <div>{profileData?.schools[profileData?.schools.length - 2]}</div>
 
               </div>
             )}
           </div>
-          {schools.length > 1 && (
+          {profileData?.schools.length > 1 && (
             <div
               style={{
                 display: "flex",
@@ -308,7 +308,7 @@ function ProfileMain({ user, token }) {
                 marginLeft: "40px"
               }}
             >
-              {schools[schools.length - 1]}
+              {profileData?.schools[profileData?.schools.length - 1]}
 
             </div>
           )}
@@ -319,14 +319,14 @@ function ProfileMain({ user, token }) {
             <div style={{ cursor: "pointer" }}>
               <img src="/src/assets/company.svg" alt="" width={30} height={30} />
             </div>
-            {companies.length > 0 && (
+            {profileData?.companies.length > 0 && (
               <div style={{ marginLeft: "10px" }}>
-                <div>{companies.length === 1 && companies[0]}</div>
-                <div>{companies[companies.length - 2]}</div>
+                <div>{profileData?.companies.length === 1 && profileData?.companies[0]}</div>
+                <div>{profileData?.companies[profileData?.companies.length - 2]}</div>
               </div>
             )}
           </div>
-          {companies.length > 1 && (
+          {profileData?.companies.length > 1 && (
             <div
               style={{
                 display: "flex",
@@ -336,15 +336,16 @@ function ProfileMain({ user, token }) {
                 marginLeft: "40px"
               }}
             >
-              {companies[companies.length - 1]}
+              {profileData?.companies[profileData?.companies.length - 1]}
 
             </div>
           )}
         </div>
-
-        <button className='editbut' onClick={() => setShowModal(true)}>
-          Edit personal details
-        </button>
+        { id === user._id && (
+          <button className='editbut' onClick={() => setShowModal(true)}>
+            Edit personal details
+          </button>
+        )}
         {showModal && (
           <div
             style={{
@@ -557,7 +558,7 @@ function ProfileMain({ user, token }) {
               onClick={() => { setEditMode(true); setNewDescription(description); }}
               style={{ cursor: "pointer" }}
             >
-              <img src="/src/assets/pen.svg" alt="Edit" width={15} height={15} />
+              { id === user._id && (<img src="/src/assets/pen.svg" alt="Edit" width={15} height={15} />)}
             </div>
           </div>
 
@@ -618,7 +619,7 @@ function ProfileMain({ user, token }) {
               </div>
             </div>
           ) : (
-            <div dangerouslySetInnerHTML={{ __html: description }}
+            <div dangerouslySetInnerHTML={{ __html: profileData?.description }}
 
             >
 
@@ -645,7 +646,7 @@ function ProfileMain({ user, token }) {
         <div>
 
           <div className="posts-container">
-            {user.posts.slice().reverse().map((post, index) => {
+            {profileData?.posts.slice().reverse().map((post, index) => {
 
               const date = new Date(post.createdAt);
               const formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}, ${date.getFullYear()}`;

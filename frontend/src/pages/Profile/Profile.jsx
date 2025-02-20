@@ -3,6 +3,7 @@ import { useNavigate, useParams, Routes, Route } from 'react-router-dom';
 import { useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../../authentication/AuthProvider';
 import Header from "../../Header";
+import axios from 'axios';
 
 import ProfileAvatar from './ProfileAvatar';
 import ProfileTab from './ProfileTab';
@@ -15,33 +16,36 @@ const Profile = ({ token }) => {
 
     const [view, setView] = useState("posts");
 
-    console.log(user.post);
+    
     const { id } = useParams();
-
+    const [profileData, setProfileData] = useState(null);
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
-        function fetchProfile() {
-            if (id) {
-                fetch(`http://localhost:3000/api/v1/profile/detail/${id}`, {
-                    method: 'GET',
+        async function fetchProfile() {
+            if (!id) return;
+            console.log("Fetching profile for ID:", id);
+    
+            try {
+                const response = await axios.get(`http://localhost:3000/api/v1/profile/detail/${id}`, {
                     headers: {
-                        Authorization: `Bearer ${token.accessToken}`,
-                        'Content-Type': 'application/json'
+                        Authorization: `Bearer ${token.accessToken}`
                     }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        setProfileData(data);
-                        setLoading(false);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching profile:', error);
-                        setLoading(false);
-                    });
+                });
+    
+                console.log("Fetched profile data:", response.data); // ✅ Kiểm tra dữ liệu trả về
+                setProfileData(response.data);
+    
+            } catch (error) {
+                console.error("Error fetching profile:", error.response?.data?.message || error.message);
             }
         }
-
-        fetchProfile()
+    
+        fetchProfile();
     }, []);
+    useEffect(() => {
+        console.log("Profile data:", profileData);
+      }, [profileData]); 
+    
 
     useEffect(() => {
         if (!isLoggedIn) {
@@ -54,11 +58,11 @@ const Profile = ({ token }) => {
             <div style={{ zIndex: 2, position: 'relative' }}><Header token={token} isAuth={false} /></div>
 
             <div style={{ zIndex: 1, position: 'relative' }}>
-                <ProfileAvatar user={user}  />
+                <ProfileAvatar user={user} profileData={profileData} id={id}  />
                 <ProfileTab view={view} setView={setView}/>
                 
-                {view === "posts" && <ProfileMain user={user} token={token} />}
-                {view === "Saved" && <ProfileSavedPost user={user}  />}
+                {view === "posts" && <ProfileMain user={user} profileData={profileData} token={token} id={id} />}
+                {view === "Saved" && <ProfileSavedPost user={user} profileData={profileData} id={id} />}
 
             </div>
         </div>
