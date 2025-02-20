@@ -45,9 +45,7 @@ function CodeEditor({ token }) {
   useEffect(() => {
     if (!projectContent) {
       console.log("content not updated yet")
-    } else {
-      console.log(projectContent.content);
-    }
+    } 
   }, [projectContent])
 
   // -------------------------------

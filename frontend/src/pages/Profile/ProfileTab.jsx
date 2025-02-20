@@ -16,13 +16,13 @@ function ProfileTab({ view, setView }) {
 
   return (
     <div className='tabs'>
-      <div>
+      <div className="tab-container">
         <button type='button' className={`p ${view === "posts" ? "active" : ""}`} onClick={() => setView("posts")}>Posts</button>
         <button type='button' className={`i ${view === "Media" ? "active" : ""}`} onClick={() => setView("Media")}>Media</button>
         <button type='button' className={`v ${view === 'Saved' ? 'active' : ''}`} onClick={() => setView("Saved")}>Saved</button>
       </div>
-      <div>
-        <div className="settings" onClick={handleSvgClick} style={{ marginRight: "20px" }}>
+      <div style={{marginRight: '10%'}}>
+        <div className="settings" onClick={handleSvgClick}>
           <img src="/src/assets/setting.svg" alt="" width={30} height={30} />
         </div>
 
