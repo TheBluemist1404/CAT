@@ -7,6 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@homepage-assets': path.resolve(__dirname, 'src/pages/homepage/assets'),
+      '@live-code-assets': path.resolve(__dirname, 'src/pages/live-code/assets'),
       '@code-editor-assets': path.resolve(__dirname, 'src/pages/live-code/assets')
     },
   },

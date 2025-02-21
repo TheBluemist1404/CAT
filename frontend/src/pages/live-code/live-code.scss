@@ -1,0 +1,138 @@
+@keyframes vinyl {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.live-code {
+  background-color: black;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-family: var(--text-font);
+  font-size: 20px;
+
+  .back {
+    position: absolute;
+    top: 20px;
+    left: 7%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .home{
+      text-decoration: none;
+    }
+
+    .home:hover{
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 5px;
+    }
+  }
+  .vinyl {
+    height: 70vh;
+    width: 70vh;
+    border-radius: 50%;
+    object-fit: cover;
+    animation: vinyl 30s linear infinite;
+
+    img {
+      height: 100%;
+    }
+  }
+
+  .user {
+    background-color: var(--primary-color);
+    position: fixed;
+    min-height: 80%;
+    min-width: 35vh;
+    display: flex;
+    flex-direction: column;
+    gap: 8vh;
+    align-items: center;
+
+    .avatar {
+      background-color: var(--secondary-color);
+      width: 20vh;
+      height: 20vh;
+      border-radius: 50%;
+
+      margin-top: 10vh;
+    }
+
+    .code-time,
+    .number-of-projects {
+      background-color: var(--box-color);
+      min-height: 80px;
+      width: 20vh;
+    }
+  }
+
+  .playlist {
+    min-width: 35%;
+    margin-left: 10%;
+    min-height: 80vh;
+
+    .topbar {
+      display: flex;
+      flex-direction: row-reverse;
+      margin-bottom: 20px;
+
+      .create-project {
+        width: fit-content;
+        border-radius: 27px;
+        padding: 15px;
+        background-color: var(--box-color);
+      }
+    }
+
+    .projects {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .project-card {
+        min-width: 100%;
+        min-height: 120px;
+        border: 1px solid var(--primary-color);
+        border-radius: 12px;
+        padding: 15px;
+        align-items: center;
+
+        display: grid;
+        grid-template-columns: 1fr 100px;
+        grid-template-rows: 1fr 100px;
+        grid-template-areas:
+          "name lang"
+          "createdAt band"
+        ;
+
+        .name {
+          grid-area: name;
+        }
+
+        .lang {
+          text-align: right;
+          grid-area: lang;
+        }
+
+        .createdAt {
+          grid-area: createdAt;
+        }
+
+        .band {
+          text-align: right;
+          grid-area: band;
+        }
+      }
+    }
+  }
+}
