@@ -3,6 +3,9 @@ import axios from 'axios';
 import { useEffect, useState, useContext, useRef } from 'react';
 import { AuthContext } from "../../authentication/AuthProvider";
 import Post from './Post';
+import Prism from "prismjs";
+import "prismjs/themes/prism.css";
+
 
 const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage, setTotalPages, render }) => {
   const { isLoggedIn, user } = useContext(AuthContext)
@@ -46,6 +49,7 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
   };
 
   const [images, setImages] = useState([]);
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -109,6 +113,50 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
       handleImageChange(event); // Call the parent function if needed
     }
   };
+
+  const [previewPost, setPreviewPost] = useState(null); // New State for Preview
+
+  const handlePreview = () => {
+    setPreviewPost({
+      title,
+      content: editorRef.current?.getContent(),
+      userCreated: user,
+      images: images.map(file => URL.createObjectURL(file)),
+      tags: selectedTags.map(tagId => tags.find(tag => tag._id === tagId)?.title),
+    });
+  };
+
+const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+const [previewContent, setPreviewContent] = useState({
+  title: "",
+  content: "",
+  images: [],
+});
+
+// Function to open preview
+const handlePreviewClick = () => {
+  if (title.trim() === '') {
+    setError('Need title to preview post');
+    return;
+  }
+
+  setPreviewContent({
+    title,
+    content: editorRef.current?.getContent() || "",
+    images,
+  });
+  setIsPreviewOpen(true);
+};
+
+useEffect(() => {
+  Prism.highlightAll(); 
+}, [previewContent.content]); 
+
+// Function to close preview
+const closePreview = () => {
+  setIsPreviewOpen(false);
+};
+
   
   const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
 
@@ -132,13 +180,16 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                   init={{
                     height: 300,
                     menubar: false,
+                    selector: 'textarea',
                     plugins: [
                       "advlist autolink lists link image charmap preview anchor",
                       "searchreplace visualblocks code fullscreen",
                       "insertdatetime media table code help wordcount",
+                      "codesample",
+                      "code",
                     ],
                     toolbar:
-                      "undo redo | code | formatselect | bold italic underline forecolor backcolor | \
+                      "undo redo| code | formatselect | bold italic underline forecolor backcolor | codesample | \
                       alignleft aligncenter alignright alignjustify | \
                       bullist numlist outdent indent | removeformat | help",
                     placeholder: "Write your content here...",
@@ -182,6 +233,28 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                   </label>
 
                   <button
+                    style={{
+                      marginLeft: "10px",
+                      display: "inline-block",
+                      marginTop: "10px",
+                      padding: "8px 15px",
+                      borderRadius: "5px",
+                      backgroundColor: "#2B2B3B",
+                      color: "#FFFFFF",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      border: "1px solid #FFFFFF",
+                    }}
+                    onClick={() => setIsImagePreviewOpen(true)} // Open Image Preview Modal
+                    disabled={images.length === 0} // Disable if no images
+                  >
+                    Preview Images
+                  </button>
+
+
+                  <button
                       style={{
                       marginLeft: "10px",
                       display: "inline-block",
@@ -195,16 +268,87 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                       fontWeight: "bold",
                       textAlign: "center",
                       border: "1px solid #FFFFFF",}}
+                      onClick={handlePreviewClick}
                   >
-                    Preview
+                    Preview Post
                   </button>
 
-                  {fileName && (
+                  {images.length > 0 && (
                     <p style={{ marginTop: "10px", color: "#FFFFFF", fontSize: "14px" }}>
-                      Selected: {fileName}
+                      Selected: {images.slice(-3).map(file => file.name).join(", ")}
+                      {images.length > 3 ? ` +${images.length - 3}` : ""}
                     </p>
                   )}
                 </div>
+
+                {isImagePreviewOpen && (
+                  <div 
+                    className="preview-modal"
+                    style={{
+                      position: "fixed",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      backgroundColor: "rgba(0, 0, 0, 0.7)",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      zIndex: 9999,
+                    }}
+                  >
+                    <div 
+                      className="modal-container"
+                      style={{
+                        backgroundColor: "#282A36",
+                        padding: "20px",
+                        borderRadius: "10px",
+                        width: "500px",
+                        maxHeight: "80vh",
+                        overflowY: "auto",
+                      }}
+                    >
+                      <div className="modal-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <h2>Preview Images</h2>
+                        <button className="close-button" onClick={() => setIsImagePreviewOpen(false)}>X</button>
+                      </div>
+
+                      <div className="image-list">
+                        {images.map((image, index) => (
+                          <div 
+                            key={index} 
+                            className="image-item" 
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              padding: "10px",
+                              borderBottom: "1px solid #444",
+                              color: "white",
+                            }}
+                          >
+                            <span>{image.name}</span>
+                            <button 
+                              style={{
+                                background: "red",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "5px",
+                                cursor: "pointer",
+                                padding: "5px 10px",
+                              }}
+                              onClick={() => {
+                                setImages(images.filter((_, i) => i !== index));
+                              }}
+                            >
+                              X
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="tags-container" style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: 10 }}>
                   {tags.map((tag) => (
@@ -224,6 +368,60 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
                     </div>
                   ))}
                 </div>
+                {isPreviewOpen && (
+                  <div 
+                    className="preview-modal"
+                    style={{
+                      position: "fixed",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      backgroundColor: "rgba(0, 0, 0, 0.7)",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      zIndex: 9999,
+                    }}
+                  >
+                    <div 
+                      className="modal-container"
+                      style={{
+                        backgroundColor: "#282A36",
+                        padding: "20px",
+                        borderRadius: "10px",
+                        width: "800px",
+                        maxHeight: "80vh",   
+                      }}
+                    >
+                      <div className="modal-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <h2>Preview Post</h2>
+                        <button className="close-button" onClick={closePreview}>X</button>
+                      </div>
+                      
+                      <div className="post" style={{ maxHeight: "70vh", overflowY: "auto", paddingRight: "10px" }}> 
+                        <h1 className="post-title">{previewContent.title}</h1>
+                        <p className="post-content" dangerouslySetInnerHTML={{ __html: previewContent.content }}></p>
+
+                        {previewContent.images.length > 0 && (
+                          <div style={{ textAlign: "center" }}>
+                            {previewContent.images.map((image, index) => (
+                              <a key={index} href={URL.createObjectURL(image)} target="_blank" rel="noopener noreferrer">
+                              <img 
+                                key={index} 
+                                src={URL.createObjectURL(image)} 
+                                alt={`Preview Image ${index}`} 
+                                style={{ maxWidth: "100%", maxHeight: "300px", marginTop: "10px", objectFit: "cover" }} 
+                              />
+                              </a>
+                            ))}
+                          </div>
+                        )}                        
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 
                 <div className="visibility-options">
                   <label htmlFor="visibility">Who can see this post?</label>
