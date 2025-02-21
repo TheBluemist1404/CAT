@@ -1,4 +1,4 @@
-.live-code{
+.code-editor{
   background-color: black;
   display: flex;
   flex-direction: row;
@@ -121,9 +121,3 @@
     }    
   }
 }
-
-// .remoteCursor {
-//   border-left: 2px solid blue;
-//   margin-left: -1px; // Adjust to ensure the decoration is visible at the cursor position
-//   height: 100%;
-// }

@@ -363,7 +363,7 @@ function CodeEditor({ token }) {
   }
 
   return (
-    <div className="live-code">
+    <div className="code-editor">
       <div className="sidebar">
         <div className='logo'>
           <img src={logo} alt="logo" onClick={() => { navigate('/') }} />
