@@ -160,7 +160,7 @@
   .main {
     position: relative;
     background-color: rgb(0, 0, 0);
-    display: inline-grid;
+    display: grid;
     grid-template-columns: 30% 1fr;
     gap: 15px;
     margin: 0 8%;
@@ -196,9 +196,8 @@
     margin-left: 20px;
     padding: 10px;
     border-radius: 8px;
-    height: 500px;
-
-
+    max-height: max-content;
+    padding-bottom: 30px;
   }
 
   .Post {
@@ -207,22 +206,6 @@
     padding: 10px;
     border-radius: 8px;
   }
-
-  // .main2 {
-  //   position: relative;
-  //   background-color: rgb(45, 43, 43);
-  //   margin: 0;
-  //   height: 400px;
-  // }
-
-  // .post {
-  //   background-color: black;
-  //   height: 200px;
-  //   margin-left: 10px;
-  //   margin-right: 10px;
-  //   padding: 10px;
-  //   border-radius: 20px;
-  // }
 
   .text {
     color: black;
@@ -263,14 +246,15 @@
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    justify-content: center;
 
-    margin: 20px auto;
+    margin: 0 20px;
   }
 
   .flex-item {
-    width: 100px;
-    height: 100px;
+    flex: 1;
+    min-width: 100px;
+    max-width: calc(50% - 10px);
+    height: width;
     background-color: #ffffff;
     color: rgb(0, 0, 0);
     display: flex;
