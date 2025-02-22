@@ -6,7 +6,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import DOMPurify from "dompurify";
 
 
-function ProfileMain({ user, token, profileData, id }) {
+function ProfileMain({ user, token, profileData, id ,posts}) {
   // edit school and company modal
   const [showModal, setShowModal] = useState(false);
 
@@ -36,7 +36,7 @@ function ProfileMain({ user, token, profileData, id }) {
 
     fetchSchools();
   }, [user, token]);
-
+console.log(posts);
   const handleAddSchool = async () => {
     if (newSchool.trim() !== "") {
       const updatedSchools = [...schools, newSchool];
@@ -629,17 +629,38 @@ function ProfileMain({ user, token, profileData, id }) {
 
       </div>
       <div className='im'>
-        <h1 style={{ margin: "20px" }}>Image</h1>
-        <div className="flex-container">
-          {Array.from({ length: 9 }).map((_, index) => (
-            <div className="flex-item" key={index}>
-              {index + 1}
-            </div>
-          ))}
+  <h1 style={{ margin: "20px" }}>Image Gallery</h1>
+  <div className="flex-container" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px" }}>
+    {Array.from({ length: 9 }).map((_, index) => {
+      const image = posts.flatMap(post => post.images || [])[index]; 
+      return (
+        <div key={index} className="flex-item" style={{ 
+          width: "100%", 
+          aspectRatio: "1/1", 
+          backgroundColor: image ? "transparent" : "#fff", 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          border: "1px solid #ccc", 
+          borderRadius: "8px"
+        }}>
+          {image ? (
+            <img 
+              src={image} 
+              alt={`Image ${index + 1}`} 
+              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} 
+            />
+          ) : (
+            <span style={{ color: "#999" }}></span> 
+          )}
         </div>
+      );
+    })}
+  </div>
+</div>
 
 
-      </div>
+
       <div className='Post'>
         <h1 style={{ margin: "20px" }}>Posts</h1>
 

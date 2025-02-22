@@ -193,7 +193,7 @@ function ProfileAvatar({ user, profileData, token, id }) {
       </div>
       <div className="box" style={{ top: '85%' }}>
         <div className="box-item">
-          <span className="number">{user.posts.length}</span>
+          <span className="number">{profileData?.posts.length}</span>
           <span className="label">Posts</span>
         </div>
         <div className="divider"></div>

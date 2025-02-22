@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-function ProfileTab({ view, setView }) {
+function ProfileTab({ view, setView,profileData,id,user }) {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
@@ -19,7 +19,7 @@ function ProfileTab({ view, setView }) {
       <div className="tab-container">
         <button type='button' className={`p ${view === "posts" ? "active" : ""}`} onClick={() => setView("posts")}>Posts</button>
         <button type='button' className={`i ${view === "Media" ? "active" : ""}`} onClick={() => setView("Media")}>Media</button>
-        <button type='button' className={`v ${view === 'Saved' ? 'active' : ''}`} onClick={() => setView("Saved")}>Saved</button>
+        { id === user._id && (<button type='button' className={`v ${view === 'Saved' ? 'active' : ''}`} onClick={() => setView("Saved")}>Saved</button>)}
       </div>
       <div style={{marginRight: '10%'}}>
         <div className="settings" onClick={handleSvgClick}>

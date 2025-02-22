@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-function ProfileSavedPost({user}) {
+function ProfileSavedPost({user,profileData,token,id}) {
   // Post
   const navigate = useNavigate()
   const handlePostClick = (postId) => {
@@ -10,7 +10,7 @@ function ProfileSavedPost({user}) {
   return (
     <div className='mainS'>
       <div className="posts-container">
-        {user.savedPosts.slice().reverse().map((post, index) => {
+        {profileData?.savedPosts.slice().reverse().map((post, index) => {
           const date = new Date(post.createdAt);
           const formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}, ${date.getFullYear()}`;
           return (

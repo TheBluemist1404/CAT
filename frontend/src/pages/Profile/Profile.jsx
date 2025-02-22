@@ -10,7 +10,7 @@ import ProfileTab from './ProfileTab';
 import ProfileMain from './ProfileMain';
 import ProfileSavedPost from './ProfileSavedPost';
 
-const Profile = ({ token }) => {
+const Profile = ({offset = 0, limit = 999, token }) => {
     const navigate = useNavigate();
     const { isLoggedIn, user } = useContext(AuthContext);
 
@@ -52,6 +52,35 @@ const Profile = ({ token }) => {
             navigate('/auth/login', { replace: true });
         }
     }, [navigate, isLoggedIn])
+    
+    //fetch post
+    const [posts, setPosts] = useState([]);
+
+    useEffect(() => {
+        if (!profileData?._id) return;
+    
+        async function fetchPosts() {
+            try {
+                const response = await axios.get(`http://localhost:3000/api/v1/forum`, {
+                    params: { offset, limit },
+                    headers: {
+                        Authorization: `Bearer ${token?.accessToken}`
+                    }
+                });
+    
+                console.log("Fetched posts:", response.data);
+    
+                
+                const filteredPosts = response.data[0]?.posts.filter(post => post.userCreated._id === profileData._id) || [];
+    
+                setPosts(filteredPosts); 
+            } catch (err) {
+                console.error("Error fetching posts:", err.response?.data?.message || err.message);
+            }
+        }
+    
+        fetchPosts();
+    }, [profileData, offset, limit, token]);
 
     return (
         <div className="profile" style={{ position: 'relative' }}>
@@ -59,9 +88,9 @@ const Profile = ({ token }) => {
 
             <div style={{ zIndex: 1, position: 'relative' }}>
                 <ProfileAvatar user={user} profileData={profileData} id={id}  />
-                <ProfileTab view={view} setView={setView}/>
+                <ProfileTab view={view} setView={setView} user={user} profileData={profileData} id={id}/>
                 
-                {view === "posts" && <ProfileMain user={user} profileData={profileData} token={token} id={id} />}
+                {view === "posts" && <ProfileMain user={user} profileData={profileData} token={token} id={id} posts={posts}  />}
                 {view === "Saved" && <ProfileSavedPost user={user} profileData={profileData} id={id} />}
 
             </div>
