@@ -4,6 +4,9 @@ import { useState, useContext, useEffect, useRef } from "react";
 import { AuthContext } from "../../authentication/AuthProvider";
 import { useNavigate } from 'react-router-dom'
 import DOMPurify from 'dompurify';
+import Prism from "prismjs";
+import "prismjs/themes/prism.css";
+
 
 function Post({ post, token, update }) {
   const navigate = useNavigate();
@@ -28,6 +31,10 @@ function Post({ post, token, update }) {
   const createdDate = new Date(timestamp);
   const now = new Date();
   const timeDiff = (now - createdDate); //in miliseconds
+
+  useEffect(() => {
+    Prism.highlightAll(); // Highlight code after rendering
+  }, [post.content]);
 
   let timeDisplay;
   if (timeDiff < 60 * 1000) {
