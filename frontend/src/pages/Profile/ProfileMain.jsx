@@ -629,8 +629,8 @@ console.log(posts);
 
       </div>
       <div className='im'>
-  <h1 style={{ margin: "20px" }}>Image Gallery</h1>
-  <div className="flex-container" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px" }}>
+  <h1 style={{ margin: "20px" }}>Images</h1>
+  <div className="flex-container">
     {Array.from({ length: 9 }).map((_, index) => {
       const image = posts.flatMap(post => post.images || [])[index]; 
       return (
