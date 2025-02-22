@@ -4,11 +4,13 @@ import arrow from '@live-code-assets/Arrow 1.svg'
 
 import axios from 'axios'
 import {useNavigate} from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { AuthContext } from '../../authentication/AuthProvider';
 import ProjectCard from './ProjectCard';
 
 function LiveCode({token}) {
   const navigate = useNavigate();
+  const {user} = useContext(AuthContext)
   const [projectName, setProjectName] = useState("")
   const [projectDesc, setProjectDesc] = useState("")
   function handleClick () {
@@ -32,10 +34,11 @@ function LiveCode({token}) {
     </div>
     <div className="user">
       <div className="avatar">
-        <img src="" alt="" />
+        <img src={user.avatar} alt="" />
       </div>
-      <div className="code-time"></div>
-      <div className="number-of-projects"></div>
+      <div className='username'>{user.fullName}</div>
+      <div className="code-time">Code hours</div>
+      <div className="number-of-projects">number of projects</div>
     </div>
     <div className="playlist">
       <div className="topbar">

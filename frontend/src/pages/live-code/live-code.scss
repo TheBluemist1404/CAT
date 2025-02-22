@@ -56,7 +56,6 @@
     min-width: 35vh;
     display: flex;
     flex-direction: column;
-    gap: 8vh;
     align-items: center;
 
     .avatar {
@@ -64,12 +63,19 @@
       width: 20vh;
       height: 20vh;
       border-radius: 50%;
+      overflow: hidden;
+      margin-top: 8vh;
+    }
 
-      margin-top: 10vh;
+    .username {
+      margin-top: 20px;
+      font-family: var(--heading-font);
+      font-size: 1.5em;
     }
 
     .code-time,
     .number-of-projects {
+      margin-top: 6vh;
       background-color: var(--box-color);
       min-height: 80px;
       width: 20vh;

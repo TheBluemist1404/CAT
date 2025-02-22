@@ -19,7 +19,6 @@ const Profile = ({offset = 0, limit = 999, token }) => {
     
     const { id } = useParams();
     const [profileData, setProfileData] = useState(null);
-    const [loading, setLoading] = useState(true);
     useEffect(() => {
         async function fetchProfile() {
             if (!id) return;
@@ -41,7 +40,7 @@ const Profile = ({offset = 0, limit = 999, token }) => {
         }
     
         fetchProfile();
-    }, []);
+    }, [id]);
     useEffect(() => {
         console.log("Profile data:", profileData);
       }, [profileData]); 
