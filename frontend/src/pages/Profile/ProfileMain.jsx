@@ -75,7 +75,6 @@ console.log(posts);
 
   const handleRemoveSchool = async (indexToRemove) => {
     if (schools.length > 0) {
-      // Lọc ra danh sách mới mà không có phần tử bị xóa
       const updatedSchools = schools.filter((_, index) => index !== indexToRemove);
       setSchools(updatedSchools);
 
@@ -172,7 +171,6 @@ console.log(posts);
 
   const handleRemoveCompany = async (indexToRemove) => {
     if (companies.length > 0) {
-      // Lọc ra danh sách mới mà không có phần tử bị xóa
       const updatedCompanies = companies.filter((_, index) => index !== indexToRemove);
       setCompanies(updatedCompanies);
 
@@ -280,6 +278,9 @@ console.log(posts);
     navigate(`/forum/${postId}`);
   };
 
+  //----------------------------
+  //Image
+  const [previewImage, setPreviewImage] = useState(null);
   return (
     <div className='main'>
       <div className='bio' >
@@ -629,9 +630,12 @@ console.log(posts);
 
       </div>
       <div className='im'>
-  <h1 style={{ margin: "20px" }}>Images</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "20px" }}>
+  <h1>Images</h1>
+  <p className="view-button" onClick={() => setView("Media")}>View full</p>
+</div>
   <div className="flex-container">
-    {Array.from({ length: 9 }).map((_, index) => {
+    {Array.from({ length: 10 }).map((_, index) => {
       const image = posts.flatMap(post => post.images || [])[index]; 
       return (
         <div key={index} className="flex-item" style={{ 
@@ -649,6 +653,15 @@ console.log(posts);
               src={image} 
               alt={`Image ${index + 1}`} 
               style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} 
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.005)";
+                e.currentTarget.style.filter = "brightness(80%)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.filter = "brightness(100%)";
+              }}
+              onClick={() => setPreviewImage(image)}
             />
           ) : (
             <span style={{ color: "#999" }}></span> 
@@ -657,6 +670,36 @@ console.log(posts);
       );
     })}
   </div>
+  {previewImage && (
+        <div 
+          className="preview-overlay" 
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000
+          }}
+          onClick={() => setPreviewImage(null)}
+        >
+          <img 
+            src={previewImage} 
+            alt="Preview" 
+            style={{
+              width: "auto",
+              height: "90%",
+              objectFit: "cover",
+              borderRadius: "8px",
+              boxShadow: "0px 4px 10px rgba(255, 255, 255, 0.2)"
+            }}
+          />
+        </div>
+      )}
 </div>
 
 
