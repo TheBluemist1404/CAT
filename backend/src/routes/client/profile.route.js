@@ -22,4 +22,10 @@ router.patch(
   controller.changePass,
 );
 
+router.patch(
+  '/change-status/:id',
+  auth.authenticateToken,
+  controller.changeStatus,
+);
+
 module.exports = router;

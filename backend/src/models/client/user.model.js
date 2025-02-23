@@ -44,6 +44,10 @@ const userSchema = new mongoose.Schema(
         ref: 'Post',
       },
     ],
+    isPrivate: {
+      type: Boolean,
+      default: false,
+    },
     // followers: [
     //   {
     //     type: mongoose.Schema.Types.ObjectId,
