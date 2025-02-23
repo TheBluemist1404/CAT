@@ -131,6 +131,12 @@
           .name {
             grid-area: name;
           }
+
+          .name:hover{
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 5px;
+          }
   
           .lang {
             text-align: right;
@@ -148,6 +154,8 @@
 
         }
       }
+
+      
     }
   }
 }

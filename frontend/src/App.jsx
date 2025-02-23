@@ -15,6 +15,7 @@ import Forum from './pages/forum/Forum'
 import Profile from './pages/Profile/Profile'
 import LiveCode from './pages/live-code/LiveCode';
 import CodeEditor from './pages/live-code/CodeEditor';
+import EditorPreview from './pages/live-code/EditorPreview';
 
 function App() {
     const { isLoggedIn, setIsLoggedIn, setUser } = useContext(AuthContext);
@@ -101,6 +102,7 @@ function App() {
                 <Route path='live-code'>
                     <Route index element={<LiveCode token={token} />}/>
                     <Route path=":id" element={<CodeEditor token={token}/>}/>
+                    <Route path="preview/:id" element={<EditorPreview token={token}/>} />
                 </Route>
             </Route>
         </Routes>

@@ -1,0 +1,22 @@
+.editor-preview {
+  height: 100%;
+  padding: 10% 100px;
+
+  .container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    height: 100%;
+    
+
+    .details {
+      flex: 1;
+      background-color: black;
+    }
+
+    .preview {
+      background-color: white;
+      flex: 3;
+    }
+  }
+}

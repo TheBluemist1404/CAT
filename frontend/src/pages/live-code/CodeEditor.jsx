@@ -4,6 +4,7 @@ import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
 import { Awareness } from "y-protocols/awareness";
 import Editor from "@monaco-editor/react";
+import { useResizeDetector } from 'react-resize-detector';
 
 import axios from 'axios';
 import { useRef, useState, useEffect } from "react";
@@ -37,14 +38,13 @@ function CodeEditor({ token }) {
   }, [])
 
   useEffect(() => {
+    if (project.name) {
+      setProjectName(project.name);
+    }
+
     if (project.files && project.files.length && ytext.toString() === "") { // Sync Ytext with current data to avoid overwrite
       ytext.insert(0, project.files[0].content);
       setProjectContent(project.files[0]);
-    }
-
-    setProjectName(project.name);
-    if (project.files && project.files.length) {
-      setProjectContent(project.files[0])
     }
   }, [project])
 
@@ -71,6 +71,9 @@ function CodeEditor({ token }) {
 
   async function handleEditorDidMount(editor) {
     editorRef.current = editor;
+    if (editorRef.current) {
+      editorRef.current.layout();
+    }
     const { MonacoBinding } = await import("y-monaco");
     // Bind Yjs text syncing to Monaco editor model
     new MonacoBinding(ytext, editor.getModel(), new Set([editor]), awareness);
@@ -361,58 +364,72 @@ function CodeEditor({ token }) {
     console.log(response.data)
   }
 
+  const { width, height, ref } = useResizeDetector({
+    handleWidth: true,
+    handleHeight: true,
+    onResize: () => {
+      console.log("resize")
+      if (editorRef.current) {
+        editorRef.current.layout();
+      }
+    },
+  });
+
   return (
     <div className="code-editor">
-      <div className="sidebar">
-        <div className='logo'>
-          <img src={logo} alt="logo" onClick={() => { navigate('/') }} />
-          <div className='language'>
-            <label htmlFor="language">Language:</label>
-            <select name="language" id="lang" value={lang} onChange={handleLanguage}>
-              {(mode == "default") && <option value="javascript">Javascript</option>}
-              <option value="cpp">C++</option>
-              <option value="python">Python</option>
-            </select>
-          </div>
-          <div className="mode">
-            <label htmlFor="mode">Mode:</label>
-            <select name="mode" id="mode" value={mode} onChange={handleMode}>
-              <option value="default">Default</option>
-              <option value="competitive">Competitive</option>
-            </select>
+      <div className="container">
+        <div className="sidebar">
+          <div className='logo'>
+            <img src={logo} alt="logo" onClick={() => { navigate('/') }} />
+            <div className='language'>
+              <label htmlFor="language">Language:</label>
+              <select name="language" id="lang" value={lang} onChange={handleLanguage}>
+                {(mode == "default") && <option value="javascript">Javascript</option>}
+                <option value="cpp">C++</option>
+                <option value="python">Python</option>
+              </select>
+            </div>
+            <div className="mode">
+              <label htmlFor="mode">Mode:</label>
+              <select name="mode" id="mode" value={mode} onChange={handleMode}>
+                <option value="default">Default</option>
+                <option value="competitive">Competitive</option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="code-editor">
-        <div className="project-name">{projectName}</div>
-        <div className="run-code">
-          <button className='run-button' onClick={execute}>Run code</button>
-        </div>
-        <div className="codespace">
-          <div className="code-input" ref={editorContainerRef}>
-            <div className="text-editor">
-              <Editor
-                height={getHeight(mode)}
-                language={lang}
-                value={projectContent ? projectContent.content : "no content"}
-                theme='vs-dark'
-                onMount={handleEditorDidMount}
-                onChange={handleChange}
-                options={{
-                  fontSize: 20
-                }}
-              />
-            </div>
-            {(mode === "competitive") && (<div className='input-field'>
-              <textarea name="" id="" placeholder='Input field' ref={inputRef}></textarea>
-            </div>)}
+        <div className="code-editor-main">
+          <div className="project-name">{projectName}</div>
+          <div className="run-code">
+            <button className='run-button' onClick={execute}>Run code</button>
           </div>
-          <div className="display">
-            <div className="code-display">
-              {codeDisplay ? codeDisplay.join('') : []}
+          <div className="codespace">
+            <div className="code-input" ref={editorContainerRef}>
+              <div className="text-editor" ref={ref}>
+                <Editor
+                  // height={getHeight(mode)}
+                  language={lang}
+                  value={projectContent ? projectContent.content : 'no content'}
+                  theme="vs-dark"
+                  onMount={handleEditorDidMount}
+                  onChange={handleChange}
+                  options={{
+                    automaticLayout: true,
+                    fontSize: 20,
+                  }}
+                />
+              </div>
+              {(mode === "competitive") && (<div className='input-field'>
+                <textarea name="" id="" placeholder='Input field' ref={inputRef}></textarea>
+              </div>)}
             </div>
-            <div className="error-display">
-              {errorDisplay}
+            <div className="display">
+              <div className="code-display">
+                {codeDisplay ? codeDisplay.join('') : []}
+              </div>
+              <div className="error-display">
+                {errorDisplay}
+              </div>
             </div>
           </div>
         </div>
