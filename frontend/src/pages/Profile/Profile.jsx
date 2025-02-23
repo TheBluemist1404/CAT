@@ -8,6 +8,7 @@ import axios from 'axios';
 import ProfileAvatar from './ProfileAvatar';
 import ProfileTab from './ProfileTab';
 import ProfileMain from './ProfileMain';
+import ProfileMedia from './ProfileMedia';
 import ProfileSavedPost from './ProfileSavedPost';
 
 const Profile = ({offset = 0, limit = 999, token }) => {
@@ -91,6 +92,7 @@ const Profile = ({offset = 0, limit = 999, token }) => {
                 <ProfileTab view={view} setView={setView} user={user} profileData={profileData} id={id}/>
                 
                 {view === "posts" && <ProfileMain user={user} profileData={profileData} token={token} id={id} posts={posts}  />}
+                {view === "Media" && <ProfileMedia user={user} profileData={profileData} token={token} id={id} posts={posts} />}
                 {view === "Saved" && <ProfileSavedPost user={user} profileData={profileData} id={id} />}
 
             </div>
