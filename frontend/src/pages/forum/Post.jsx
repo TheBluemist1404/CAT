@@ -482,34 +482,45 @@ function Post({ post, token, update }) {
         <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }} style={{cursor:'pointer'}}>{post.title}</h1>
         <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
         <div className="post-gallery-container">
-      <div className={`post-gallery-grid-container ${getGridClass(images.length)}`}>
-        {images.map((img, index) => (
-          index === 4 && remainingCount > 0 ? (
-            <div key={index} className="post-gallery-overlay-container" onClick={() => handleClick(index)}>
-              <img src={img} alt={`img-${index}`} className="post-gallery-blurred-image" />
-              <div className="post-gallery-overlay-text">+{remainingCount}</div>
-            </div>
-          ) : (
-            <img
-              key={index}
-              src={img}
-              alt={`img-${index}`}
-              onClick={() => handleClick(index)}
-              className="post-gallery-image"
-            />
-          )
-        ))}
-      </div>
-
-      {isOpen && (
-        <div className="post-gallery-modal">
-          <button className="post-gallery-close-button" onClick={() => setIsOpen(false)}>✖</button>
-          <button className="post-gallery-nav-button post-gallery-left" onClick={() => setPhotoIndex((photoIndex - 1 + post.images.length) % post.images.length)}>◀</button>
-          <img src={post.images[photoIndex]} alt="Enlarged" className="post-gallery-modal-image" />
-          <button className="post-gallery-nav-button post-gallery-right" onClick={() => setPhotoIndex((photoIndex + 1) % post.images.length)}>▶</button>
+        <div className={`post-gallery-grid-container ${getGridClass(images.length)}`}>
+          {images.map((img, index) => (
+            index === 4 && remainingCount > 0 ? (
+              <div key={index} className="post-gallery-overlay-container" style={{ gridColumn: 'span 2' }} onClick={() => handleClick(index)}>
+                <img src={img} alt={`img-${index}`} className="post-gallery-blurred-image" />
+                <div className="post-gallery-overlay-text">+{remainingCount}</div>
+              </div>
+            ) : (
+              <img
+                key={index}
+                src={img}
+                alt={`img-${index}`}
+                onClick={() => handleClick(index)}
+                className="post-gallery-image"
+                style={index === 4 ? { gridColumn: 'span 2' } : {}}
+              />
+            )
+          ))}
         </div>
-      )}
-    </div>
+
+        {isOpen && (
+          <div className="post-gallery-modal">
+            <button className="post-gallery-close-button" onClick={() => setIsOpen(false)}>✖</button>
+            <button className="post-gallery-nav-button post-gallery-left" onClick={() => setPhotoIndex((photoIndex - 1 + post.images.length) % post.images.length)}>◀</button>
+
+            <img src={post.images[photoIndex]} alt="Enlarged" className="post-gallery-modal-image" />
+
+            <button className="post-gallery-nav-button post-gallery-right" onClick={() => setPhotoIndex((photoIndex + 1) % post.images.length)}>▶</button>
+
+            {/* <div className="post-gallery-index">{photoIndex + 1} / {post.images.length}</div> */}
+
+            <div className="post-gallery-dots">
+              {post.images.map((_, i) => (
+                <span key={i} className={`dot ${i === photoIndex ? "active" : ""}`} onClick={() => setPhotoIndex(i)}></span>
+              ))}
+            </div>
+          </div>
+        )}
+        </div>
         <div className="tag-box">
           {tag.map((tag, index) => (
             <div className="post-tags" key={index}>{tag}</div>
