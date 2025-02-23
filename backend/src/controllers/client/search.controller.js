@@ -4,6 +4,7 @@ const User = require('../../models/client/user.model');
 const Comment = require('../../models/client/comment.model');
 const Like = require('../../models/client/like.model');
 const unidecode = require('unidecode');
+const { pickInfoData } = require('../../utils/getInfoData');
 
 // [GET] /api/v1/forum/search
 module.exports.search = async (req, res) => {
@@ -187,6 +188,12 @@ module.exports.search = async (req, res) => {
         const users = await User.find({
           slug: new RegExp(qRegex, 'i'),
           deleted: false,
+        }).lean();
+
+        users.forEach(user => {
+          if (user.isPrivate) {
+            user = pickInfoData(['_id', 'fullName', 'avatar'], user);
+          }
         });
 
         res.status(200).json(users);

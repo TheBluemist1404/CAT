@@ -25,6 +25,7 @@ function CodeEditor({ token }) {
   const [project, setProject] = useState({})
   const [projectName, setProjectName] = useState("")
   const [projectContent, setProjectContent] = useState({})
+  const editorRef = useRef(null);
 
   useEffect(() => {
     async function fetchProject() {
@@ -36,17 +37,16 @@ function CodeEditor({ token }) {
   }, [])
 
   useEffect(() => {
+    if (project.files && project.files.length && ytext.toString() === "") { // Sync Ytext with current data to avoid overwrite
+      ytext.insert(0, project.files[0].content);
+      setProjectContent(project.files[0]);
+    }
+
     setProjectName(project.name);
     if (project.files && project.files.length) {
       setProjectContent(project.files[0])
     }
   }, [project])
-
-  useEffect(() => {
-    if (!projectContent) {
-      console.log("content not updated yet")
-    } 
-  }, [projectContent])
 
   // -------------------------------
   //Setup monaco editor with Yjs binding
@@ -57,7 +57,6 @@ function CodeEditor({ token }) {
 
   // Create awareness instance (using Yjs document)
   const awareness = new Awareness(ydoc.current);
-  const editorRef = useRef(null);
   const decorationsRef = useRef([]); // to track remote decorations
 
   useEffect(() => {
@@ -97,7 +96,7 @@ function CodeEditor({ token }) {
       awareness.setLocalStateField("cursor", { relPos, color: clientColor });
     });
 
-    editor.onDidChangeCursorSelection((event)=> {
+    editor.onDidChangeCursorSelection((event) => {
       const model = editor.getModel();
       const selection = event.selection;
       // Convert the selection range to offsets.
@@ -395,7 +394,7 @@ function CodeEditor({ token }) {
               <Editor
                 height={getHeight(mode)}
                 language={lang}
-                value={projectContent ? projectContent.content : ""}
+                value={projectContent ? projectContent.content : "no content"}
                 theme='vs-dark'
                 onMount={handleEditorDidMount}
                 onChange={handleChange}
