@@ -19,6 +19,7 @@ const Profile = ({offset = 0, limit = 999, token }) => {
 
     
     const { id } = useParams();
+    console.log(id);
     const [profileData, setProfileData] = useState(null);
     useEffect(() => {
         async function fetchProfile() {

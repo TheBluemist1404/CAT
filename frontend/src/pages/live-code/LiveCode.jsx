@@ -18,21 +18,24 @@ function LiveCode({token}) {
   useEffect(()=>{
     async function fetchProjects() {
       const response = await axios.get('http://localhost:3000/api/v1/projects', { headers: { Authorization: `Bearer ${token.accessToken}` } }, {user: {id: user._id}})
-      // console.log(response.data[0])
       setProjects(response.data)
     }
 
     fetchProjects();
   }, [])
-  function handleClick () {
 
+  async function createProject () {
+    try {
+      const response = await axios.post('http://localhost:3000/api/v1/projects', {name: "Untitled", description: "write someting..."}, {headers: {Authorization: `Bearer ${token.accessToken}`}})
+      if (response) {
+        console.log(response.data)
+        navigate(`/live-code/preview/${response.data._id}`)
+      }
+    } catch (error) {
+      console.error("error create project", error.message)
+    }
   }
-  async function createProject(e) {
-    e.preventDefault();
 
-    const response = await axios.post('http://localhost:3000/api/v1/projects/${}', { name: projectName, description: projectDesc}, {headers: `Bearer ${token.accessToken}`})
-    console.log(response.data)
-  }
 
   return (
   <div className='live-code'>
@@ -53,7 +56,7 @@ function LiveCode({token}) {
     </div>
     <div className="playlist">
       <div className="topbar">
-        <div className="create-project" onClick={handleClick}>+ New Project</div>
+        <div className="create-project" onClick={createProject}>+ New Project</div>
       </div>
       <div className="projects">
         {projects && projects.map((project, index) => (
