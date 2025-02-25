@@ -17,8 +17,10 @@
 #root{
   height: 100%;
 }
-
-html, body {
+html {
+  height: 100%;
+}
+body {
   height: 100%;
   color: var(--text-color);
   background-color: var(--primary-color);

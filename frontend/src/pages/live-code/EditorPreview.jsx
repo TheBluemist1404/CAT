@@ -1,24 +1,168 @@
-import './editor-preview.scss'
+import "./editor-preview.scss";
+import add from "@live-code-assets/add-person.svg";
 
-import { useNavigate } from "react-router-dom"
-import CodeEditor from "./CodeEditor"
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useContext } from "react";
 
-function EditorPreview ({token}) {
-  const projectId = window.location.href.split('/').pop();
-  const navigate = useNavigate()
-  return(
+import { AuthContext } from "../../authentication/AuthProvider";
+import CodeEditor from "./CodeEditor";
+import Button from "./Button";
+import Member from "./Member";
+
+function EditorPreview({ token, preview }) {
+  const projectId = window.location.href.split("/").pop();
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const [detail, setDetail] = useState({});
+  const [renderInvite, setRenderInvite] = useState(false);
+  const [display, setDisplay] = useState(false);
+  const [email, setEmail] = useState("");
+
+  async function fetchProject() {
+    const response = await axios.get(
+      `http://localhost:3000/api/v1/projects/${projectId}`,
+      { headers: { Authorization: `Bearer ${token.accessToken}` } }
+    );
+    if (response) {
+      setDetail(response.data);
+      console.log(response.data.owner[0]._id === user._id)
+      setRenderInvite(response.data.owner[0]._id === user._id);
+    }
+  }
+
+  useEffect(() => {
+    fetchProject();
+  }, []);
+
+  function handleName(event) {
+    async function updateDesc(e) {
+      const input = e.target.innerHTML;
+      const response = await axios.patch(
+        `http://localhost:3000/api/v1/projects/${projectId}`,
+        { name: input },
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
+      console.log(response.data);
+    }
+
+    updateDesc(event);
+  }
+
+  function handleDesc(event) {
+    async function updateDesc(e) {
+      const input = e.target.innerHTML;
+      const response = await axios.patch(
+        `http://localhost:3000/api/v1/projects/${projectId}`,
+        { description: input },
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
+      console.log(response.data);
+    }
+
+    updateDesc(event);
+  }
+
+  async function addMember() {
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/api/v1/projects/${projectId}/collaborators`,
+        { email: email },
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
+      if (response) {
+        console.log(response.data);
+        fetchProject();
+      }
+    } catch (error) {
+      console.error("error adding member", error.message);
+    }
+  }
+
+  function renderingInvite() {
+    if (renderInvite) {
+      return (
+        <div
+          className="add"
+          onClick={() => {
+            setDisplay(() => !display);
+          }}
+        >
+          <div className="img-container">
+            <img src={add} alt="" />
+          </div>
+          Invite
+        </div>
+      );
+    }
+  }
+
+  return (
     <div className="editor-preview">
       <div className="container">
-        <div className="details">details
-          <div onClick={()=>{navigate(`/live-code/${projectId}`)}}>To Code Editor</div>
+        <div className="details">
+          <div className="container">
+            <div
+              className="project-name"
+              contentEditable={true}
+              onInput={handleName}
+            >
+              {detail.name}
+            </div>
+            <div className="desc" contentEditable={true} onInput={handleDesc}>
+              {detail.description}
+            </div>
+            <div
+              className="navigate"
+              onClick={() => {
+                navigate(`/live-code/${projectId}`);
+              }}
+            >
+              <Button />
+            </div>
+            <div className="band">
+              {renderingInvite()}
+              <div
+                className="members"
+                style={{ display: display ? "flex" : "none" }}
+              >
+                <div className="invite">
+                  <input
+                    type="text"
+                    placeholder="Add member by email"
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                    }}
+                  />
+                  <div className="invite-button" onClick={addMember}>
+                    Invite
+                  </div>
+                </div>
+                <div className="members-container">
+                  {detail.collaborators &&
+                    detail.collaborators.map((member, index) => (
+                      <div
+                        className="member-container"
+                        key={index}
+                        onClick={() => {
+                          navigate(`/profile/${member._id}`);
+                        }}
+                      >
+                        <Member member={member} />
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="preview">
-          <CodeEditor token={token}>
-          </CodeEditor>
+          <CodeEditor token={token} preview={preview} />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default EditorPreview
+export default EditorPreview;

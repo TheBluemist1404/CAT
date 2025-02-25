@@ -20,7 +20,7 @@ function getRandomColor() {
 const clientColor = getRandomColor(); // Static color for this client
 
 
-function CodeEditor({ token }) {
+function CodeEditor({ token, preview }) {
   //Get Project info
   const projectId = window.location.href.split('/').pop();
   const [project, setProject] = useState({})
@@ -282,7 +282,8 @@ function CodeEditor({ token }) {
 
   const execute = async () => {
     try {
-      setCodeDisplay([])
+      if (!preview) {
+        setCodeDisplay([])
       setErrorDisplay("")
       const code = editorRef.current.getValue()
       if (code) {
@@ -322,6 +323,7 @@ function CodeEditor({ token }) {
       ws.onerror = (error) => {
         console.error("⚠️ WebSocket error:", error);
       };
+      }
 
     } catch (error) {
       console.error("❌ Axios Error:", error.response ? error.response.data : error.message);
@@ -358,9 +360,9 @@ function CodeEditor({ token }) {
     console.log("Selected Mode:", selectedMode); // ✅ Debugging log
   };
   // ---------------------------------
-  async function handleChange() {
+  async function handleChange(e) {
     const code = editorRef.current.getValue();
-    const response = await axios.patch(`http://localhost:3000/api/v1/projects/${projectId}`, { "files": [{ "name": "main", "content": code, "language": lang }] }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
+    const response = await axios.patch(`http://localhost:3000/api/v1/projects/${projectId}`, { name: e.target.innerHTML, files: [{ name: "main", content: code, language: lang }] }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
     console.log(response.data)
   }
 
@@ -380,10 +382,10 @@ function CodeEditor({ token }) {
       <div className="container">
         <div className="sidebar">
           <div className='logo'>
-            <img src={logo} alt="logo" onClick={() => { navigate('/') }} />
+            <img src={logo} alt="logo" onClick={() => { if (!preview) navigate('/live-code') }} />
             <div className='language'>
               <label htmlFor="language">Language:</label>
-              <select name="language" id="lang" value={lang} onChange={handleLanguage}>
+              <select disabled={preview} name="language" id="lang" value={lang} onChange={handleLanguage}>
                 {(mode == "default") && <option value="javascript">Javascript</option>}
                 <option value="cpp">C++</option>
                 <option value="python">Python</option>
@@ -391,7 +393,7 @@ function CodeEditor({ token }) {
             </div>
             <div className="mode">
               <label htmlFor="mode">Mode:</label>
-              <select name="mode" id="mode" value={mode} onChange={handleMode}>
+              <select disabled={preview} name="mode" id="mode" value={mode} onChange={handleMode}>
                 <option value="default">Default</option>
                 <option value="competitive">Competitive</option>
               </select>
@@ -399,7 +401,7 @@ function CodeEditor({ token }) {
           </div>
         </div>
         <div className="code-editor-main">
-          <div className="project-name">{projectName}</div>
+          <div className="project-name" contentEditable={true} onInput={handleChange}>{projectName}</div>
           <div className="run-code">
             <button className='run-button' onClick={execute}>Run code</button>
           </div>
@@ -407,13 +409,13 @@ function CodeEditor({ token }) {
             <div className="code-input" ref={editorContainerRef}>
               <div className="text-editor" ref={ref}>
                 <Editor
-                  // height={getHeight(mode)}
                   language={lang}
                   value={projectContent ? projectContent.content : 'no content'}
                   theme="vs-dark"
                   onMount={handleEditorDidMount}
                   onChange={handleChange}
                   options={{
+                    readOnly: preview,
                     automaticLayout: true,
                     fontSize: 20,
                   }}

@@ -65,9 +65,16 @@
       border-radius: 50%;
       overflow: hidden;
       margin-top: 8vh;
+
+      object-fit: cover;
+
+      img{
+        width: 100%;
+      }
     }
 
     .username {
+      width: 70%;
       margin-top: 20px;
       font-family: var(--heading-font);
       font-size: 1.5em;
@@ -97,6 +104,12 @@
         border-radius: 27px;
         padding: 15px;
         background-color: var(--box-color);
+        transition: background-color 100ms ease-in
+      }
+
+      .create-project:hover{
+        cursor: pointer;
+        background-color: var(--primary-color);
       }
     }
 
@@ -132,21 +145,21 @@
             grid-area: name;
           }
 
-          .name:hover{
+          .name:hover {
             cursor: pointer;
             text-decoration: underline;
             text-underline-offset: 5px;
           }
-  
+
           .lang {
             text-align: right;
             grid-area: lang;
           }
-  
+
           .createdAt {
             grid-area: createdAt;
           }
-  
+
           .band {
             text-align: right;
             grid-area: band;
@@ -155,7 +168,7 @@
         }
       }
 
-      
+
     }
   }
 }

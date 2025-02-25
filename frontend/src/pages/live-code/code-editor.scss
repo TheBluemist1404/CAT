@@ -64,7 +64,6 @@
       }
 
       .codespace {
-        background-color: grey;
         flex-grow: 1;
         display: flex;
         flex-direction: row;
@@ -78,6 +77,8 @@
           flex-direction: column;
           gap: 10px;
           height: 100%;
+
+          margin-bottom: -100px; //This somehow keep the editor not overflowing
 
           .text-editor {
             height: 100%;
