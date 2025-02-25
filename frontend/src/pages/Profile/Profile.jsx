@@ -87,7 +87,7 @@ const Profile = ({offset = 0, limit = 999, token }) => {
             <div style={{ zIndex: 2, position: 'relative' }}><Header token={token} isAuth={false} /></div>
 
             <div style={{ zIndex: 1, position: 'relative' }}>
-                <ProfileAvatar user={user} profileData={profileData} id={id}  />
+                <ProfileAvatar user={user} profileData={profileData} id={id} token={token}  />
                 <ProfileTab view={view} setView={setView} user={user} profileData={profileData} id={id}/>
                 
                 {view === "posts" && <ProfileMain user={user} profileData={profileData} token={token} id={id} posts={posts}  />}

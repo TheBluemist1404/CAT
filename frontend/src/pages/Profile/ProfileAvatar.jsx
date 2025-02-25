@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-
+import axios from "axios";
 import AvatarEditor from "react-avatar-editor";
 
 
@@ -21,6 +21,7 @@ function ProfileAvatar({ user, profileData, token, id }) {
       setSelectedFile(file);
     }
   };
+  console.log("Token:", token);
 
   const handleUpload = async () => {
     if (!selectedFile) {
