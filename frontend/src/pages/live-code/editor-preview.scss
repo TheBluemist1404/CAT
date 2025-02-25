@@ -7,6 +7,25 @@ $bg-color: #0c0c0c;
 
   font-family: var(--code-font);
 
+  .back {
+    position: absolute;
+    top: 20px;
+    left: 7%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .home {
+      text-decoration: none;
+    }
+
+    .home:hover {
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 5px;
+    }
+  }
+  
   .container {
     display: flex;
     flex-direction: row;
@@ -34,10 +53,10 @@ $bg-color: #0c0c0c;
         align-items: center;
         justify-content: center;
 
-        .project-name{
+        .project-name {
           width: 70%;
           min-height: 50px;
-          max-height: 20%;  
+          max-height: 20%;
           padding: 5px 10px;
           display: flex;
           align-items: center;
@@ -47,13 +66,13 @@ $bg-color: #0c0c0c;
           font-family: var(--heading-font);
           font-size: 30px;
         }
-        
-        .name:focus{
+
+        .name:focus {
           border: none;
           border-bottom: 2px solid var(--box-color);
         }
 
-        .desc {          
+        .desc {
           background-color: var(--box-color);
           width: 70%;
           min-height: 50px;
@@ -108,7 +127,7 @@ $bg-color: #0c0c0c;
             }
           }
 
-          .add:hover{
+          .add:hover {
             background-color: #161616;
           }
 
@@ -173,22 +192,41 @@ $bg-color: #0c0c0c;
                 .member {
                   border-radius: 5px;
                   cursor: pointer;
+                  padding: 10px;
                   display: flex;
                   flex-direction: row;
-                  gap: 10px;
+                  justify-content: space-between;
+                  gap: 20px;
 
-                  padding: 10px;
+                  .member-info {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: row;
+                    gap: 10px;
 
-                  .avatar {
-                    width: 20px;
-                    height: 20px;
-                    border-radius: 50%;
-                    overflow: hidden;
+                    .avatar {
+                      min-width: 20px;
+                      height: 20px;
+                      border-radius: 50%;
+                      overflow: hidden;
 
-                    img {
-                      width: 100%;
-                      height: 100%;
+                      img {
+                        width: 100%;
+                        height: 100%;
+                      }
                     }
+                  }
+
+                  .remove{
+                    display: flex;
+                    justify-content: center;
+                    font-size: 14px;
+                    color: #49494f;
+                    opacity: .8;
+                  }
+
+                  .remove:hover{
+                    color: var(--highlight-red)
                   }
                 }
 

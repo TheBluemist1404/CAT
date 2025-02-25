@@ -50,7 +50,7 @@ function LiveCode({token}) {
       <div className="avatar">
         <img src={user.avatar} alt="" />
       </div>
-      <div className='username'>{user.fullName}</div>
+      <div className='username'>{user.fullName.length <= 15 ? user.fullName: user.fullName.substr(0, 10)}</div>
       <div className="code-time">Code hours</div>
       <div className="number-of-projects">number of projects</div>
     </div>
