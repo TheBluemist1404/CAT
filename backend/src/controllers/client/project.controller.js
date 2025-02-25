@@ -135,12 +135,13 @@ module.exports.getProject = async (req, res) => {
     }
 
     if (
-      !projects[0].owner.equals(userId) &&
-      !projects[0].collaborators.includes(new mongoose.Types.ObjectId(userId))
+      !projects[0].owner[0]._id.equals(userId) &&
+      !projects[0].collaborators.some(collab => collab._id.equals(userId))
     ) {
       res.status(403).json({ message: 'Access denied!' });
       return;
     }
+    
 
     const folders = await Promise.all(
       projects[0].folders.map(

@@ -4,15 +4,26 @@ import arrow from '@live-code-assets/Arrow 1.svg'
 
 import axios from 'axios'
 import {useNavigate} from 'react-router-dom';
-import { useState, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../authentication/AuthProvider';
 import ProjectCard from './ProjectCard';
 
 function LiveCode({token}) {
   const navigate = useNavigate();
   const {user} = useContext(AuthContext)
+  const [projects, setProjects] = useState();
   const [projectName, setProjectName] = useState("")
   const [projectDesc, setProjectDesc] = useState("")
+
+  useEffect(()=>{
+    async function fetchProjects() {
+      const response = await axios.get('http://localhost:3000/api/v1/projects', { headers: { Authorization: `Bearer ${token.accessToken}` } }, {user: {id: user._id}})
+      // console.log(response.data[0])
+      setProjects(response.data)
+    }
+
+    fetchProjects();
+  }, [])
   function handleClick () {
 
   }
@@ -45,9 +56,9 @@ function LiveCode({token}) {
         <div className="create-project" onClick={handleClick}>+ New Project</div>
       </div>
       <div className="projects">
-        <ProjectCard></ProjectCard>
-        <ProjectCard></ProjectCard>
-        <ProjectCard></ProjectCard>
+        {projects && projects.map((project, index) => (
+          <ProjectCard key={index} info={project}></ProjectCard>
+        ))}
       </div>
     </div>
   </div>)

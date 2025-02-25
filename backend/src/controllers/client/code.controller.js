@@ -3,7 +3,6 @@ const WebSocket = require('ws');
 
 
 const wssExecute = new WebSocket.Server({ port: 3001 }); // ✅ WebSocket Server
-const wssColab = new WebSocket.Server({ port: 3002 })
 
 const executions = {}; // Stores active WebSocket connections
 
@@ -85,5 +84,3 @@ wssExecute.on("connection", (ws, req) => {
 
   console.log(`✅ WebSocket connected for execution ID: ${executionId}`);
 });
-
-// wssColab.on()
