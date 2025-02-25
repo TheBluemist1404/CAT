@@ -25,7 +25,7 @@ function ProjectCard ({info}) {
   }
 
   function handleCick() {
-    navigate(`/live-code/preview/${info._id}`)
+    navigate(`/live-code/preview/${info._id}`, {replace: true})
   }
   return(
   <div className="project-card">

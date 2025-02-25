@@ -67,7 +67,7 @@ function Header({token, isAuth}) {
                         <div style={{ position: 'absolute', top: '-25px', right: '20px' }}>
                             <div className='logged-in' onClick={toggleDropdown}>
                                 <div className="avatar"><img src={user.avatar} alt="" /></div>
-                                <div className='username'>{user.fullName}</div>
+                                <div className='username'>{user.fullName.length <= 15 ? user.fullName: user.fullName.substr(0, 10)}</div>
                             </div>
                             <div className="action" style={{ height: dropdown ? '100px' : '0' }}>
                                 <div className="container">

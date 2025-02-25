@@ -78,6 +78,9 @@
       margin-top: 20px;
       font-family: var(--heading-font);
       font-size: 1.5em;
+
+      display: flex;
+      justify-content: center;
     }
 
     .code-time,
@@ -92,7 +95,7 @@
   .playlist {
     min-width: 35%;
     margin-left: 10%;
-    min-height: 80vh;
+    height: 80vh;
 
     .topbar {
       display: flex;
@@ -115,6 +118,8 @@
 
     .projects {
       width: 100%;
+      max-height: calc(100% - 150px);
+      overflow: auto;
       display: flex;
       flex-direction: column;
       gap: 20px;

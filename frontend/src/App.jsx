@@ -101,7 +101,7 @@ function App() {
                 </Route>
                 <Route path='live-code'>
                     <Route index element={<LiveCode token={token} />}/>
-                    <Route path=":id" element={<CodeEditor token={token} preview={false}/>}/>
+                    <Route path="editor/:id" element={<CodeEditor token={token} preview={false}/>}/>
                     <Route path="preview/:id" element={<EditorPreview token={token} preview={true}/>} />
                 </Route>
             </Route>
