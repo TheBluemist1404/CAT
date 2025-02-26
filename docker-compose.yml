@@ -21,9 +21,9 @@ services:
     container_name: signaling-server
     restart: always
     ports:
-      - "4444:4040"  # Mapping host port 4444 to container's internal 8080
+      - "4444:4444"  # Mapping host port 4444 to container's internal 8080
     environment:
-      - PORT=4040  # Must match the ENV PORT in Dockerfile
+      - PORT=4444  # Must match the ENV PORT in Dockerfile
 
   sandbox-js:
     build: ./sandbox-js
