@@ -16,6 +16,15 @@ services:
   #     - sandbox-cpp
   #     - redis
 
+  signaling-server:
+    build: ./y-webrtc
+    container_name: signaling-server
+    restart: always
+    ports:
+      - "4444:4040"  # Mapping host port 4444 to container's internal 8080
+    environment:
+      - PORT=4040  # Must match the ENV PORT in Dockerfile
+
   sandbox-js:
     build: ./sandbox-js
     container_name: sandbox-js

@@ -41,7 +41,7 @@ const PlaneAnimation = () => {
         }}
       >
         <svg width="506" height="1632" viewBox="30 -20 506 1632" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ position: 'relative', left: '50%' }}>
-          <path id='curvePath' d="M44.4994 0.50107C1080 299.501 47 586.5 44.5 796.5C42 1006.5 521.499 868.502 492 1141C462.5 1413.5 1.00001 1631.5 1.00001 1631.5" stroke="black" stroke-dasharray="10.1 10.1" />
+          <path id='curvePath' d="M44.4994 0.50107C1080 299.501 47 586.5 44.5 796.5C42 1006.5 521.499 868.502 492 1141C462.5 1413.5 1.00001 1631.5 1.00001 1631.5" stroke="black" strokeDasharray="10.1 10.1" />
           <PlaneIcon progress={scrollProgress} />
         </svg>
       </div>
