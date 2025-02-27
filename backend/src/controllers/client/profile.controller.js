@@ -86,7 +86,7 @@ module.exports.edit = async (req, res) => {
       if (req.body.schools) cachedData.schools = req.body.schools;
       if (req.body.companies) cachedData.companies = req.body.companies;
       if (req.body.avatar) cachedData.avatar = req.body.avatar;
-
+      if (req.body.duration) cachedData.duration = req.body.duration;
 
       await redisClient.setEx(
         `${process.env.CACHE_PREFIX}:profile:${id}`,
