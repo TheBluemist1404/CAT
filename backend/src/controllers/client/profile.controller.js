@@ -25,7 +25,7 @@ module.exports.index = async (req, res) => {
     }
 
     if (user.isPrivate && req.user.id !== id) {
-      const data = pickInfoData(['_id', 'fullName', 'avatar'], user);
+      const data = pickInfoData(['_id', 'fullName', 'avatar', 'isPrivate'], user);
       res.status(200).json(data);
       return;
     }
