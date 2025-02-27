@@ -1,5 +1,7 @@
 import "./editor-preview.scss";
 import add from "@live-code-assets/add-person.svg";
+import arrow from "@live-code-assets/Arrow 1.svg";
+
 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -27,8 +29,8 @@ function EditorPreview({ token, preview }) {
     );
     if (response) {
       setDetail(response.data);
-      console.log(response.data.owner[0]._id === user._id)
-      setRenderInvite(response.data.owner[0]._id === user._id);
+      console.log(response.data.owner[0]._id === user._id);
+      setRenderInvite(response.data.owner[0]._id === user._id); // Collaborators wont be able to invite others
     }
   }
 
@@ -100,6 +102,12 @@ function EditorPreview({ token, preview }) {
 
   return (
     <div className="editor-preview">
+      <div className="back">
+        <div className="home" onClick={() => navigate("/live-code")}>
+          Live Code
+        </div>
+        <img src={arrow} alt="" />
+      </div>
       <div className="container">
         <div className="details">
           <div className="container">
@@ -116,7 +124,7 @@ function EditorPreview({ token, preview }) {
             <div
               className="navigate"
               onClick={() => {
-                navigate(`/live-code/${projectId}`);
+                navigate(`/live-code/editor/${projectId}`);
               }}
             >
               <Button />
@@ -142,14 +150,13 @@ function EditorPreview({ token, preview }) {
                 <div className="members-container">
                   {detail.collaborators &&
                     detail.collaborators.map((member, index) => (
-                      <div
-                        className="member-container"
-                        key={index}
-                        onClick={() => {
-                          navigate(`/profile/${member._id}`);
-                        }}
-                      >
-                        <Member member={member} />
+                      <div className="member-container" key={index}>
+                        <Member
+                          member={member}
+                          projectId={projectId}
+                          token={token}
+                          fetchProject={fetchProject}
+                        />
                       </div>
                     ))}
                 </div>

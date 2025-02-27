@@ -1,16 +1,16 @@
-import './code-editor.scss'
+import "./code-editor.scss";
 
 import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
 import { Awareness } from "y-protocols/awareness";
 import Editor from "@monaco-editor/react";
-import { useResizeDetector } from 'react-resize-detector';
+import { useResizeDetector } from "react-resize-detector";
 
-import axios from 'axios';
+import axios from "axios";
 import { useRef, useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
-import logo from '@code-editor-assets/logo.svg'
+import logo from "@code-editor-assets/logo.svg";
 
 function getRandomColor() {
   // Generate a random color only once per client.
@@ -19,34 +19,38 @@ function getRandomColor() {
 
 const clientColor = getRandomColor(); // Static color for this client
 
-
 function CodeEditor({ token, preview }) {
   //Get Project info
-  const projectId = window.location.href.split('/').pop();
-  const [project, setProject] = useState({})
-  const [projectName, setProjectName] = useState("")
-  const [projectContent, setProjectContent] = useState({})
+  const projectId = window.location.href.split("/").pop();
+  console.log(projectId);
+  const [project, setProject] = useState({});
+  const [projectName, setProjectName] = useState("");
+  const [projectContent, setProjectContent] = useState({});
   const editorRef = useRef(null);
 
   useEffect(() => {
     async function fetchProject() {
-      const response = await axios.get(`http://localhost:3000/api/v1/projects/${projectId}`, { headers: { Authorization: `Bearer ${token.accessToken}` } })
-      console.log(response.data)
-      setProject(response.data)
+      const response = await axios.get(
+        `http://localhost:3000/api/v1/projects/${projectId}`,
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
+      console.log(response.data);
+      setProject(response.data);
     }
-    fetchProject()
-  }, [])
+    fetchProject();
+  }, []);
 
   useEffect(() => {
     if (project.name) {
       setProjectName(project.name);
     }
 
-    if (project.files && project.files.length && ytext.toString() === "") { // Sync Ytext with current data to avoid overwrite
+    if (project.files && project.files.length && ytext.toString() === "") {
+      // Sync Ytext with current data to avoid overwrite
       ytext.insert(0, project.files[0].content);
       setProjectContent(project.files[0]);
     }
-  }, [project])
+  }, [project]);
 
   // -------------------------------
   //Setup monaco editor with Yjs binding
@@ -57,11 +61,18 @@ function CodeEditor({ token, preview }) {
 
   // Create awareness instance (using Yjs document)
   const awareness = new Awareness(ydoc.current);
-  const decorationsRef = useRef([]); // to track remote decorations
 
   useEffect(() => {
     // Initialize the WebRTC provider with awareness
-    provider.current = new WebrtcProvider("my-room-name", ydoc.current, { awareness });
+    provider.current = new WebrtcProvider("my-room-name", ydoc.current, {
+      awareness,
+      signaling: ["ws://localhost:4444"], // Use your own signaling server
+
+    });
+
+    if (provider.current) {
+      provider.current.on("status", (event) => console.log(event));
+    }
 
     return () => {
       provider.current.destroy();
@@ -80,12 +91,15 @@ function CodeEditor({ token, preview }) {
 
     // Here we store a relative position that initially points to index 0.
     const initialRelPos = Y.createRelativePositionFromTypeIndex(ytext, 0);
-    awareness.setLocalStateField("cursor", { relPos: initialRelPos, color: clientColor });
+    awareness.setLocalStateField("cursor", {
+      relPos: initialRelPos,
+      color: clientColor,
+    });
 
     awareness.setLocalStateField("selection", {
       relPosStart: initialRelPos,
-      relPosEnd: initialRelPos
-    })
+      relPosEnd: initialRelPos,
+    });
 
     // Listen to local cursor changes
     editor.onDidChangeCursorPosition((event) => {
@@ -105,15 +119,18 @@ function CodeEditor({ token, preview }) {
       // Convert the selection range to offsets.
       const startOffset = model.getOffsetAt(selection.getStartPosition());
       const endOffset = model.getOffsetAt(selection.getEndPosition());
-      const relPosStart = Y.createRelativePositionFromTypeIndex(ytext, startOffset);
+      const relPosStart = Y.createRelativePositionFromTypeIndex(
+        ytext,
+        startOffset
+      );
       const relPosEnd = Y.createRelativePositionFromTypeIndex(ytext, endOffset);
       // Update awareness with the selection data.
       awareness.setLocalStateField("selection", {
         relPosStart,
         relPosEnd,
-        color: clientColor  // Optionally use a color for selection (or different from the cursor color)
+        color: clientColor, // Optionally use a color for selection (or different from the cursor color)
       });
-    })
+    });
 
     // Listen for remote awareness changes to update remote cursor decorations.
     awareness.on("change", () => {
@@ -123,6 +140,8 @@ function CodeEditor({ token, preview }) {
     });
   }
 
+  const cursorDecorationsRef = useRef([]); // to track remote decorations
+
   function updateCursorDecorations(editor) {
     const decorations = [];
     // Loop through all remote awareness states.
@@ -131,13 +150,16 @@ function CodeEditor({ token, preview }) {
       if (clientId === awareness.clientID) return;
       if (state.cursor && state.cursor.relPos) {
         // Convert the relative position back into an absolute position in our document.
-        const absolutePos = Y.createAbsolutePositionFromRelativePosition(state.cursor.relPos, ydoc.current);
+        const absolutePos = Y.createAbsolutePositionFromRelativePosition(
+          state.cursor.relPos,
+          ydoc.current
+        );
         if (absolutePos && absolutePos.type === ytext) {
           const model = editor.getModel();
           // Convert the document offset (absolute position index) back to a Monaco position.
           const position = model.getPositionAt(absolutePos.index);
 
-          const remoteColor = state.cursor.color || "red"
+          const remoteColor = state.cursor.color || "red";
           const className = "remoteCursor-" + remoteColor.replace("#", "");
           addDynamicCursorStyle(className, remoteColor);
           decorations.push({
@@ -160,7 +182,10 @@ function CodeEditor({ token, preview }) {
       }
     });
     // Update decorations (pass the previous decorations for proper cleanup)
-    decorationsRef.current = editor.deltaDecorations(decorationsRef.current, decorations);
+    cursorDecorationsRef.current = editor.deltaDecorations(
+      cursorDecorationsRef.current,
+      decorations
+    );
   }
 
   // Helper function to inject a CSS rule if it doesn't exist yet.
@@ -188,17 +213,32 @@ function CodeEditor({ token, preview }) {
     awareness.getStates().forEach((state, clientId) => {
       // Skip our own state.
       if (clientId === awareness.clientID) return;
-      if (state.selection && state.selection.relPosStart && state.selection.relPosEnd) {
+      if (
+        state.selection &&
+        state.selection.relPosStart &&
+        state.selection.relPosEnd
+      ) {
         // Convert the relative position back into an absolute position in our document.
-        const absStart = Y.createAbsolutePositionFromRelativePosition(state.selection.relPosStart, ydoc.current);
-        const absEnd = Y.createAbsolutePositionFromRelativePosition(state.selection.relPosEnd, ydoc.current);
+        const absStart = Y.createAbsolutePositionFromRelativePosition(
+          state.selection.relPosStart,
+          ydoc.current
+        );
+        const absEnd = Y.createAbsolutePositionFromRelativePosition(
+          state.selection.relPosEnd,
+          ydoc.current
+        );
 
-        if (absStart && absEnd && absStart.type === ytext && absEnd.type === ytext) {
+        if (
+          absStart &&
+          absEnd &&
+          absStart.type === ytext &&
+          absEnd.type === ytext
+        ) {
           const model = editor.getModel();
           const startPos = model.getPositionAt(absStart.index);
           const endPos = model.getPositionAt(absEnd.index);
 
-          const remoteColor = state.selection.color || "red"
+          const remoteColor = state.selection.color || "red";
           const className = "remoteSelection-" + remoteColor.replace("#", "");
           addDynamicSelectionStyle(className, remoteColor);
           decorations.push({
@@ -221,7 +261,10 @@ function CodeEditor({ token, preview }) {
       }
     });
     // Update decorations (pass the previous decorations for proper cleanup)
-    selectionDecorationsRef.current = editor.deltaDecorations(selectionDecorationsRef.current, decorations);
+    selectionDecorationsRef.current = editor.deltaDecorations(
+      selectionDecorationsRef.current,
+      decorations
+    );
   }
 
   // Helper function to inject a CSS rule if it doesn't exist yet.
@@ -242,22 +285,25 @@ function CodeEditor({ token, preview }) {
 
   // -------------------------------
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const inputRef = useRef(null);
-  const [mode, setMode] = useState("default")
-  const [codeDisplay, setCodeDisplay] = useState([])
-  const [errorDisplay, setErrorDisplay] = useState("")
+  const [mode, setMode] = useState("default");
+  const [codeDisplay, setCodeDisplay] = useState([]);
+  const [errorDisplay, setErrorDisplay] = useState("");
 
   //Resize editor properly since it is not dynamic
   const editorContainerRef = useRef(null);
-  const [dimensions, setDimensions] = useState({ width: "100%", height: "100%" });
+  const [dimensions, setDimensions] = useState({
+    width: "100%",
+    height: "100%",
+  });
 
   useEffect(() => {
-    const observer = new ResizeObserver(entries => {
+    const observer = new ResizeObserver((entries) => {
       for (let entry of entries) {
         setDimensions({
           width: entry.contentRect.width,
-          height: entry.contentRect.height
+          height: entry.contentRect.height,
         });
       }
     });
@@ -271,10 +317,10 @@ function CodeEditor({ token, preview }) {
 
   function getHeight(mode) {
     if (mode == "default") {
-      return (dimensions.height + "px")
+      return dimensions.height + "px";
     } else {
-      let resizeHeight = dimensions.height - 110
-      return (resizeHeight + "px")
+      let resizeHeight = dimensions.height - 110;
+      return resizeHeight + "px";
     }
   }
 
@@ -283,64 +329,69 @@ function CodeEditor({ token, preview }) {
   const execute = async () => {
     try {
       if (!preview) {
-        setCodeDisplay([])
-      setErrorDisplay("")
-      const code = editorRef.current.getValue()
-      if (code) {
-        console.log(code)
-      }
-      const input = inputRef.current ? inputRef.current.value : ""
-      const response = await axios.post('http://localhost:3000/api/v1/code/execute', { code: code, input: input, language: lang })
-      const executionId = response.data.executionId
-      console.log("✅ Execution started. Connecting WebSocket...");
-
-      // ✅ Connect to WebSocket for real-time logs
-      const ws = new WebSocket(`ws://localhost:3001/${executionId}`);
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-
-          if (data.log) {
-            console.log("📥 Log:", data.log); // ✅ Display log immediately
-            setCodeDisplay((prev) => [...prev, data.log])
-          }
-
-          if (data.error) {
-            console.error("🚨 Error:", data.error); // ✅ Show errors if any
-            setErrorDisplay(data.error)
-          }
-
-          if (data.done) {
-            console.log("✅ Execution Complete.");
-            ws.close();
-          }
-        } catch (error) {
-          console.error("⚠️ Error parsing WebSocket data:", error);
+        setCodeDisplay([]);
+        setErrorDisplay("");
+        const code = editorRef.current.getValue();
+        if (code) {
+          console.log(code);
         }
-      };
+        const input = inputRef.current ? inputRef.current.value : "";
+        const response = await axios.post(
+          "http://localhost:3000/api/v1/code/execute",
+          { code: code, input: input, language: lang }
+        );
+        const executionId = response.data.executionId;
+        console.log("✅ Execution started. Connecting WebSocket...");
 
-      ws.onerror = (error) => {
-        console.error("⚠️ WebSocket error:", error);
-      };
+        // ✅ Connect to WebSocket for real-time logs
+        const ws = new WebSocket(`ws://localhost:3001/${executionId}`);
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+
+            if (data.log) {
+              console.log("📥 Log:", data.log); // ✅ Display log immediately
+              setCodeDisplay((prev) => [...prev, data.log]);
+            }
+
+            if (data.error) {
+              console.error("🚨 Error:", data.error); // ✅ Show errors if any
+              setErrorDisplay(data.error);
+            }
+
+            if (data.done) {
+              console.log("✅ Execution Complete.");
+              ws.close();
+            }
+          } catch (error) {
+            console.error("⚠️ Error parsing WebSocket data:", error);
+          }
+        };
+
+        ws.onerror = (error) => {
+          console.error("⚠️ WebSocket error:", error);
+        };
       }
-
     } catch (error) {
-      console.error("❌ Axios Error:", error.response ? error.response.data : error.message);
+      console.error(
+        "❌ Axios Error:",
+        error.response ? error.response.data : error.message
+      );
     }
-  }
+  };
 
   //Set language
 
   const defaultLang = {
     default: "javascript",
-    competitive: "cpp"
-  }
+    competitive: "cpp",
+  };
 
   const [lang, setLang] = useState("javascript"); // Default language is JavaScript
   useEffect(() => {
-    setLang(defaultLang[String(mode)])
-  }, [mode])
+    setLang(defaultLang[String(mode)]);
+  }, [mode]);
 
   const handleLanguage = (event) => {
     event.preventDefault(); // ✅ Prevent form reload
@@ -360,17 +411,23 @@ function CodeEditor({ token, preview }) {
     console.log("Selected Mode:", selectedMode); // ✅ Debugging log
   };
   // ---------------------------------
-  async function handleChange(e) {
+  async function handleChange() {
     const code = editorRef.current.getValue();
-    const response = await axios.patch(`http://localhost:3000/api/v1/projects/${projectId}`, { name: e.target.innerHTML, files: [{ name: "main", content: code, language: lang }] }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
-    console.log(response.data)
+    const response = await axios.patch(
+      `http://localhost:3000/api/v1/projects/${projectId}`,
+      {
+        files: [{ name: "main", content: code, language: lang }],
+      },
+      { headers: { Authorization: `Bearer ${token.accessToken}` } }
+    );
+    console.log(response.data);
   }
 
   const { width, height, ref } = useResizeDetector({
     handleWidth: true,
     handleHeight: true,
     onResize: () => {
-      console.log("resize")
+      console.log("resize");
       if (editorRef.current) {
         editorRef.current.layout();
       }
@@ -381,19 +438,39 @@ function CodeEditor({ token, preview }) {
     <div className="code-editor">
       <div className="container">
         <div className="sidebar">
-          <div className='logo'>
-            <img src={logo} alt="logo" onClick={() => { if (!preview) navigate('/live-code') }} />
-            <div className='language'>
+          <div className="logo">
+            <img
+              src={logo}
+              alt="logo"
+              onClick={() => {
+                if (!preview) navigate(`/live-code/preview/${projectId}`);
+              }}
+            />
+            <div className="language">
               <label htmlFor="language">Language:</label>
-              <select disabled={preview} name="language" id="lang" value={lang} onChange={handleLanguage}>
-                {(mode == "default") && <option value="javascript">Javascript</option>}
+              <select
+                disabled={preview}
+                name="language"
+                id="lang"
+                value={lang}
+                onChange={handleLanguage}
+              >
+                {mode == "default" && (
+                  <option value="javascript">Javascript</option>
+                )}
                 <option value="cpp">C++</option>
                 <option value="python">Python</option>
               </select>
             </div>
             <div className="mode">
               <label htmlFor="mode">Mode:</label>
-              <select disabled={preview} name="mode" id="mode" value={mode} onChange={handleMode}>
+              <select
+                disabled={preview}
+                name="mode"
+                id="mode"
+                value={mode}
+                onChange={handleMode}
+              >
                 <option value="default">Default</option>
                 <option value="competitive">Competitive</option>
               </select>
@@ -401,16 +478,20 @@ function CodeEditor({ token, preview }) {
           </div>
         </div>
         <div className="code-editor-main">
-          <div className="project-name" contentEditable={true} onInput={handleChange}>{projectName}</div>
+          <div className="project-name" onInput={handleChange}>
+            {projectName}
+          </div>
           <div className="run-code">
-            <button className='run-button' onClick={execute}>Run code</button>
+            <button className="run-button" onClick={execute}>
+              Run code
+            </button>
           </div>
           <div className="codespace">
             <div className="code-input" ref={editorContainerRef}>
               <div className="text-editor" ref={ref}>
                 <Editor
                   language={lang}
-                  value={projectContent ? projectContent.content : 'no content'}
+                  value={projectContent ? projectContent.content : "no content"}
                   theme="vs-dark"
                   onMount={handleEditorDidMount}
                   onChange={handleChange}
@@ -421,17 +502,22 @@ function CodeEditor({ token, preview }) {
                   }}
                 />
               </div>
-              {(mode === "competitive") && (<div className='input-field'>
-                <textarea name="" id="" placeholder='Input field' ref={inputRef}></textarea>
-              </div>)}
             </div>
             <div className="display">
+              {mode === "competitive" && (
+                <div className="input-field">
+                  <textarea
+                    name=""
+                    id=""
+                    placeholder="Input field"
+                    ref={inputRef}
+                  ></textarea>
+                </div>
+              )}
               <div className="code-display">
-                {codeDisplay ? codeDisplay.join('') : []}
+                {codeDisplay ? codeDisplay.join("") : []}
               </div>
-              <div className="error-display">
-                {errorDisplay}
-              </div>
+              <div className="error-display">{errorDisplay}</div>
             </div>
           </div>
         </div>

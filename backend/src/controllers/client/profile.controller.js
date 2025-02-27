@@ -23,13 +23,13 @@ module.exports.index = async (req, res) => {
       );
     }
 
-    if (user.isPrivate) {
-      const data = pickInfoData(['_id', 'fullName', 'avatar','isPrivate'], user);
+    if (user.isPrivate && req.user.id !== id) {
+      const data = pickInfoData(['_id', 'fullName', 'avatar'], user);
       res.status(200).json(data);
       return;
     }
 
-    if (req.user && req.user.id !== id) {
+    if (req.user.id !== id) {
       delete user['savedPosts'];
       user.posts = user.posts.filter(post => post.status === 'public');
     }
