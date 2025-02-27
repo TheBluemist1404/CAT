@@ -24,6 +24,11 @@ const userSchema = new mongoose.Schema(
       default:
         'https://res.cloudinary.com/cat-project/image/upload/v1735743336/coder-sign-icon-programmer-symbol-vector-2879989_ecvn23.webp',
     },
+    duration: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     password: {
       type: String,
       required: 'Your password is required',
