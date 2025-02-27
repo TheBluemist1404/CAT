@@ -61,12 +61,13 @@ function CodeEditor({ token, preview }) {
 
   // Create awareness instance (using Yjs document)
   const awareness = new Awareness(ydoc.current);
-  const decorationsRef = useRef([]); // to track remote decorations
 
   useEffect(() => {
     // Initialize the WebRTC provider with awareness
     provider.current = new WebrtcProvider("my-room-name", ydoc.current, {
       awareness,
+      signaling: ["ws://localhost:4444"], // Use your own signaling server
+
     });
 
     if (provider.current) {
@@ -139,6 +140,8 @@ function CodeEditor({ token, preview }) {
     });
   }
 
+  const cursorDecorationsRef = useRef([]); // to track remote decorations
+
   function updateCursorDecorations(editor) {
     const decorations = [];
     // Loop through all remote awareness states.
@@ -179,8 +182,8 @@ function CodeEditor({ token, preview }) {
       }
     });
     // Update decorations (pass the previous decorations for proper cleanup)
-    decorationsRef.current = editor.deltaDecorations(
-      decorationsRef.current,
+    cursorDecorationsRef.current = editor.deltaDecorations(
+      cursorDecorationsRef.current,
       decorations
     );
   }

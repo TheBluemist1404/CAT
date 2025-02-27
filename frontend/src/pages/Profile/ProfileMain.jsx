@@ -9,7 +9,23 @@ import DOMPurify from "dompurify";
 function ProfileMain({ user, token, profileData, id ,posts}) {
   // edit school and company modal
   const [showModal, setShowModal] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const handleCloseClick = () => {
+    setShowConfirm(true);
+  };
 
+  const handleYesClick = () => {
+    window.location.reload();
+  };
+
+  const handleCancelClick = () => {
+    setShowConfirm(false);
+    setShowModal(false);
+  };
+  const SaveDescription = () => {
+    handleUpdateDescription();
+    setShowConfirm(true);
+  };
   // School
   const [schools, setSchools] = useState([]);
   const [newSchool, setNewSchool] = useState("");
@@ -37,41 +53,44 @@ function ProfileMain({ user, token, profileData, id ,posts}) {
     fetchSchools();
   }, [user, token]);
 console.log(posts);
-  const handleAddSchool = async () => {
-    if (newSchool.trim() !== "") {
-      const updatedSchools = [...schools, newSchool];
-      setSchools(updatedSchools);
-      setNewSchool("");
+const handleAddSchool = async () => {
+  if (newSchool.trim() === "") return;
 
-      try {
-        const response = await axios.patch(
-          `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-          {
-            schools: updatedSchools,
-            user: { id: user._id },
-            fullName: user.fullName,
-            companies,
-            description,
-            avatar: user.avatar,
-          },
-          {
-            headers: {
-              "Authorization": `Bearer ${token.accessToken}`,
-            },
-          }
-        );
+  if (schools.length >= 2) {
+    alert("The limit for schools is 2. Please delete one and enter again.");
+    return;
+  }
 
-        if (response.status === 200) {
+  const updatedSchools = [...schools, newSchool];
+  setSchools(updatedSchools);
+  setNewSchool("");
 
-          if (Array.isArray(response.data.schools)) {
-            setSchools(response.data.schools);
-          }
-        }
-      } catch (err) {
-        console.error("Error:", err.response?.data?.message || err.message);
+  try {
+    const response = await axios.patch(
+      `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+      {
+        schools: updatedSchools,
+        user: { id: user._id },
+        fullName: user.fullName,
+        companies,
+        description,
+        avatar: user.avatar,
+      },
+      {
+        headers: {
+          "Authorization": `Bearer ${token.accessToken}`,
+        },
       }
+    );
+
+    if (response.status === 200 && Array.isArray(response.data.schools)) {
+      setSchools(response.data.schools);
     }
-  };
+  } catch (err) {
+    console.error("Error:", err.response?.data?.message || err.message);
+  }
+};
+
 
   const handleRemoveSchool = async (indexToRemove) => {
     if (schools.length > 0) {
@@ -134,40 +153,43 @@ console.log(posts);
   }, [user, token]);
 
   const handleAddCompany = async () => {
-    if (newCompany.trim() !== "") {
-      const updatedCompanies = [...companies, newCompany];
-      setCompanies(updatedCompanies);
-      setNewCompany("");
-
-
-      try {
-        const response = await axios.patch(
-          `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-          {
-            companies: updatedCompanies,
-            user: { id: user._id },
-            fullName: user.fullName,
-            schools,
-            description,
-            avatar: user.avatar,
+    if (newCompany.trim() === "") return;
+  
+    if (companies.length >= 2) {
+      alert("The limit for companies is 2. Please delete one and enter again.");
+      return;
+    }
+  
+    const updatedCompanies = [...companies, newCompany];
+    setCompanies(updatedCompanies);
+    setNewCompany("");
+  
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+        {
+          companies: updatedCompanies,
+          user: { id: user._id },
+          fullName: user.fullName,
+          schools,
+          description,
+          avatar: user.avatar,
+        },
+        {
+          headers: {
+            "Authorization": `Bearer ${token.accessToken}`,
           },
-          {
-            headers: {
-              "Authorization": `Bearer ${token.accessToken}`,
-            },
-          }
-        );
-
-        if (response.status === 200) {
-          if (Array.isArray(response.data.companies)) {
-            setCompanies(response.data.companies);
-          }
         }
-      } catch (err) {
-        console.error("Error:", err.response?.data?.message || err.message);
+      );
+  
+      if (response.status === 200 && Array.isArray(response.data.companies)) {
+        setCompanies(response.data.companies);
       }
+    } catch (err) {
+      console.error("Error:", err.response?.data?.message || err.message);
     }
   };
+  
 
   const handleRemoveCompany = async (indexToRemove) => {
     if (companies.length > 0) {
@@ -281,8 +303,13 @@ console.log(posts);
   //----------------------------
   //Image
   const [previewImage, setPreviewImage] = useState(null);
+  console.log("id other", id);
+  console.log("user id",user._id);
+  const information = id === user._id ? user : profileData;
+
   return (
     <div className='main'>
+      <div className="left">
       <div className='bio' >
         <h1 style={{ margin: "20px" }}>Bio</h1>
         <div style={{ marginLeft: '30px' }}>
@@ -290,16 +317,16 @@ console.log(posts);
             <div style={{ cursor: "pointer" }}>
               <img src="/src/assets/school.svg" alt="" width={30} height={30} />
             </div>
-            {profileData?.schools.length > 0 && (
+            {information?.schools?.length > 0 && (
               <div style={{ marginLeft: "10px" }}>
-                <div>{profileData?.schools.length === 1 && profileData?.schools[0]}</div>
+                <div>{information?.schools?.length === 1 && user.schools[0]}</div>
 
-                <div>{profileData?.schools[profileData?.schools.length - 2]}</div>
+                <div>{information?.schools[information?.schools?.length - 2]}</div>
 
               </div>
             )}
           </div>
-          {profileData?.schools.length > 1 && (
+          {information?.schools?.length > 1 && (
             <div
               style={{
                 display: "flex",
@@ -309,7 +336,7 @@ console.log(posts);
                 marginLeft: "40px"
               }}
             >
-              {profileData?.schools[profileData?.schools.length - 1]}
+              {information?.schools[information?.schools?.length - 1]}
 
             </div>
           )}
@@ -320,14 +347,14 @@ console.log(posts);
             <div style={{ cursor: "pointer" }}>
               <img src="/src/assets/company.svg" alt="" width={30} height={30} />
             </div>
-            {profileData?.companies.length > 0 && (
+            {information?.companies?.length > 0 && (
               <div style={{ marginLeft: "10px" }}>
-                <div>{profileData?.companies.length === 1 && profileData?.companies[0]}</div>
-                <div>{profileData?.companies[profileData?.companies.length - 2]}</div>
+                <div>{information?.companies?.length === 1 && information?.companies[0]}</div>
+                <div>{information?.companies[information?.companies?.length - 2]}</div>
               </div>
             )}
           </div>
-          {profileData?.companies.length > 1 && (
+          {(information?.companies ?? []).length > 1 && (
             <div
               style={{
                 display: "flex",
@@ -337,7 +364,7 @@ console.log(posts);
                 marginLeft: "40px"
               }}
             >
-              {profileData?.companies[profileData?.companies.length - 1]}
+              {information?.companies[information?.companies?.length - 1]}
 
             </div>
           )}
@@ -369,93 +396,20 @@ console.log(posts);
                 borderRadius: "16px",
                 textAlign: "center",
                 display: "block",
-                overflowY: "auto", // ✅ Cho phép cuộn nếu nội dung vượt quá chiều cao
-                maxHeight: "80vh", // ✅ Giới hạn chiều cao tối đa
-                backgroundColor: "#333", // (Giữ màu nền nếu cần)
+                overflowY: "auto", 
+                maxHeight: "80vh", 
+                backgroundColor: "#333", 
                 padding: "20px",
               }}
               className='detail'
             >
               <h1 style={{ color: "#FFFFFF", marginTop: "10px" }}>Editing Details</h1>
-              <h2 style={{ color: "#FFFFFF", marginLeft: "20px", textAlign: "left" }}>Company</h2>
-              <div style={{ display: 'flex', alignItems: 'center', marginLeft: "20px", marginTop: "15px" }}>
-                <div tabindex="0" class="plusButton" onClick={handleAddCompany}>
-                  <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
-                    <g mask="url(#mask0_21_345)">
-                      <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
-                    </g>
-                  </svg>
-                </div>
-                <input
-                  type="text"
-                  className='input'
-                  value={newCompany}
-                  onChange={(e) => setNewCompany(e.target.value)}
-                  placeholder="type..."
-                />
-
-              </div>
-
-              {companies.map((company, index) => (
-                <div
-                  key={index}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "10px",
-                    marginLeft: "20px",
-                    height: "30px",
-                    position: "relative"
-                  }}
-                  className="company-item"
-                >
-                  <div style={{
-                    fontSize: "16px",
-                    lineHeight: "1",
-                    display: "flex",
-                    alignItems: "center",
-                  }}>
-                    {company}
-                  </div>
-                  <button
-                    onClick={() => handleRemoveCompany(index)}
-                    className="delete-button"
-                  >
-                    x
-                  </button>
-                </div>
-              ))}
-
-              <style>
-                {`
-        .company-item {
-            position: relative;
-        }
-        .delete-button {
-            margin-left: 10px;
-            color: red;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            height: 24px;
-            width: 24px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            line-height: 1;
-        }
-        .company-item:hover .delete-button {
-            display: flex;
-        }
-    `}
-              </style>
-
+              
+              {/*schools*/}
               <h2 style={{ color: "#FFFFFF", marginLeft: "20px", textAlign: "left", marginTop: "20px" }}>School</h2>
               <div style={{ display: 'flex', alignItems: 'center', marginLeft: "20px", marginTop: "15px" }}>
-                <div tabindex="0" class="plusButton" onClick={handleAddSchool}>
-                  <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+                <div tabIndex="0" className="plusButton" onClick={handleAddSchool}>
+                  <svg className="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
                     <g mask="url(#mask0_21_345)">
                       <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
                     </g>
@@ -527,11 +481,87 @@ console.log(posts);
         }
     `}
               </style>
+              {/*companies*/}
+              <h2 style={{ color: "#FFFFFF", marginLeft: "20px", textAlign: "left" }}>Company</h2>
+              <div style={{ display: 'flex', alignItems: 'center', marginLeft: "20px", marginTop: "15px" }}>
+                <div tabIndex="0" className="plusButton" onClick={handleAddCompany}>
+                  <svg className="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+                    <g mask="url(#mask0_21_345)">
+                      <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
+                    </g>
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  className='input'
+                  value={newCompany}
+                  onChange={(e) => setNewCompany(e.target.value)}
+                  placeholder="type..."
+                />
+
+              </div>
+
+              {companies.map((company, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "10px",
+                    marginLeft: "20px",
+                    height: "30px",
+                    position: "relative"
+                  }}
+                  className="company-item"
+                >
+                  <div style={{
+                    fontSize: "16px",
+                    lineHeight: "1",
+                    display: "flex",
+                    alignItems: "center",
+                  }}>
+                    {company}
+                  </div>
+                  <button
+                    onClick={() => handleRemoveCompany(index)}
+                    className="delete-button"
+                  >
+                    x
+                  </button>
+                </div>
+              ))}
+
+              <style>
+                {`
+        .company-item {
+            position: relative;
+        }
+        .delete-button {
+            margin-left: 10px;
+            color: red;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            height: 24px;
+            width: 24px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+        }
+        .company-item:hover .delete-button {
+            display: flex;
+        }
+    `}
+              </style>
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid gray", borderBottom: "1px solid gray", marginTop: "10px", height: "50px" }}>
                 <div style={{ color: "#FFFFFF" }}>Update information</div>
+                <div>
                 <button
-                  onClick={() => setShowModal(false)}
+                  onClick={handleCloseClick}
                   style={{
 
                     padding: "10px 20px",
@@ -542,91 +572,80 @@ console.log(posts);
                     cursor: "pointer"
                   }}
                 >
+                  Update
+                </button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#6b7280", 
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    marginLeft:"10px",
+                    cursor: "pointer",
+                  }}
+                >
                   Close
                 </button>
+                </div>
+                {showConfirm && (
+                <div
+                  style={{
+                    position: "fixed",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    backgroundColor: "#000000",
+                    padding: "20px",
+                    borderRadius: "10px",
+                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                    textAlign: "center",
+                    zIndex: 1000,
+                    border: "3px solid #ff4e4e",
+                  }}
+                >
+                  <img
+                    src="/src/assets/bg-logo.svg"
+                    alt="Logo"
+                    style={{ width: "50px", height: "50px", marginBottom: "10px" }}
+                  />
+                  <p>Are you sure with your changes?</p>
+                  <button
+                    onClick={handleYesClick}
+                    style={{
+                      margin: "10px",
+                      padding: "8px 16px",
+                      backgroundColor: "#22c55e",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onClick={handleCancelClick}
+                    style={{
+                      margin: "10px",
+                      padding: "8px 16px",
+                      backgroundColor: "#ef4444",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
               </div>
             </div>
           </div>
         )}
 
-
-      </div>
-      <div className='about' >
-        <div style={{ margin: "20px" }}>
-          <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
-            <h1 style={{ margin: "0 20px 0 0" }}>About</h1>
-            <div
-              onClick={() => { setEditMode(true); setNewDescription(description); }}
-              style={{ cursor: "pointer" }}
-            >
-              { id === user._id && (<img src="/src/assets/pen.svg" alt="Edit" width={15} height={15} />)}
-            </div>
-          </div>
-
-          {editMode ? (
-            <div >
-              <div dangerouslySetInnerHTML={{ __html: newDescription }} />
-
-              <Editor
-                apiKey={textEditorAPI}
-                value={newDescription}
-                onEditorChange={handleEditorChange}
-
-                init={{
-                  height: 300,
-                  menubar: true,
-                  plugins: [
-                    "advlist autolink lists link image charmap preview anchor",
-                    "searchreplace visualblocks code fullscreen",
-                    "insertdatetime media table code help wordcount",
-                  ],
-                  toolbar:
-                    "undo redo | formatselect | bold italic underline forecolor backcolor | \
-                        alignleft aligncenter alignright alignjustify | \
-                        bullist numlist outdent indent | removeformat | help",
-                  content_style:
-                    "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-
-                }}
-              />
-              <div
-
-
-              />
-              <div style={{ marginTop: "10px" }}>
-                <button onClick={handleUpdateDescription} style={{
-                  marginLeft: '10px',
-                  backgroundColor: 'black',
-                  color: 'white',
-                  border: '1px solid white',
-                  padding: '8px 12px',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}>Save</button>
-                <button
-                  onClick={() => { setEditMode(false); setNewDescription(""); }}
-                  style={{
-                    marginLeft: '10px',
-                    backgroundColor: 'black',
-                    color: 'white',
-                    border: '1px solid white',
-                    padding: '8px 12px',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div dangerouslySetInnerHTML={{ __html: profileData?.description }}
-
-            >
-
-            </div>
-          )}
-        </div>
 
       </div>
       <div className='im'>
@@ -701,35 +720,169 @@ console.log(posts);
         </div>
       )}
 </div>
-
-
-
-      <div className='Post'>
-        <h1 style={{ margin: "20px" }}>Posts</h1>
-
-        <div>
-
-          <div className="posts-container">
-            {profileData?.posts.slice().reverse().map((post, index) => {
-
-              const date = new Date(post.createdAt);
-              const formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}, ${date.getFullYear()}`;
-
-              return (
-
-                <div className='post-card' key={index}>
-                  <div className='post-icon-title'>
-                    <img src="/src/assets/qa.svg" alt="" width={30} height={30} />
-                    <div className='post-title' key={post._id} onClick={() => handlePostClick(post._id)}>{post.title}</div>
-                  </div>
-
-                  <div className='post-date'>{formattedDate}</div>
-                </div>
-              );
-            })}
+</div>
+      <div className="right">
+      <div className='about' >
+        <div style={{ margin: "20px" }}>
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+            <h1 style={{ margin: "0 20px 0 0" }}>About</h1>
+            <div
+              onClick={() => { setEditMode(true); setNewDescription(description); }}
+              style={{ cursor: "pointer" }}
+            >
+              { id === user._id && (<img src="/src/assets/pen.svg" alt="Edit" width={15} height={15} />)}
+            </div>
           </div>
+
+          {editMode ? (
+            <div >
+              <div dangerouslySetInnerHTML={{ __html: newDescription }} />
+
+              <Editor
+                apiKey={textEditorAPI}
+                value={newDescription}
+                onEditorChange={handleEditorChange}
+
+                init={{
+                  height: 300,
+                  menubar: true,
+                  plugins: [
+                    "advlist autolink lists link image charmap preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "insertdatetime media table code help wordcount",
+                  ],
+                  toolbar:
+                    "undo redo | formatselect | bold italic underline forecolor backcolor | \
+                        alignleft aligncenter alignright alignjustify | \
+                        bullist numlist outdent indent | removeformat | help",
+                  content_style:
+                    "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+
+                }}
+              />
+              <div
+
+
+              />
+              <div style={{ marginTop: "10px" }}>
+                <button onClick={SaveDescription} style={{
+                  marginLeft: '10px',
+                  backgroundColor: 'black',
+                  color: 'white',
+                  border: '1px solid white',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}>Save</button>
+                {showConfirm && (
+                <div
+                  style={{
+                    position: "fixed",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    backgroundColor: "#000000",
+                    padding: "20px",
+                    borderRadius: "10px",
+                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                    textAlign: "center",
+                    zIndex: 1000,
+                    border: "3px solid #ff4e4e",
+                  }}
+                >
+                  <img
+                    src="/src/assets/bg-logo.svg"
+                    alt="Logo"
+                    style={{ width: "50px", height: "50px", marginBottom: "10px" }}
+                  />
+                  <p>Are you sure with your changes?</p>
+                  <button
+                    onClick={handleYesClick}
+                    style={{
+                      margin: "10px",
+                      padding: "8px 16px",
+                      backgroundColor: "#22c55e",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onClick={handleCancelClick}
+                    style={{
+                      margin: "10px",
+                      padding: "8px 16px",
+                      backgroundColor: "#ef4444",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+                <button
+                  onClick={() => { setEditMode(false); setNewDescription(""); }}
+                  style={{
+                    marginLeft: '10px',
+                    backgroundColor: 'black',
+                    color: 'white',
+                    border: '1px solid white',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div dangerouslySetInnerHTML={{ __html: information?.description }}
+
+            >
+
+            </div>
+          )}
         </div>
+
       </div>
+      
+
+
+<div className='Post'>
+  <h1 style={{ margin: "20px" }}>Posts</h1>
+
+  <div>
+    <div className="posts-container">
+      {(information?.posts ?? []).slice().reverse().map((post, index) => {
+        const date = new Date(post.createdAt);
+        const formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}, ${date.getFullYear()}`;
+
+        // Chọn icon phù hợp
+        const postIcon = post.status === "private" ? "/src/assets/private.svg" : "/src/assets/qa.svg";
+
+        return (
+          <div className='post-card' key={index}>
+            <div className='post-icon-title'>
+              <img src={postIcon} alt="" width={30} height={30} />
+              <div className='post-title' key={post._id} onClick={() => handlePostClick(post._id)}>
+                {post.title}
+              </div>
+            </div>
+            <div className='post-date'>{formattedDate}</div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</div>
+</div>
 
     </div>)
 }

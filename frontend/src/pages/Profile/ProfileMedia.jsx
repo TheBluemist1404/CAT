@@ -9,7 +9,8 @@ function ProfileMedia({ posts = [] }) {
 
   return (
     <div >
-      <h1 style={{ margin: "20px" }}>Image Gallery</h1>
+      <h1 style={{ margin: "20px 20px 20px 90px" }}>Image Gallery</h1>
+
       <div 
         className="flex-container" 
         style={{ 

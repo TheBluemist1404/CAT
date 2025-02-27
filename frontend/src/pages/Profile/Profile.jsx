@@ -19,7 +19,8 @@ const Profile = ({offset = 0, limit = 999, token }) => {
 
     
     const { id } = useParams();
-    console.log(id);
+    console.log(id,typeof id);
+    
     const [profileData, setProfileData] = useState(null);
     useEffect(() => {
         async function fetchProfile() {
@@ -33,7 +34,7 @@ const Profile = ({offset = 0, limit = 999, token }) => {
                     }
                 });
     
-                console.log("Fetched profile data:", response.data); // ✅ Kiểm tra dữ liệu trả về
+                console.log("Fetched profile data:", response.data); 
                 setProfileData(response.data);
     
             } catch (error) {
@@ -82,19 +83,21 @@ const Profile = ({offset = 0, limit = 999, token }) => {
     
         fetchPosts();
     }, [profileData, offset, limit, token]);
-
+    console.log("id in main",id);
+    console.log("user id in main",user._id);
+    
     return (
         <div className="profile" style={{ position: 'relative' }}>
             <div style={{ zIndex: 2, position: 'relative' }}><Header token={token} isAuth={false} /></div>
 
             <div style={{ zIndex: 1, position: 'relative' }}>
                 <ProfileAvatar user={user} profileData={profileData} id={id} token={token}  />
-                <ProfileTab view={view} setView={setView} user={user} profileData={profileData} id={id}/>
+                <ProfileTab view={view} setView={setView} user={user} profileData={profileData} id={id} token={token}  />
                 
                 {view === "posts" && <ProfileMain user={user} profileData={profileData} token={token} id={id} posts={posts}  />}
                 {view === "Media" && <ProfileMedia user={user} profileData={profileData} token={token} id={id} posts={posts} />}
                 {view === "Saved" && <ProfileSavedPost user={user} profileData={profileData} id={id} />}
-
+                
             </div>
         </div>
     );

@@ -1,10 +1,11 @@
 import { Editor } from "@tinymce/tinymce-react";
 import axios from 'axios';
-import { useEffect, useState, useContext, useRef } from 'react';
+import React, { useEffect, useState, useContext, useRef,Suspense } from 'react';
 import { AuthContext } from "../../authentication/AuthProvider";
-import Post from './Post';
 import Prism from "prismjs";
 import "prismjs/themes/prism.css";
+
+const Post = React.lazy(() => import('./Post'));
 
 
 const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage, setTotalPages, render }) => {
@@ -436,9 +437,13 @@ const closePreview = () => {
           </div>
         )}
         <section className="post-feed" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', gap: '50px' }}>
-          {postFeed && postFeed.map((post, index) => (
-            <Post key={index} post={post} token={token} update={fetchPosts} />
-          ))}
+          {postFeed && (
+            <Suspense fallback={<div>Loading posts...</div>}>
+              {postFeed.map((post, index) => (
+                <Post key={index} post={post} token={token} update={fetchPosts} />
+              ))}
+            </Suspense>
+          )}
         </section>
       </div>
 

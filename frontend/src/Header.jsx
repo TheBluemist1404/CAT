@@ -36,8 +36,7 @@ function Header({token, isAuth}) {
 
     const logout = async () => {
         try {
-            const refreshToken = token.refreshToken;
-            await axios.delete('http://localhost:3000/api/v1/auth/logout', {data: {refreshToken: refreshToken}}) //axios.delete is treated different
+            await axios.delete('http://localhost:3000/api/v1/auth/logout', {data: {refreshToken: token.refreshToken}}) //axios.delete is treated different
             setIsLoggedIn(false)
             localStorage.removeItem('token')
         } catch (error) {
@@ -50,7 +49,7 @@ function Header({token, isAuth}) {
             <img src="/src/assets/logo.svg" alt="" onClick={() => navigate('/')} style={{ cursor: 'pointer' }} />
                 <div className="navbar">
                     {navbar.map((obj, index) => (
-                        <div ref={el => linkRefs.current[index] = el}
+                        <div key={index} ref={el => linkRefs.current[index] = el}
                             onMouseEnter={() => setHoveredIndex(index)}
                             onMouseLeave={() => setHoveredIndex(null)}
                             onClick={() => navigate(obj.link)}>
@@ -67,7 +66,7 @@ function Header({token, isAuth}) {
                         <div style={{ position: 'absolute', top: '-25px', right: '20px' }}>
                             <div className='logged-in' onClick={toggleDropdown}>
                                 <div className="avatar"><img src={user.avatar} alt="" /></div>
-                                <div className='username'>{user.fullName.length <= 15 ? user.fullName: user.fullName.substr(0, 10)}</div>
+                                <div className='username'>{user? (user.fullName.length <= 15 ? user.fullName: user.fullName.substr(0, 10)): "..."}</div>
                             </div>
                             <div className="action" style={{ height: dropdown ? '100px' : '0' }}>
                                 <div className="container">

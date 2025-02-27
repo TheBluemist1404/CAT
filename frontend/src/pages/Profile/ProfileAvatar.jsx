@@ -97,20 +97,21 @@ function ProfileAvatar({ user, profileData, token, id }) {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            zIndex: 99999
+            zIndex: 9999
           }}
         >
           <div
             style={{
               width: "50%",
-              height: "80%",
+              height: "70%",
+              marginTop:"5%",
               borderRadius: "16px",
               textAlign: "center",
               display: "block"
             }}
             className='detail'
           >
-
+            <style>{`body { overflow: hidden; }`}</style>
             <div style={{ textAlign: "center" }}>
               <h1 style={{ color: "#FFFFFF" }}>Upload Avatar</h1>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginTop: "20px" }}>
@@ -164,8 +165,8 @@ function ProfileAvatar({ user, profileData, token, id }) {
                 </div>
               )}
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid gray", borderBottom: "1px solid gray", marginTop: "10px" }}>
-              <div style={{ color: "#FFFFFF" }}>Update information</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid gray", marginTop: "10px" }}>
+              <div style={{ color: "#FFFFFF",marginLeft:"10px" }}>Update information</div>
               <button
                 onClick={() => setShowAvatarChange(false)}
                 style={{
@@ -175,7 +176,8 @@ function ProfileAvatar({ user, profileData, token, id }) {
                   color: "white",
                   border: "none",
                   borderRadius: "8px",
-                  cursor: "pointer"
+                  cursor: "pointer",
+                  marginRight:"10px"
                 }}
               >
                 Đóng
@@ -194,7 +196,7 @@ function ProfileAvatar({ user, profileData, token, id }) {
       </div>
       <div className="box" style={{ top: '85%' }}>
         <div className="box-item">
-          <span className="number">{profileData?.posts.length}</span>
+          <span className="number">{(profileData?.posts ?? []).length}</span>
           <span className="label">Posts</span>
         </div>
         <div className="divider"></div>

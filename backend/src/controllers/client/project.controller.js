@@ -168,8 +168,7 @@ module.exports.deleteProject = async (req, res) => {
     }
 
     if (
-      !project.owner.equals(userId) &&
-      !project.collaborators.includes(new mongoose.Types.ObjectId(userId))
+      !project.owner.equals(userId) // Only owner can delete project
     ) {
       res.status(403).json({ message: 'Access denied!' });
       return;

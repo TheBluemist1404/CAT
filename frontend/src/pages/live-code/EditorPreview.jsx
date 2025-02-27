@@ -30,7 +30,7 @@ function EditorPreview({ token, preview }) {
     if (response) {
       setDetail(response.data);
       console.log(response.data.owner[0]._id === user._id);
-      setRenderInvite(response.data.owner[0]._id === user._id);
+      setRenderInvite(response.data.owner[0]._id === user._id); // Collaborators wont be able to invite others
     }
   }
 
