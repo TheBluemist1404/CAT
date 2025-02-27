@@ -17,6 +17,7 @@
     "react-avatar-editor": "^13.0.2",
     "react-easy-crop": "^5.2.0",
     "react-quill": "^2.0.0",
+    "react-resize-detector": "^12.0.2",
     "ws": "^8.18.0",
     "y-monaco": "^0.1.6",
     "y-webrtc": "^10.3.0",

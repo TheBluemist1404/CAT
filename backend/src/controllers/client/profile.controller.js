@@ -24,7 +24,7 @@ module.exports.index = async (req, res) => {
     }
 
     if (user.isPrivate) {
-      const data = pickInfoData(['_id', 'fullName', 'avatar'], user);
+      const data = pickInfoData(['_id', 'fullName', 'avatar','isPrivate'], user);
       res.status(200).json(data);
       return;
     }
@@ -75,6 +75,10 @@ module.exports.edit = async (req, res) => {
       cachedData.schools = req.body.schools;
       cachedData.companies = req.body.companies;
       cachedData.avatar = req.body.avatar;
+      
+
+
+      
 
       await redisClient.setEx(
         `${process.env.CACHE_PREFIX}:profile:${id}`,
