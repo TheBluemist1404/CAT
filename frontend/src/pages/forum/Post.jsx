@@ -34,6 +34,110 @@ function Post({ post, token, update }) {
   const timeDiff = (now - createdDate); //in miliseconds
 
   useEffect(() => {
+    const addButtons = () => {
+      document.querySelectorAll("pre code").forEach((codeBlock, index) => {
+        const pre = codeBlock.parentElement;
+  
+        // Avoid duplicates
+        if (pre.querySelector(".copy-button") || pre.querySelector(".download-button")) return;
+  
+        // Extract language from class (e.g., "language-javascript" -> "javascript")
+        const langClass = codeBlock.className.match(/language-(\w+)/);
+        const language = langClass ? langClass[1] : "txt";
+        const fileExtension = getFileExtension(language);
+        const defaultFileName = `snippet-${index + 1}.${fileExtension}`;
+  
+        // Create Copy Button
+        const copyButton = document.createElement("button");
+        copyButton.innerText = "Copy";
+        copyButton.className = "copy-button";
+        Object.assign(copyButton.style, {
+          position: "absolute",
+          top: "5px",
+          right: "80px",
+          padding: "5px 10px",
+          fontSize: "12px",
+          border: "none",
+          background: "#007bff",
+          color: "white",
+          cursor: "pointer",
+          borderRadius: "3px",
+          zIndex: "10",
+        });
+  
+        // Copy to clipboard functionality
+        copyButton.addEventListener("click", () => {
+          navigator.clipboard.writeText(codeBlock.innerText);
+          copyButton.innerText = "Copied!";
+          setTimeout(() => (copyButton.innerText = "Copy"), 2000);
+        });
+  
+        // Create Download Button
+        const downloadButton = document.createElement("button");
+        downloadButton.innerText = "Download";
+        downloadButton.className = "download-button";
+        Object.assign(downloadButton.style, {
+          position: "absolute",
+          top: "5px",
+          right: "5px",
+          padding: "5px 10px",
+          fontSize: "12px",
+          border: "none",
+          background: "#28a745",
+          color: "white",
+          cursor: "pointer",
+          borderRadius: "3px",
+          zIndex: "10",
+        });
+  
+        // Download functionality with language-based file naming
+        downloadButton.addEventListener("click", () => {
+          const fileName = prompt("Enter file name:", defaultFileName) || defaultFileName;
+          const blob = new Blob([codeBlock.innerText], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+  
+        // Attach buttons inside <pre>
+        pre.style.position = "relative";
+        pre.appendChild(copyButton);
+        pre.appendChild(downloadButton);
+      });
+    };
+  
+    addButtons();
+  }, [post.content]);
+
+  const getFileExtension = (language) => {
+    const extensions = {
+      javascript: "js",
+      html: "html",
+      css: "css",
+      python: "py",
+      java: "java",
+      c: "c",
+      cpp: "cpp",
+      php: "php",
+      ruby: "rb",
+      swift: "swift",
+      go: "go",
+      rust: "rs",
+      kotlin: "kt",
+      ts: "ts",
+      sql: "sql",
+      bash: "sh",
+    };
+    return extensions[language] || "txt";
+  };
+  
+
+  useEffect(() => {
     Prism.highlightAll(); // Highlight code after rendering
   }, [post.content]);
 
@@ -465,6 +569,7 @@ function Post({ post, token, update }) {
     if (count === 4) return "post-gallery-grid-4";
     return "post-gallery-grid-5plus";
   };
+  
   const defaultAvatar = "https://res.cloudinary.com/cat-project/image/upload/v1735743336/coder-sign-icon-programmer-symbol-vector-2879989_ecvn23.webp";
 
   return (
@@ -497,6 +602,7 @@ function Post({ post, token, update }) {
                 onClick={() => handleClick(index)}
                 className="post-gallery-image"
                 style={index === 4 ? { gridColumn: 'span 2' } : {}}
+                loading="lazy"
               />
             )
           ))}
