@@ -15,8 +15,8 @@ const fileSchema = new mongoose.Schema(
 
 const folderSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true }, 
-    files: [fileSchema], 
+    name: { type: String, required: true },
+    files: [fileSchema],
     folders: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -42,7 +42,13 @@ const projectSchema = new mongoose.Schema(
         ref: 'User',
       },
     ],
-    files: [fileSchema], 
+    files: [fileSchema],
+    remarks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
     folders: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -52,7 +58,7 @@ const projectSchema = new mongoose.Schema(
     deleted: {
       type: Boolean,
       default: false,
-    }
+    },
   },
   { timestamps: true },
 );
