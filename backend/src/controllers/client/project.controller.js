@@ -119,6 +119,7 @@ module.exports.getProject = async (req, res) => {
           _id: 1,
           name: 1,
           description: 1,
+          remarks: 1,
           owner: { _id: 1, fullName: 1, avatar: 1, email: 1 },
           files: 1,
           folders: 1,
@@ -141,7 +142,6 @@ module.exports.getProject = async (req, res) => {
       res.status(403).json({ message: 'Access denied!' });
       return;
     }
-    
 
     const folders = await Promise.all(
       projects[0].folders.map(
@@ -338,5 +338,71 @@ module.exports.removeCollaborator = async (req, res) => {
 
   res.status(200).json({
     message: 'Remove collaborators successfully!',
+  });
+};
+
+// [PATCH] /api/v1/projects/:id/remarks
+module.exports.changeRemark = async (req, res) => {
+  const id = '' + req.params.id;
+  const userId = '' + req.user.id;
+  const isRemarked = req.body.isRemarked;
+
+  const user = await User.findOne({
+    _id: new mongoose.Types.ObjectId(id),
+    deleted: false,
+  });
+
+  if (!user) {
+    res.status(404).json({
+      message: 'User not found!',
+    });
+    return;
+  }
+
+  const project = await Project.findOne({
+    _id: new mongoose.Types.ObjectId(id),
+    deleted: false,
+  });
+
+  if (!project) {
+    res.status(404).json({
+      message: 'Project not found!',
+    });
+    return;
+  }
+
+  if (
+    !project.owner.equals(userId) &&
+    !project.collaborators.includes(new mongoose.Types.ObjectId(userId))
+  ) {
+    res.status(403).json({ message: 'Access denied!' });
+    return;
+  }
+
+  if (isRemarked) {
+    await Project.findOneAndUpdate(
+      {
+        _id: new mongoose.Types.ObjectId(id),
+        deleted: false,
+      },
+      {
+        $addToSet: { remarks: user._id },
+      },
+    );
+  } else {
+    await Project.findOneAndUpdate(
+      {
+        _id: new mongoose.Types.ObjectId(id),
+        deleted: false,
+      },
+      {
+        $pull: { remarks: user._id },
+      },
+    );
+  }
+
+  res.status(200).json({
+    message: 'Update successfully!',
+    isRemarked,
   });
 };

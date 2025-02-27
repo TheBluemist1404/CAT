@@ -67,6 +67,7 @@ module.exports.getProfile = async id => {
           'companies': 1,
           'email': 1,
           'avatar': 1,
+          'duration': 1,
           'posts._id': 1,
           'posts.title': 1,
           'posts.createdAt': 1,
