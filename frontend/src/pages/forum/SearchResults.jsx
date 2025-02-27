@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
-import Post from './Post';  // Make sure to import your Post component
 import User from'./PostUserList';
+
+const Post = React.lazy(() => import('./Post'));
 
 const SearchResults = ({ token }) => {
     const [postFeed, setPostFeed] = useState([]);

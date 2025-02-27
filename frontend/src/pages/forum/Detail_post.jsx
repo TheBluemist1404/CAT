@@ -138,8 +138,7 @@ function Detail({ token }) {
       editorRef.current[commentId]?.setContent("");
       setActiveReply(null);
   
-      // Refetch the post data to get the updated replies
-      fetchData();  // This triggers the re-render
+      fetchData();  
   
     } catch (error) {
       console.error("Error posting reply:", error);
@@ -468,6 +467,27 @@ function Detail({ token }) {
     handleSubmit();
   }, [post]); 
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+
+  if (!post || !post.images) return <div className="post-gallery-container"></div>;
+
+  const images = post.images.slice(0, 5);
+  const remainingCount = post.images.length - 5;
+
+  const handleClick = (index) => {
+    setPhotoIndex(index);
+    setIsOpen(true);
+  };
+
+  const getGridClass = (count) => {
+    if (count === 1) return "post-gallery-grid-1";
+    if (count === 2) return "post-gallery-grid-2";
+    if (count === 3) return "post-gallery-grid-3";
+    if (count === 4) return "post-gallery-grid-4";
+    return "post-gallery-grid-5plus";
+  };
+
   const screenHeight = window.innerHeight;
 
   const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
@@ -487,20 +507,45 @@ function Detail({ token }) {
       <div className="post-body">
         <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post ? post.title : ""}</h1>
         <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
-        <div style={{ textAlign: "center" }}>
-          {post?.images && post?.images.length > 0 && (
-            <div>
-              {post.images.map((image, index) => (
-                <a key={index} href={image} target="_blank" rel="noopener noreferrer" style={{ marginTop: "10px" }}>
-                  <img 
-                    src={image} 
-                    alt={`Post Image ${index + 1}`} 
-                    style={{width: "90%", height: "auto", display: "block", margin: "0 auto" }} 
-                  />
-                </a>
+        <div className="post-gallery-container">
+        <div className={`post-gallery-grid-container ${getGridClass(images.length)}`}>
+          {images.map((img, index) => (
+            index === 4 && remainingCount > 0 ? (
+              <div key={index} className="post-gallery-overlay-container" style={{ gridColumn: 'span 2' }} onClick={() => handleClick(index)}>
+                <img src={img} alt={`img-${index}`} className="post-gallery-blurred-image" />
+                <div className="post-gallery-overlay-text">+{remainingCount}</div>
+              </div>
+            ) : (
+              <img
+                key={index}
+                src={img}
+                alt={`img-${index}`}
+                onClick={() => handleClick(index)}
+                className="post-gallery-image"
+                style={index === 4 ? { gridColumn: 'span 2' } : {}}
+              />
+            )
+          ))}
+        </div>
+
+        {isOpen && (
+          <div className="post-gallery-modal">
+            <button className="post-gallery-close-button" onClick={() => setIsOpen(false)}>✖</button>
+            <button className="post-gallery-nav-button post-gallery-left" onClick={() => setPhotoIndex((photoIndex - 1 + post.images.length) % post.images.length)}>◀</button>
+
+            <img src={post.images[photoIndex]} alt="Enlarged" className="post-gallery-modal-image" />
+
+            <button className="post-gallery-nav-button post-gallery-right" onClick={() => setPhotoIndex((photoIndex + 1) % post.images.length)}>▶</button>
+
+            {/* <div className="post-gallery-index">{photoIndex + 1} / {post.images.length}</div> */}
+
+            <div className="post-gallery-dots">
+              {post.images.map((_, i) => (
+                <span key={i} className={`dot ${i === photoIndex ? "active" : ""}`} onClick={() => setPhotoIndex(i)}></span>
               ))}
             </div>
-          )}
+          </div>
+        )}
         </div>
         <div className="tag-box">
           {tag.map((tag, index) => (

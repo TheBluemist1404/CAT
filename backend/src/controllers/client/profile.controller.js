@@ -5,6 +5,7 @@ const hashPassword = require('../../utils/hashPassword');
 const { getProfile } = require('../../services/client/getProfile.service');
 const { initializeRedisClient } = require('../../utils/redis');
 const { pickInfoData } = require('../../utils/getInfoData');
+const mongoose = require('mongoose');
 
 // [GET] /api/v1/profile/detail/:id
 module.exports.index = async (req, res) => {
@@ -47,12 +48,6 @@ module.exports.edit = async (req, res) => {
   try {
     const id = req.params.id;
     const user = await User.findById(id);
-    if (!user) {
-      res.status(404).json({
-        message: 'Cannot find user',
-      });
-      return;
-    }
     if (user._id.toString() !== req.user.id) {
       res.status(403).json({
         message: 'Only the owner of the account can edit it!',
@@ -60,25 +55,38 @@ module.exports.edit = async (req, res) => {
       return;
     }
 
-    req.body.slug = slugify(req.body.fullName, { trim: true, lower: true });
-    req.body.password = user.password;
-    await User.updateOne({ _id: id }, req.body);
+    if (req.body.fullName) {
+      req.body.slug = slugify(req.body.fullName, { trim: true, lower: true });
+    }
 
+    const updatedProfile = await User.findByIdAndUpdate(
+      new mongoose.Types.ObjectId('' + id),
+      req.body,
+      { new: true },
+    );
+
+    if (!updatedProfile) {
+      if (!user) {
+        res.status(404).json({
+          message: 'Cannot find user',
+        });
+        return;
+      }
+    }
     const redisClient = await initializeRedisClient();
     const cachedUser = await redisClient.get(
       `${process.env.CACHE_PREFIX}:profile:${id}`,
     );
+
     if (cachedUser) {
       const cachedData = JSON.parse(cachedUser);
-      cachedData.fullName = req.body.fullName;
-      cachedData.description = req.body.description;
-      cachedData.schools = req.body.schools;
-      cachedData.companies = req.body.companies;
-      cachedData.avatar = req.body.avatar;
-      
 
+      if (req.body.fullName) cachedData.fullName = req.body.fullName;
+      if (req.body.description) cachedData.description = req.body.description;
+      if (req.body.schools) cachedData.schools = req.body.schools;
+      if (req.body.companies) cachedData.companies = req.body.companies;
+      if (req.body.avatar) cachedData.avatar = req.body.avatar;
 
-      
 
       await redisClient.setEx(
         `${process.env.CACHE_PREFIX}:profile:${id}`,
@@ -93,8 +101,9 @@ module.exports.edit = async (req, res) => {
       );
       if (cachedPost) {
         const cachedData = JSON.parse(cachedPost);
-        cachedData.userCreated.fullName = req.body.fullName;
-        cachedData.userCreated.avatar = req.body.avatar;
+        if (req.body.fullName)
+          cachedData.userCreated.fullName = req.body.fullName;
+        if (req.body.avatar) cachedData.userCreated.avatar = req.body.avatar;
 
         await redisClient.setEx(
           `${process.env.CACHE_PREFIX}:post:${post._id.toString()}`,
