@@ -4,7 +4,7 @@ import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
 import { Awareness } from "y-protocols/awareness";
 import Editor from "@monaco-editor/react";
-import { useResizeDetector } from "react-resize-detector";
+import { MonacoBinding } from "y-monaco";
 
 import axios from "axios";
 import { useRef, useState, useEffect } from "react";
@@ -22,7 +22,6 @@ const clientColor = getRandomColor(); // Static color for this client
 function CodeEditor({ token, preview }) {
   //Get Project info
   const projectId = window.location.href.split("/").pop();
-  console.log(projectId);
   const [project, setProject] = useState({});
   const [projectName, setProjectName] = useState("");
   const [projectContent, setProjectContent] = useState({});
@@ -66,8 +65,7 @@ function CodeEditor({ token, preview }) {
     // Initialize the WebRTC provider with awareness
     provider.current = new WebrtcProvider("my-room-name", ydoc.current, {
       awareness,
-      signaling: ["ws://localhost:4444"], // Use your own signaling server
-
+      signaling: ["wss://cat-signaling-server.fly.dev"], // Use your own signaling server
     });
 
     if (provider.current) {
@@ -85,7 +83,6 @@ function CodeEditor({ token, preview }) {
     if (editorRef.current) {
       editorRef.current.layout();
     }
-    const { MonacoBinding } = await import("y-monaco");
     // Bind Yjs text syncing to Monaco editor model
     new MonacoBinding(ytext, editor.getModel(), new Set([editor]), awareness);
 
@@ -423,17 +420,6 @@ function CodeEditor({ token, preview }) {
     console.log(response.data);
   }
 
-  const { width, height, ref } = useResizeDetector({
-    handleWidth: true,
-    handleHeight: true,
-    onResize: () => {
-      console.log("resize");
-      if (editorRef.current) {
-        editorRef.current.layout();
-      }
-    },
-  });
-
   return (
     <div className="code-editor">
       <div className="container">
@@ -488,7 +474,7 @@ function CodeEditor({ token, preview }) {
           </div>
           <div className="codespace">
             <div className="code-input" ref={editorContainerRef}>
-              <div className="text-editor" ref={ref}>
+              <div className="text-editor">
                 <Editor
                   language={lang}
                   value={projectContent ? projectContent.content : "no content"}

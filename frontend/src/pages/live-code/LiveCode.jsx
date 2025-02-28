@@ -8,12 +8,14 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../authentication/AuthProvider";
 import ProjectCard from "./ProjectCard";
 
+import useSessionTimeTracker from "./useSessionTimeTracker";
+
 function LiveCode({ token }) {
+  useSessionTimeTracker();
+  
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [projects, setProjects] = useState();
-  const [projectName, setProjectName] = useState("");
-  const [projectDesc, setProjectDesc] = useState("");
 
   async function fetchProjects() {
     const response = await axios.get(
@@ -40,7 +42,7 @@ function LiveCode({ token }) {
         navigate(`/live-code/preview/${response.data._id}`);
       }
     } catch (error) {
-      console.error("error create project", error.message);
+      console.error("error create project", error);
     }
   }
 
