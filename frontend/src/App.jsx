@@ -124,7 +124,7 @@ function App() {
             element={<Forum token={token} render="search" />}
           />
         </Route>
-        <Route path="/profile/:id/*" element={<Profile token={token} />}>
+        <Route path="profile/:id/*" element={<Profile token={token} />}>
           <Route path="post" element={<></>} />
           <Route path="media" element={<></>} />
           <Route path="saved" element={<></>} />

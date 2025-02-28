@@ -124,7 +124,8 @@ function EditorPreview({ token, preview }) {
             <div
               className="navigate"
               onClick={() => {
-                navigate(`/live-code/editor/${projectId}`);
+                console.log("redirect to editor")
+                navigate(`/live-code/editor/${projectId}`, {replace: true});
               }}
             >
               <Button />
