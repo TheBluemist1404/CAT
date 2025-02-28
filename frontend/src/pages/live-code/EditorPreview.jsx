@@ -78,7 +78,7 @@ function EditorPreview({ token, preview }) {
         fetchProject();
       }
     } catch (error) {
-      console.error("error adding member", error.message);
+      console.error("error adding member", error);
     }
   }
 
