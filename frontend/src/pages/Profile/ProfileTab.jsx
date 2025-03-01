@@ -67,7 +67,7 @@ const handleTogglePrivacy = async () => {
   }
 };
 
-console.log("Current isPrivate:", isPrivate);
+console.log("profiledata:", profileData);
 
 const check = id !== user._id && profileData.isPrivate;
   return (

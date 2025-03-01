@@ -86,6 +86,7 @@ const Profile = ({offset = 0, limit = 999, token }) => {
     console.log("id in main",id);
     console.log("user id in main",user._id);
     
+    
     return (
         <div className="profile" style={{ position: 'relative' }}>
             <div style={{ zIndex: 2, position: 'relative' }}><Header token={token} isAuth={false} /></div>
