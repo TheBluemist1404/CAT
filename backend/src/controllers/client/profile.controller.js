@@ -197,6 +197,6 @@ module.exports.changeStatus = async (req, res) => {
 
   res.status(200).json({
     message: 'Update status successfully!',
-    userStatus: status,
+    isPrivate: status,
   });
 };
