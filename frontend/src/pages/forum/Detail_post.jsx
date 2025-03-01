@@ -3,6 +3,13 @@ import axios from "axios";
 import { useEffect, useState, useContext, useRef } from "react";
 import { AuthContext } from "../../authentication/AuthProvider";
 import { useParams, useNavigate } from "react-router-dom";
+import Prism from "prismjs";
+import hljs from "highlight.js/lib/core"; 
+import cpp from "highlight.js/lib/languages/cpp";
+import "prismjs/themes/prism.css"; 
+import "highlight.js/styles/monokai-sublime.css"; 
+import "prismjs/components/prism-python"; 
+import "prismjs/components/prism-javascript";
 import DOMPurify from 'dompurify';
 
 function Detail({ token }) {
@@ -50,6 +57,20 @@ function Detail({ token }) {
       fetchData();
     }
   }, [])
+
+  hljs.registerLanguage("cpp", cpp); 
+
+    useEffect(() => {
+      Prism.highlightAll(); 
+  
+      document.querySelectorAll("pre code.language-cpp").forEach((block) => {
+        block.classList.remove("language-cpp"); 
+        block.classList.add("cpp"); 
+        block.removeAttribute("data-highlighted"); 
+        hljs.highlightElement(block); 
+      });
+    }, [post ? post.content : ""]);
+
   const sanitizedContent = DOMPurify.sanitize(post ? post.content : "");
   //Handle time display
   const timestamp = post ? post.createdAt : new Date();

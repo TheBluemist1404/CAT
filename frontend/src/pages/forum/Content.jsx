@@ -3,7 +3,12 @@ import axios from 'axios';
 import React, { useEffect, useState, useContext, useRef,Suspense } from 'react';
 import { AuthContext } from "../../authentication/AuthProvider";
 import Prism from "prismjs";
-import "prismjs/themes/prism.css";
+import hljs from "highlight.js/lib/core"; 
+import cpp from "highlight.js/lib/languages/cpp";
+import "prismjs/themes/prism.css"; 
+import "highlight.js/styles/monokai-sublime.css"; 
+import "prismjs/components/prism-python"; 
+import "prismjs/components/prism-javascript";
 
 const Post = React.lazy(() => import('./Post'));
 
@@ -149,15 +154,44 @@ const handlePreviewClick = () => {
   setIsPreviewOpen(true);
 };
 
+hljs.registerLanguage("cpp", cpp); 
+
 useEffect(() => {
   Prism.highlightAll(); 
-}, [previewContent.content]); 
+
+  document.querySelectorAll("pre code.language-cpp").forEach((block) => {
+    block.classList.remove("language-cpp"); 
+    block.classList.add("cpp"); 
+    block.removeAttribute("data-highlighted"); 
+    hljs.highlightElement(block); 
+  });
+}, [previewContent.content]);
 
 // Function to close preview
 const closePreview = () => {
   setIsPreviewOpen(false);
 };
 
+const [isOpen, setIsOpen] = useState(false);
+const [photoIndex, setPhotoIndex] = useState(0);
+
+if (!previewContent.images) return <div className="post-gallery-container"></div>;
+
+const imageset = previewContent.images.slice(0, 5);
+const remainingCount = previewContent.images.length - 5;
+
+const handleClick = (index) => {
+  setPhotoIndex(index);
+  setIsOpen(true);
+};
+
+const getGridClass = (count) => {
+  if (count === 1) return "post-gallery-grid-1";
+  if (count === 2) return "post-gallery-grid-2";
+  if (count === 3) return "post-gallery-grid-3";
+  if (count === 4) return "post-gallery-grid-4";
+  return "post-gallery-grid-5plus";
+};
   
   const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
 
@@ -403,21 +437,47 @@ const closePreview = () => {
                       <div className="post" style={{ maxHeight: "70vh", overflowY: "auto", paddingRight: "10px" }}> 
                         <h1 className="post-title">{previewContent.title}</h1>
                         <p className="post-content" dangerouslySetInnerHTML={{ __html: previewContent.content }}></p>
-
-                        {previewContent.images.length > 0 && (
-                          <div style={{ textAlign: "center" }}>
-                            {previewContent.images.map((image, index) => (
-                              <a key={index} href={URL.createObjectURL(image)} target="_blank" rel="noopener noreferrer">
-                              <img 
-                                key={index} 
-                                src={URL.createObjectURL(image)} 
-                                alt={`Preview Image ${index}`} 
-                                style={{ maxWidth: "100%", maxHeight: "300px", marginTop: "10px", objectFit: "cover" }} 
-                              />
-                              </a>
+                        <div className="post-gallery-container">
+                          <div className={`post-gallery-grid-container ${getGridClass(images.length)}`}>
+                            {imageset.map((img, index) => (
+                              index === 4 && remainingCount > 0 ? (
+                                <div key={index} className="post-gallery-overlay-container" style={{ gridColumn: 'span 2' }} onClick={() => handleClick(index)}>
+                                  <img src={URL.createObjectURL(img)} alt={`img-${index}`} className="post-gallery-blurred-image" />
+                                  <div className="post-gallery-overlay-text">+{remainingCount}</div>
+                                </div>
+                              ) : (
+                                <img
+                                  key={index}
+                                  src={URL.createObjectURL(img)}
+                                  alt={`img-${index}`}
+                                  onClick={() => handleClick(index)}
+                                  className="post-gallery-image"
+                                  style={index === 4 ? { gridColumn: 'span 2' } : {}}
+                                  loading="lazy"
+                                />
+                              )
                             ))}
                           </div>
-                        )}                        
+
+                          {isOpen && (
+                            <div className="post-gallery-modal">
+                              <button className="post-gallery-close-button" onClick={() => setIsOpen(false)}>✖</button>
+                              <button className="post-gallery-nav-button post-gallery-left" onClick={() => setPhotoIndex((photoIndex - 1 + previewContent.images.length) % previewContent.images.length)}>◀</button>
+
+                              <img src={URL.createObjectURL(previewContent.images[photoIndex])} alt="Enlarged" className="post-gallery-modal-image" />
+
+                              <button className="post-gallery-nav-button post-gallery-right" onClick={() => setPhotoIndex((photoIndex + 1) % previewContent.images.length)}>▶</button>
+
+                              {/* <div className="post-gallery-index">{photoIndex + 1} / {post.images.length}</div> */}
+
+                              <div className="post-gallery-dots">
+                                {previewContent.images.map((_, i) => (
+                                  <span key={i} className={`dot ${i === photoIndex ? "active" : ""}`} onClick={() => setPhotoIndex(i)}></span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>                   
                       </div>
                     </div>
                   </div>

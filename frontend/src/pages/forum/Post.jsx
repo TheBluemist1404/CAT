@@ -5,7 +5,12 @@ import { AuthContext } from "../../authentication/AuthProvider";
 import { useNavigate } from 'react-router-dom'
 import DOMPurify from 'dompurify';
 import Prism from "prismjs";
-import "prismjs/themes/prism.css";
+import hljs from "highlight.js/lib/core"; 
+import cpp from "highlight.js/lib/languages/cpp";
+import "prismjs/themes/prism-okaidia.css"; 
+import "highlight.js/styles/dark.css"; 
+import "prismjs/components/prism-python"; 
+import "prismjs/components/prism-javascript";
 import "./PostGallery.css"; 
 
 
@@ -114,6 +119,7 @@ function Post({ post, token, update }) {
     addButtons();
   }, [post.content]);
 
+  
   const getFileExtension = (language) => {
     const extensions = {
       javascript: "js",
@@ -136,11 +142,18 @@ function Post({ post, token, update }) {
     return extensions[language] || "txt";
   };
   
+  hljs.registerLanguage("cpp", cpp); 
 
-  useEffect(() => {
-    Prism.highlightAll(); // Highlight code after rendering
-  }, [post.content]);
-
+    useEffect(() => {
+      Prism.highlightAll(); 
+  
+      document.querySelectorAll("pre code.language-cpp").forEach((block) => {
+        block.classList.remove("language-cpp"); 
+        block.classList.add("cpp"); 
+        block.removeAttribute("data-highlighted"); 
+        hljs.highlightElement(block); 
+      });
+    }, [post.content]);
   let timeDisplay;
   if (timeDiff < 60 * 1000) {
     const seconds = Math.floor(timeDiff / 1000);
@@ -191,15 +204,12 @@ function Post({ post, token, update }) {
       }
     }
   };
-  //Also note that we should retrive comments from db, and add comment should make update to db, as well as cause rerender, not adding it manually to fe like this
 
-  const [activeReply, setActiveReply] = useState(null); // Track which comment's reply editor is open
-  // Function to handle showing the reply editor
+  const [activeReply, setActiveReply] = useState(null); 
   const toggleReplyEditor = (commentId) => {
-    setActiveReply(activeReply === commentId ? null : commentId); // Toggle reply editor for the comment
+    setActiveReply(activeReply === commentId ? null : commentId); 
   };
 
-  // Handle adding a reply to a comment
   const handleAddReply = async (commentId) => {
     const editorContent = editorRef.current[commentId]?.getContent();
     if (!editorContent.trim()) return;
@@ -212,13 +222,11 @@ function Post({ post, token, update }) {
       );
       console.log("Reply posted:", response.data);
 
-      // Refresh post or update replies locally
       const updatedPost = { ...post };
       const commentIndex = updatedPost.comments.findIndex((c) => c._id === commentId);
       updatedPost.comments[commentIndex].replies.push(response.data);
       setPost(updatedPost);
 
-      // Clear editor and hide it
       editorRef.current[commentId]?.setContent("");
       setActiveReply(null);
     } catch (error) {
@@ -231,9 +239,7 @@ function Post({ post, token, update }) {
   const toggleCommentBox = () => {
     setIsCommentBoxVisible(!isCommentBoxVisible);
   };
-  //Hmm, actually I actually think the comment box should appear with the comments
 
-  //Handle vote
   useEffect(() => {
     const renderVote = () => {
       const upvote = post.upvotes;
@@ -365,10 +371,10 @@ function Post({ post, token, update }) {
     </div>
   );
   useEffect(() => {
-    console.log(post._id); // Debugging post._id value
+    console.log(post._id); 
     if (user.savedPosts && Array.isArray(user.savedPosts)) {
       const isPostSaved = user.savedPosts.some(
-        (savedPost) => savedPost._id.toString() === post._id.toString() // Updated comparison
+        (savedPost) => savedPost._id.toString() === post._id.toString() 
       );
       setIsSaved(isPostSaved);
     }
@@ -382,9 +388,9 @@ function Post({ post, token, update }) {
         { headers: { Authorization: `Bearer ${token.accessToken}` } }
       );
   
-      console.log(response.data); // Debugging the response
+      console.log(response.data); 
       if (response.status === 200) {
-        setIsSaved(!isSaved); // Toggle the save status
+        setIsSaved(!isSaved);
       } else {
         console.error("Error updating save status:", response.data.message);
       }
@@ -398,7 +404,7 @@ function Post({ post, token, update }) {
       className="post-navigate-dropdown"
       style={{ display: dropdownVisible === index ? 'block' : 'none' }}
     >
-      <div className="dropdown-item" onClick={handleSavePost}>{isSaved ? "Unsave" : "Save"}</div> {/*Placeholder, but replace with some api call later */}
+      <div className="dropdown-item" onClick={handleSavePost}>{isSaved ? "Unsave" : "Save"}</div> 
       <hr className="post-navigate-line" />
       {post.userCreated._id === user._id ? (
         <div
@@ -421,18 +427,16 @@ function Post({ post, token, update }) {
     const handleClickOutside = (event) => {
       if (
         postRef.current &&
-        !postRef.current.contains(event.target) && // Check if clicked outside of the post
+        !postRef.current.contains(event.target) &&
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) // Check if clicked outside of the dropdown
+        !dropdownRef.current.contains(event.target)
       ) {
-        setDropdownVisible(null); // Close the dropdown
+        setDropdownVisible(null); 
       }
     };
 
-    // Add event listener for clicks
     document.addEventListener('click', handleClickOutside);
 
-    // Clean up the event listener on component unmount
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
@@ -441,7 +445,7 @@ function Post({ post, token, update }) {
   const renderComments = () => (
     <div className="comments-list">
       {comments.map((comment) => {
-        const sanitizedContent = DOMPurify.sanitize(comment.content); // Sanitize the comment content
+        const sanitizedContent = DOMPurify.sanitize(comment.content); 
         const isReplyEditorOpen = activeReply === comment._id;
         return (
           <div key={comment.id} className="comment">
