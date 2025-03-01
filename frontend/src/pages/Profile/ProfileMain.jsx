@@ -6,7 +6,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import DOMPurify from "dompurify";
 
 
-function ProfileMain({ user, token, profileData, id ,posts}) {
+function ProfileMain({ user, token, profileData, id ,posts,isPrivate}) {
   // edit school and company modal
   const [showModal, setShowModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -52,7 +52,7 @@ function ProfileMain({ user, token, profileData, id ,posts}) {
 
     fetchSchools();
   }, [user, token]);
-console.log(posts);
+console.log("check profile private",profileData?.isPrivate)
 const handleAddSchool = async () => {
   if (newSchool.trim() === "") return;
 
@@ -306,9 +306,19 @@ const handleAddSchool = async () => {
   console.log("id other", id);
   console.log("user id",user._id);
   const information = id === user._id ? user : profileData;
-
+  //--------------
+  const check = id !== user._id && profileData.isPrivate;
+  console.log("check",check)
   return (
-    <div className='main'>
+    
+    <div >
+      {check ? (
+      <div style={{ padding: "50px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <p>This profile is private!</p>
+      </div>
+      
+      ) : (
+        <div className='main'>
       <div className="left">
       <div className='bio' >
         <h1 style={{ margin: "20px" }}>Bio</h1>
@@ -883,7 +893,7 @@ const handleAddSchool = async () => {
   </div>
 </div>
 </div>
-
+      </div>)}
     </div>)
 }
 

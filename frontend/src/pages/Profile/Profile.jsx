@@ -19,7 +19,7 @@ const Profile = ({offset = 0, limit = 999, token }) => {
 
     
     const { id } = useParams();
-    console.log(id,typeof id);
+    const [isPrivate, setIsPrivate] = useState(false);
     
     const [profileData, setProfileData] = useState(null);
     useEffect(() => {
@@ -92,10 +92,10 @@ const Profile = ({offset = 0, limit = 999, token }) => {
 
             <div style={{ zIndex: 1, position: 'relative' }}>
                 <ProfileAvatar user={user} profileData={profileData} id={id} token={token}  />
-                <ProfileTab view={view} setView={setView} user={user} profileData={profileData} id={id} token={token}  />
+                <ProfileTab view={view} setView={setView} user={user} profileData={profileData} id={id} token={token} isPrivate={isPrivate} setIsPrivate={setIsPrivate}  />
                 
-                {view === "posts" && <ProfileMain user={user} profileData={profileData} token={token} id={id} posts={posts}  />}
-                {view === "Media" && <ProfileMedia user={user} profileData={profileData} token={token} id={id} posts={posts} />}
+                {view === "posts" && <ProfileMain user={user} profileData={profileData} token={token} id={id} posts={posts} isPrivate={isPrivate}  />}
+                {view === "Media" && <ProfileMedia user={user} profileData={profileData} token={token} id={id} posts={posts} isPrivate={isPrivate}/>}
                 {view === "Saved" && <ProfileSavedPost user={user} profileData={profileData} id={id} />}
                 
             </div>

@@ -1,7 +1,7 @@
 import { useState,useEffect } from "react"
 import axios from "axios";
 
-function ProfileTab({ view, setView,id,user,token,profileData }) {
+function ProfileTab({ view, setView,id,user,token,profileData,isPrivate,setIsPrivate }) {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
@@ -16,7 +16,7 @@ function ProfileTab({ view, setView,id,user,token,profileData }) {
   };
   
 
-  const [isPrivate, setIsPrivate] = useState(false);
+  
   
   console.log("User Data:", user);
   useEffect(() => {
@@ -69,12 +69,12 @@ const handleTogglePrivacy = async () => {
 
 console.log("Current isPrivate:", isPrivate);
 
-
+const check = id !== user._id && profileData.isPrivate;
   return (
     <div className='tabs'>
       <div className="tab-container">
         <button type='button' className={`p ${view === "posts" ? "active" : ""}`} onClick={() => setView("posts")}>Posts</button>
-        <button type='button' className={`i ${view === "Media" ? "active" : ""}`} onClick={() => setView("Media")}>Media</button>
+        {!check && <button type="button" className={`i ${view === "Media" ? "active" : ""}`} onClick={() => setView("Media")}>Media</button>}
         { id === user._id && (<button type='button' className={`v ${view === 'Saved' ? 'active' : ''}`} onClick={() => setView("Saved")}>Saved</button>)}
       </div>
       { id === user._id && (
