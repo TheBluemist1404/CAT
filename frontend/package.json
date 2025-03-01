@@ -13,6 +13,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@tinymce/tinymce-react": "^5.1.1",
     "dompurify": "^3.2.3",
+    "highlight.js": "^11.11.1",
     "jwt-decode": "^4.0.0",
     "monaco-editor": "^0.52.2",
     "prismjs": "^1.29.0",
