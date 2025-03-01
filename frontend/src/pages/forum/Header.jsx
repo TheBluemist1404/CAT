@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../../authentication/AuthProvider';
 import axios from 'axios';
 
-const Header = () => {
-    const { isLoggedIn, user } = useContext(AuthContext);
+const Header = ({token}) => {
+    const {isLoggedIn, setIsLoggedIn, user} = useContext(AuthContext);
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
