@@ -60,6 +60,7 @@ module.exports.getProfile = async id => {
       },
       {
         $project: {
+          'isPrivate': 1,
           '_id': 1,
           'fullName': 1,
           'description': 1,
