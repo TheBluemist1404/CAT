@@ -40,7 +40,7 @@ function CodeEditor({ token, preview }) {
       console.log(response.data.files[0]);
     }
     fetchProject();
-  }, []);
+  }, [projectId]);
 
   // -------------------------------
   //Setup monaco editor with Yjs binding
@@ -50,11 +50,13 @@ function CodeEditor({ token, preview }) {
   const ytext = ydoc.current.getText("monaco"); // Shared Yjs text model
 
   useEffect(() =>{
-    setTimeout(()=>{
+    const update = setTimeout(()=>{
       if (ytext.toString() === "" && projectContent.content) {
         ytext.insert(0, projectContent.content)
       }
     }, 2000) // Give a bit delay so everything is set
+
+    return () => clearTimeout(update); //debounce so it update only once 
   }, [projectContent])
 
   // Create awareness instance (using Yjs document)

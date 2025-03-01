@@ -1,10 +1,13 @@
-import { useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
-import TimeMe from 'timeme.js';
+import axios from "axios";
+import { useContext, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
+import TimeMe from "timeme.js";
+import { AuthContext } from "../../authentication/AuthProvider";
 
-function useSessionTimeTracker() {
+export function useSessionTimeTracker(token) {
+  const { user, setUser } = useContext(AuthContext);
   const location = useLocation();
-  const previousPath = useRef("");
+  const currentPath = useRef("");
 
   useEffect(() => {
     // Initialize TimeMe only once
@@ -12,38 +15,35 @@ function useSessionTimeTracker() {
   }, []);
 
   useEffect(() => {
-    // Stop the previous route's timer
-    if (previousPath.current) {
-      const timeSpent = TimeMe.getTimeOnPageInSeconds(previousPath.current);
-      console.log("Time spent on route:", previousPath.current, timeSpent);
-      // Send to API, etc.
-      TimeMe.stopTimer(previousPath.current);
-    }
-
     // Start a timer for the new route
-    previousPath.current = location.pathname;
+    currentPath.current = location.pathname;
     TimeMe.startTimer(location.pathname);
 
-    const handleSessionEnd = () =>{
-      const timeSpent = TimeMe.getTimeOnPageInSeconds(previousPath.current);
-      console.log(timeSpent)
-
-      const payload = JSON.stringify({session: previousPath.current, timeSpent})
-      // navigator.sendBeacon('api', payload)
-    }
-
-    window.addEventListener("beforeunload", handleSessionEnd)
-    // Optionally clean up on unmount
-    return () => {
+    const handleSessionEnd = async () => {
       const timeSpent = TimeMe.getTimeOnPageInSeconds(location.pathname);
       console.log("Unmounted route:", location.pathname, timeSpent);
-      // Send to API
-      TimeMe.stopTimer(location.pathname);
+      const response = await axios.patch(
+        `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+        { fullName: user.fullName, duration: user.duration + timeSpent },
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
 
+      TimeMe.resetRecordedPageTime(location.pathname);
+
+      if (response) {
+        console.log(response.data);
+        setUser((prevUser) =>({
+          ...prevUser,
+          duration: prevUser.duration + timeSpent
+        }))
+      }
+    };
+
+    window.addEventListener("beforeunload", handleSessionEnd);
+    // Optionally clean up on unmount
+    return () => {
       handleSessionEnd();
-      window.removeEventListener("beforeunload", handleSessionEnd)
+      window.removeEventListener("beforeunload", handleSessionEnd);
     };
   }, [location]);
 }
-
-export default useSessionTimeTracker;

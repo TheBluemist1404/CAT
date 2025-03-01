@@ -9,10 +9,13 @@ function ProjectCard({ info, token, fetchProjects }) {
 
   async function deleteProject() {
     try {
-      const response = await axios.delete(`http://localhost:3000/api/v1/projects/${info._id}`,{headers: {Authorization: `Bearer ${token.accessToken}`}})
+      const response = await axios.delete(
+        `http://localhost:3000/api/v1/projects/${info._id}`,
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
       fetchProjects();
     } catch (error) {
-      console.error("failed to delete project". error)
+      console.error("failed to delete project".error);
     }
   }
 
@@ -47,40 +50,61 @@ function ProjectCard({ info, token, fetchProjects }) {
         <div className="name" onClick={handleCick}>
           {info.name}
         </div>
-        <div className="settings" onClick={toggleOpen}>
-          <svg
-            preserveAspectRatio="xMidYMin"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-            className="css-492dz9"
-            style={{
-              size: "20px",
-              rotate: "0deg",
-              width: "20px",
-              height: "20px",
-            }}
-          >
-            <path
-              fillRule="evenodd"
-              d="M10.25 5a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Zm0 7a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Zm0 7a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Z"
-              clipRule="evenodd"
-            ></path>
-          </svg>
-          <div className="open" style={{ display: display ? "flex" : "none" }}>
-            <div className="delete" onClick={deleteProject}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="24px"
-                viewBox="0 -960 960 960"
-                width="24px"
-                fill="#5f6368"
-              >
-                <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
-              </svg>
-              <div>Delete</div>
+        <div className="card-icons">
+          <div className="star">
+            <svg
+              preserveAspectRatio="xMidYMin"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="white"
+              aria-hidden="true"
+              style={{size: "16px", rotate: "0deg", width: "16px", height: "16px"}}
+            >
+              <path
+                fill-rule="evenodd"
+                d="M12 1.25a.75.75 0 0 1 .673.418l2.915 5.907 6.52.953a.75.75 0 0 1 .415 1.28l-4.717 4.594 1.113 6.491a.75.75 0 0 1-1.088.79L12 18.618l-5.83 3.067a.75.75 0 0 1-1.09-.79l1.114-6.492-4.717-4.595a.75.75 0 0 1 .415-1.28l6.52-.952 2.915-5.907A.75.75 0 0 1 12 1.25Z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+          </div>
+          <div className="settings" onClick={toggleOpen}>
+            <svg
+              preserveAspectRatio="xMidYMin"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+              className="css-492dz9"
+              style={{
+                size: "20px",
+                rotate: "0deg",
+                width: "20px",
+                height: "20px",
+              }}
+            >
+              <path
+                fillRule="evenodd"
+                d="M10.25 5a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Zm0 7a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Zm0 7a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Z"
+                clipRule="evenodd"
+              ></path>
+            </svg>
+            <div
+              className="open"
+              style={{ display: display ? "flex" : "none" }}
+            >
+              <div className="delete" onClick={deleteProject}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 -960 960 960"
+                  width="24px"
+                >
+                  <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
+                </svg>
+                <div>Delete</div>
+              </div>
             </div>
           </div>
         </div>

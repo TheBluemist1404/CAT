@@ -1,6 +1,8 @@
 import "./live-code.scss";
 import vinyl from "@live-code-assets/vinyl.svg";
 import arrow from "@live-code-assets/Arrow 1.svg";
+import timer from "@live-code-assets/timer.svg";
+import doc from '@live-code-assets/code-doc.svg'
 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -8,11 +10,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../authentication/AuthProvider";
 import ProjectCard from "./ProjectCard";
 
-import useSessionTimeTracker from "./useSessionTimeTracker";
-
 function LiveCode({ token }) {
-  useSessionTimeTracker();
-  
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [projects, setProjects] = useState();
@@ -46,6 +44,22 @@ function LiveCode({ token }) {
     }
   }
 
+  function timeDisplay(secs) {
+    if (secs < 60) {
+      const seconds = Math.floor(secs);
+      return `${seconds} secs`;
+    } else if (secs < 60 * 60) {
+      const minutes = Math.floor(secs / 60);
+      return `${minutes} mins`;
+    } else if (secs < 24 * 60 * 60) {
+      const hours = Math.floor(secs / (60 * 60));
+      return `${hours} hrs`;
+    } else {
+      const days = Math.floor(secs / (60 * 60 * 24));
+      return `${days} days`;
+    }
+  }
+
   return (
     <div className="live-code">
       <div className="back">
@@ -66,8 +80,24 @@ function LiveCode({ token }) {
             ? user.fullName
             : user.fullName.substr(0, 10)}
         </div>
-        <div className="code-time">Code hours</div>
-        <div className="number-of-projects">number of projects</div>
+        <div className="code-time">
+          <div className="icon">
+            <img src={timer} alt="" />
+          </div>
+          <div className="content">
+            <div className="main">{timeDisplay(user.duration)}</div>
+            <div className="sub">hard-coding</div>
+          </div>
+        </div>
+        <div className="number-of-projects">
+          <div className="icon">
+            <img src={doc} alt="" />
+          </div>
+          <div className="content">
+            <div className="main">{projects?.length}+</div>
+            <div className="sub">Projects</div>
+          </div>
+        </div>
       </div>
       <div className="playlist">
         <div className="topbar">
