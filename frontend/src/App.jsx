@@ -16,6 +16,7 @@ import Profile from "./pages/Profile/Profile";
 import LiveCode from "./pages/live-code/LiveCode";
 import CodeEditor from "./pages/live-code/CodeEditor";
 import EditorPreview from "./pages/live-code/EditorPreview";
+import LiveCodeLayout from "./pages/live-code/LiveCodeLayout";
 
 function App() {
   const { isLoggedIn, setIsLoggedIn, setUser } = useContext(AuthContext);
@@ -89,7 +90,7 @@ function App() {
 
   const getUser = async () => {
     const response = await fetch();
-    console.log(response);
+    console.log("get user: ",response);
     setUser(response);
     setIsLoading(false);
   };
@@ -129,7 +130,7 @@ function App() {
           <Route path="media" element={<></>} />
           <Route path="saved" element={<></>} />
         </Route>
-        <Route path="live-code">
+        <Route path="live-code" element={<LiveCodeLayout token={token}/>} >
           <Route index element={<LiveCode token={token} />} />
           <Route
             path="editor/:id"

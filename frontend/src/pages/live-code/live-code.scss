@@ -68,7 +68,7 @@
 
       object-fit: cover;
 
-      img{
+      img {
         width: 100%;
       }
     }
@@ -87,8 +87,49 @@
     .number-of-projects {
       margin-top: 6vh;
       background-color: var(--box-color);
-      min-height: 80px;
+      min-height: 100px;
       width: 20vh;
+      border-radius: 10px;
+      padding: 0 20px;
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      
+
+      .icon {
+        flex: 1;
+        object-fit: cover;
+        max-width: 40px;
+        max-height: 40px;
+
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        .main {
+          font-family: var(--code-font);
+          font-size: 20px;
+          letter-spacing: 1px;
+        }
+
+        .sub {
+          font-family: var(--code-font);
+          font-size: 14px;
+        }
+      }
     }
   }
 
@@ -111,7 +152,7 @@
         transition: background-color 100ms ease-in
       }
 
-      .create-project:hover{
+      .create-project:hover {
         cursor: pointer;
         background-color: var(--highlight-red);
       }
@@ -130,7 +171,7 @@
       padding-right: 15px;
       scrollbar-width: thin;
       scrollbar-color: black var(--primary-color);
-      
+
 
       .project-card {
         min-width: 100%;
@@ -149,7 +190,7 @@
           grid-template-columns: 1fr 100px;
           grid-template-rows: 1fr auto;
           grid-template-areas:
-            "name settings"
+            "name icons"
             "createdAt _ "
           ;
           row-gap: 10px;
@@ -164,53 +205,63 @@
             text-underline-offset: 5px;
           }
 
-          .settings {
-            cursor: pointer;
-            position: relative;
-            text-align: right;
-            grid-area: settings;
-            object-fit: cover;
+          .card-icons{
+            grid-area: icons;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
 
-            svg{
-              width: fit-content;
-              height: 100%;
-            }
-
-            .open{
-              position: absolute;
-              right: 0;
-              bottom: calc(-100% - 20px);
-
-              background-color: var(--box-color);
-              box-sizing: border-box;    
-              border-radius: 5px;        
-              font-size: 14px;
-
-              object-fit: contain;
-
-              .delete{
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-
-                cursor: pointer;
-                padding: 10px;
-                color: var(--highlight-red);
-
-                svg{
-                  width: 100%;
-                  height: 100%;
-                  max-height: 14px;
-                  fill: var(--highlight-red);
-                }
-              }
-
-              .delete:hover{
-                background-color: #404057;
-              }
+            .star, .settings{
+              cursor: pointer;
               
+              text-align: right;              
+              object-fit: cover;
+  
+              svg {
+                width: fit-content;
+                height: 100%;
+              }
+            }
+            .settings {            
+              position: relative;
+
+              .open {
+                position: absolute;
+                right: 0;
+                bottom: calc(-100% - 20px);
+                width: max-content;
+  
+                background-color: var(--box-color);
+                box-sizing: border-box;
+                border-radius: 5px;
+                font-size: 14px;
+  
+                object-fit: contain;
+  
+                .delete {
+                  display: flex;
+                  flex-direction: row;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 10px;
+  
+                  cursor: pointer;
+                  padding: 10px;
+                  color: var(--highlight-red);
+  
+                  svg {
+                    width: 100%;
+                    height: 100%;
+                    max-height: 14px;
+                    fill: var(--highlight-red);
+                  }
+                }
+  
+                .delete:hover {
+                  background-color: #404057;
+                }
+  
+              }
             }
           }
 
@@ -218,12 +269,12 @@
             font-size: 14px;
             color: #cbcbcbcd;
             grid-area: createdAt;
-          }            
+          }
 
         }
       }
 
-      .project-card:hover{
+      .project-card:hover {
         background-color: #12121294;
       }
     }

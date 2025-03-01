@@ -36,7 +36,7 @@ function EditorPreview({ token, preview }) {
 
   useEffect(() => {
     fetchProject();
-  }, []);
+  }, [projectId]);
 
   function handleName(event) {
     async function updateDesc(e) {
@@ -116,10 +116,10 @@ function EditorPreview({ token, preview }) {
               contentEditable={true}
               onInput={handleName}
             >
-              {detail.name}
+              {detail?.name}
             </div>
             <div className="desc" contentEditable={true} onInput={handleDesc}>
-              {detail.description}
+              {detail?.description}
             </div>
             <div
               className="navigate"
