@@ -21,7 +21,7 @@ const Profile = ({offset = 0, limit = 999, token }) => {
     const { id } = useParams();
     const [isPrivate, setIsPrivate] = useState(false);
     
-    const [profileData, setProfileData] = useState(null);
+    const [profileData, setProfileData] = useState({});
     useEffect(() => {
         async function fetchProfile() {
             if (!id) return;

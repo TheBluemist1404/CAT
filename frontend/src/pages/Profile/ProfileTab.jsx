@@ -73,7 +73,7 @@ const check = id !== user._id && profileData.isPrivate;
   return (
     <div className='tabs'>
       <div className="tab-container">
-        <button type='button' className={`p ${view === "posts" ? "active" : ""}`} onClick={() => setView("posts")}>Posts</button>
+        {!check &&<button type='button' className={`p ${view === "posts" ? "active" : ""}`} onClick={() => setView("posts")}>Posts</button>}
         {!check && <button type="button" className={`i ${view === "Media" ? "active" : ""}`} onClick={() => setView("Media")}>Media</button>}
         { id === user._id && (<button type='button' className={`v ${view === 'Saved' ? 'active' : ''}`} onClick={() => setView("Saved")}>Saved</button>)}
       </div>

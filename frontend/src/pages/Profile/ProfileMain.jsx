@@ -664,7 +664,7 @@ const handleAddSchool = async () => {
   <p className="view-button" onClick={() => setView("Media")}>View full</p>
 </div>
   <div className="flex-container">
-    {Array.from({ length: 10 }).map((_, index) => {
+    {Array.from({ length: 4 }).map((_, index) => {
       const image = posts.flatMap(post => post.images || [])[index]; 
       return (
         <div key={index} className="flex-item" style={{ 
