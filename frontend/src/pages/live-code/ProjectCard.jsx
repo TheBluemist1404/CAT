@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function ProjectCard({ info, token, fetchProjects }) {
-  console.log(info)
   const navigate = useNavigate();
   const [createAt, setCreatedAt] = useState(0);
   const [display, setDisplay] = useState(false);
@@ -11,16 +10,14 @@ function ProjectCard({ info, token, fetchProjects }) {
   async function deleteProject() {
     try {
       const response = await axios.delete(`http://localhost:3000/api/v1/projects/${info._id}`,{headers: {Authorization: `Bearer ${token.accessToken}`}})
-      console.log(response.data);
       fetchProjects();
     } catch (error) {
-      console.error("failed to delete project". error.message)
+      console.error("failed to delete project". error)
     }
   }
 
   const toggleOpen = () => {
     setDisplay(!display);
-    console.log(display);
   };
 
   useEffect(() => {
@@ -58,7 +55,7 @@ function ProjectCard({ info, token, fetchProjects }) {
             viewBox="0 0 24 24"
             fill="currentColor"
             aria-hidden="true"
-            class="css-492dz9"
+            className="css-492dz9"
             style={{
               size: "20px",
               rotate: "0deg",
@@ -67,9 +64,9 @@ function ProjectCard({ info, token, fetchProjects }) {
             }}
           >
             <path
-              fill-rule="evenodd"
+              fillRule="evenodd"
               d="M10.25 5a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Zm0 7a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Zm0 7a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Z"
-              clip-rule="evenodd"
+              clipRule="evenodd"
             ></path>
           </svg>
           <div className="open" style={{ display: display ? "flex" : "none" }}>

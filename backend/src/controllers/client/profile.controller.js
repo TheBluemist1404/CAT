@@ -25,7 +25,7 @@ module.exports.index = async (req, res) => {
     }
 
     if (user.isPrivate && req.user.id !== id) {
-      const data = pickInfoData(['_id', 'fullName', 'avatar','isPrivate'], user);
+      const data = pickInfoData(['_id', 'fullName', 'avatar','private'], user);
       res.status(200).json(data);
       return;
     }
@@ -86,7 +86,7 @@ module.exports.edit = async (req, res) => {
       if (req.body.schools) cachedData.schools = req.body.schools;
       if (req.body.companies) cachedData.companies = req.body.companies;
       if (req.body.avatar) cachedData.avatar = req.body.avatar;
-
+      if (req.body.duration) cachedData.duration = req.body.duration;
 
       await redisClient.setEx(
         `${process.env.CACHE_PREFIX}:profile:${id}`,
@@ -197,6 +197,6 @@ module.exports.changeStatus = async (req, res) => {
 
   res.status(200).json({
     message: 'Update status successfully!',
-    userStatus: status,
+    isPrivate: status,
   });
 };

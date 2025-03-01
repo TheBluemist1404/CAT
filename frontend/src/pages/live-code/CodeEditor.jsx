@@ -4,7 +4,7 @@ import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
 import { Awareness } from "y-protocols/awareness";
 import Editor from "@monaco-editor/react";
-import { useResizeDetector } from "react-resize-detector";
+import { MonacoBinding } from "y-monaco";
 
 import axios from "axios";
 import { useRef, useState, useEffect } from "react";
@@ -21,9 +21,10 @@ const clientColor = getRandomColor(); // Static color for this client
 
 function CodeEditor({ token, preview }) {
   //Get Project info
-  const projectId = window.location.href.split("/").pop();
-  console.log(projectId);
-  const [project, setProject] = useState({});
+  let projectId = window.location.href.split("/").pop();
+  if (projectId.slice(-1) === '#') {
+    projectId = projectId.slice(0, -1)
+  }
   const [projectName, setProjectName] = useState("");
   const [projectContent, setProjectContent] = useState({});
   const editorRef = useRef(null);
@@ -34,23 +35,12 @@ function CodeEditor({ token, preview }) {
         `http://localhost:3000/api/v1/projects/${projectId}`,
         { headers: { Authorization: `Bearer ${token.accessToken}` } }
       );
-      console.log(response.data);
-      setProject(response.data);
+      setProjectName(response.data.name);
+      setProjectContent(response.data.files[0]);
+      console.log(response.data.files[0]);
     }
     fetchProject();
   }, []);
-
-  useEffect(() => {
-    if (project.name) {
-      setProjectName(project.name);
-    }
-
-    if (project.files && project.files.length && ytext.toString() === "") {
-      // Sync Ytext with current data to avoid overwrite
-      ytext.insert(0, project.files[0].content);
-      setProjectContent(project.files[0]);
-    }
-  }, [project]);
 
   // -------------------------------
   //Setup monaco editor with Yjs binding
@@ -59,25 +49,39 @@ function CodeEditor({ token, preview }) {
   const provider = useRef(null);
   const ytext = ydoc.current.getText("monaco"); // Shared Yjs text model
 
+  useEffect(() =>{
+    setTimeout(()=>{
+      if (ytext.toString() === "" && projectContent.content) {
+        ytext.insert(0, projectContent.content)
+      }
+    }, 2000) // Give a bit delay so everything is set
+  }, [projectContent])
+
   // Create awareness instance (using Yjs document)
   const awareness = new Awareness(ydoc.current);
 
   useEffect(() => {
     // Initialize the WebRTC provider with awareness
-    provider.current = new WebrtcProvider("my-room-name", ydoc.current, {
-      awareness,
-      signaling: ["ws://localhost:4444"], // Use your own signaling server
-
-    });
-
-    if (provider.current) {
-      provider.current.on("status", (event) => console.log(event));
+    if (!preview) {
+      provider.current = new WebrtcProvider(projectId, ydoc.current, {
+        awareness,
+        signaling: ["wss://cat-signaling-server.fly.dev"], // Use your own signaling server
+      });
+  
+      if (provider.current) {
+        provider.current.on("status", (event) => console.log(event));
+        provider.current.on("sync", (isSync)=>{
+          if (isSync) {
+            fetchProject(); //refresh on sync to fully update
+          }
+        })
+      }
+  
+      return () => {
+        provider.current.destroy();
+        ydoc.current.destroy();
+      };
     }
-
-    return () => {
-      provider.current.destroy();
-      ydoc.current.destroy();
-    };
   }, []);
 
   async function handleEditorDidMount(editor) {
@@ -85,9 +89,10 @@ function CodeEditor({ token, preview }) {
     if (editorRef.current) {
       editorRef.current.layout();
     }
-    const { MonacoBinding } = await import("y-monaco");
     // Bind Yjs text syncing to Monaco editor model
-    new MonacoBinding(ytext, editor.getModel(), new Set([editor]), awareness);
+    if (!preview) {
+      new MonacoBinding(ytext, editor.getModel(), new Set([editor]), awareness);
+    }
 
     // Here we store a relative position that initially points to index 0.
     const initialRelPos = Y.createRelativePositionFromTypeIndex(ytext, 0);
@@ -332,9 +337,6 @@ function CodeEditor({ token, preview }) {
         setCodeDisplay([]);
         setErrorDisplay("");
         const code = editorRef.current.getValue();
-        if (code) {
-          console.log(code);
-        }
         const input = inputRef.current ? inputRef.current.value : "";
         const response = await axios.post(
           "http://localhost:3000/api/v1/code/execute",
@@ -423,17 +425,6 @@ function CodeEditor({ token, preview }) {
     console.log(response.data);
   }
 
-  const { width, height, ref } = useResizeDetector({
-    handleWidth: true,
-    handleHeight: true,
-    onResize: () => {
-      console.log("resize");
-      if (editorRef.current) {
-        editorRef.current.layout();
-      }
-    },
-  });
-
   return (
     <div className="code-editor">
       <div className="container">
@@ -488,10 +479,9 @@ function CodeEditor({ token, preview }) {
           </div>
           <div className="codespace">
             <div className="code-input" ref={editorContainerRef}>
-              <div className="text-editor" ref={ref}>
+              <div className="text-editor"> 
                 <Editor
                   language={lang}
-                  value={projectContent ? projectContent.content : "no content"}
                   theme="vs-dark"
                   onMount={handleEditorDidMount}
                   onChange={handleChange}

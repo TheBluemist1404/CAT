@@ -10,5 +10,5 @@ router.delete('/:id', auth.authenticateToken, projectController.deleteProject);
 router.get('/', auth.authenticateToken, projectController.getProjects);
 router.patch('/:id/collaborators', auth.authenticateToken, projectController.addCollaborator);
 router.patch('/:id/remove-collaborator', auth.authenticateToken, projectController.removeCollaborator);
-
+router.patch('/:id/remarks', auth.authenticateToken, projectController.changeRemark);
 module.exports = router;

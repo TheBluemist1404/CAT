@@ -78,7 +78,7 @@ function EditorPreview({ token, preview }) {
         fetchProject();
       }
     } catch (error) {
-      console.error("error adding member", error.message);
+      console.error("error adding member", error);
     }
   }
 
@@ -124,7 +124,8 @@ function EditorPreview({ token, preview }) {
             <div
               className="navigate"
               onClick={() => {
-                navigate(`/live-code/editor/${projectId}`);
+                console.log("redirect to editor")
+                navigate(`/live-code/editor/${projectId}`, {replace: true});
               }}
             >
               <Button />
