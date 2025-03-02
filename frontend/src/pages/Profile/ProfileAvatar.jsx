@@ -1,12 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import AvatarEditor from "react-avatar-editor";
 
-
 function ProfileAvatar({ user, profileData, token, id }) {
-  console.log(profileData);
-  const [avatar, setAvatar] = useState(user?.avatar || '');
-
   const [showAvatarChange, setShowAvatarChange] = useState(false);
 
   //update avatar
@@ -37,9 +33,10 @@ function ProfileAvatar({ user, profileData, token, id }) {
         formData.append("fullName", user.fullName);
         formData.append("description", user.description || "");
 
-        
-        user.companies.forEach(company => formData.append("companies[]", company));
-        user.schools.forEach(school => formData.append("schools[]", school));
+        user.companies.forEach((company) =>
+          formData.append("companies[]", company)
+        );
+        user.schools.forEach((school) => formData.append("schools[]", school));
 
         try {
           const response = await axios.patch(
@@ -47,8 +44,8 @@ function ProfileAvatar({ user, profileData, token, id }) {
             formData,
             {
               headers: {
-                Authorization: `Bearer ${token.accessToken}`
-              }
+                Authorization: `Bearer ${token.accessToken}`,
+              },
             }
           );
 
@@ -72,18 +69,63 @@ function ProfileAvatar({ user, profileData, token, id }) {
             }));
           }
         } catch (error) {
-          console.error("Error:", error.response?.data?.message || error.message);
+          console.error(
+            "Error:",
+            error.response?.data?.message || error.message
+          );
         }
       }, "image/png");
     }
   };
   console.log(user._id);
-  return (
-    <div className='image' >
 
+  // Status bar
+
+  const codeSecs = profileData.duration || 0;
+  const codeHrs = Math.round(codeSecs / 36) / 100;
+
+  const [followers, setFollowers] = useState(0);
+  useEffect(() => {
+    const getFollowers = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/v1/users/${id}/followers`,
+
+          {
+            headers: {
+              Authorization: `Bearer ${token.accessToken}`,
+            },
+          }
+        );
+        setFollowers(response?.data.length);
+      } catch (error) {
+        console.error("failed return followers for profile", error);
+      }
+    };
+
+    getFollowers();
+  }, []);
+
+  return (
+    <div className="image">
       <div className="profile-avatar">
-        <img className='ava' src={profileData?.avatar} alt="" />
-        { id === user._id && (<img className='cam' src="/src/assets/camera.svg" onClick={() => setShowAvatarChange(true)} alt="" width={30} height={30} style={{ position: "absolute", bottom: "5px", left: "90px", zIndex: 1000 }} />)}
+        <img className="ava" src={profileData?.avatar} alt="" />
+        {id === user._id && (
+          <img
+            className="cam"
+            src="/src/assets/camera.svg"
+            onClick={() => setShowAvatarChange(true)}
+            alt=""
+            width={30}
+            height={30}
+            style={{
+              position: "absolute",
+              bottom: "5px",
+              left: "90px",
+              zIndex: 1000,
+            }}
+          />
+        )}
       </div>
       {showAvatarChange && (
         <div
@@ -97,25 +139,39 @@ function ProfileAvatar({ user, profileData, token, id }) {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            zIndex: 9999
+            zIndex: 9999,
           }}
         >
           <div
             style={{
               width: "50%",
               height: "70%",
-              marginTop:"5%",
+              marginTop: "5%",
               borderRadius: "16px",
               textAlign: "center",
-              display: "block"
+              display: "block",
             }}
-            className='detail'
+            className="detail"
           >
             <style>{`body { overflow: hidden; }`}</style>
             <div style={{ textAlign: "center" }}>
               <h1 style={{ color: "#FFFFFF" }}>Upload Avatar</h1>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginTop: "20px" }}>
-                <input type="file" accept="image/*" onChange={handleFileChange} id="fileInput" style={{ marginTop: "20px", display: "none" }} />
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "10px",
+                  marginTop: "20px",
+                }}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  id="fileInput"
+                  style={{ marginTop: "20px", display: "none" }}
+                />
                 <label
                   htmlFor="fileInput"
                   style={{
@@ -125,13 +181,17 @@ function ProfileAvatar({ user, profileData, token, id }) {
                     color: "white",
                     borderRadius: "8px",
                     cursor: "pointer",
-                    textAlign: "center"
+                    textAlign: "center",
                   }}
                 >
                   Choose File
                 </label>
 
-                {selectedFile ? <p>{selectedFile.name}</p> : <p>No file selected</p>}
+                {selectedFile ? (
+                  <p>{selectedFile.name}</p>
+                ) : (
+                  <p>No file selected</p>
+                )}
               </div>
               {selectedFile && (
                 <div style={{ marginTop: "20px" }}>
@@ -153,31 +213,45 @@ function ProfileAvatar({ user, profileData, token, id }) {
                     value={scale}
                     onChange={(e) => setScale(parseFloat(e.target.value))}
                   />
-                  <button onClick={handleUpload} style={{
-                    display: "inline-block",
-                    padding: "10px 20px",
-                    backgroundColor: "#3b82f6",
-                    color: "white",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    textAlign: "center"
-                  }}>Save Avatar</button>
+                  <button
+                    onClick={handleUpload}
+                    style={{
+                      display: "inline-block",
+                      padding: "10px 20px",
+                      backgroundColor: "#3b82f6",
+                      color: "white",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      textAlign: "center",
+                    }}
+                  >
+                    Save Avatar
+                  </button>
                 </div>
               )}
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid gray", marginTop: "10px" }}>
-              <div style={{ color: "#FFFFFF",marginLeft:"10px" }}>Update information</div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderTop: "1px solid gray",
+                marginTop: "10px",
+              }}
+            >
+              <div style={{ color: "#FFFFFF", marginLeft: "10px" }}>
+                Update information
+              </div>
               <button
                 onClick={() => setShowAvatarChange(false)}
                 style={{
-
                   padding: "10px 20px",
                   backgroundColor: "#ef4444",
                   color: "white",
                   border: "none",
                   borderRadius: "8px",
                   cursor: "pointer",
-                  marginRight:"10px"
+                  marginRight: "10px",
                 }}
               >
                 Đóng
@@ -187,32 +261,30 @@ function ProfileAvatar({ user, profileData, token, id }) {
         </div>
       )}
 
-
-      <h1 className='profile-username'>{profileData?.fullName}</h1>
-      <div className='social'>
+      <h1 className="profile-username">{profileData?.fullName}</h1>
+      <div className="social">
         <img src="/src/assets/facebook.svg" alt="" width={30} height={30} />
         <img src="/src/assets/github.svg" alt="" width={30} height={30} />
         <img src="/src/assets/twitter.svg" alt="" width={30} height={30} />
       </div>
-      <div className="box" style={{ top: '85%' }}>
+      <div className="box" style={{ top: "85%" }}>
         <div className="box-item">
           <span className="number">{(profileData?.posts ?? []).length}</span>
           <span className="label">Posts</span>
         </div>
         <div className="divider"></div>
         <div className="box-item">
-          <span className="number">15h</span>
+          <span className="number">{codeHrs} hours</span>
           <span className="label">Coding</span>
         </div>
         <div className="divider"></div>
         <div className="box-item">
-          <span className="number">150</span>
+          <span className="number">{followers}</span>
           <span className="label">Followers</span>
         </div>
       </div>
-
     </div>
-  )
+  );
 }
 
-export default ProfileAvatar
+export default ProfileAvatar;

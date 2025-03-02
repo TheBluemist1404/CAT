@@ -18,8 +18,7 @@ function LiveCode({ token }) {
   async function fetchProjects() {
     const response = await axios.get(
       "http://localhost:3000/api/v1/projects",
-      { headers: { Authorization: `Bearer ${token.accessToken}` } },
-      { user: { id: user._id } }
+      { headers: { Authorization: `Bearer ${token.accessToken}` } }
     );
     setProjects(response.data);
   }
@@ -94,7 +93,7 @@ function LiveCode({ token }) {
             <img src={doc} alt="" />
           </div>
           <div className="content">
-            <div className="main">{projects?.length}+</div>
+            <div className="main">{projects && (projects.length > 0)? projects.length + '+': 0}</div>
             <div className="sub">Projects</div>
           </div>
         </div>

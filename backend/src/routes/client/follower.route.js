@@ -5,6 +5,6 @@ const followerController = require('../../controllers/client/follower.controller
 
 router.post('/follows', auth.authenticateToken, followerController.followUser);
 router.delete('/follows', auth.authenticateToken, followerController.unfollowUser);
-router.get('/followers', auth.authenticateToken, followerController.getFollowers);
+router.get('/:id/followers', auth.authenticateToken, followerController.getFollowers);
 router.get('/followees', auth.authenticateToken, followerController.getFollowees);
 module.exports = router;
