@@ -221,6 +221,7 @@ module.exports.getProjects = async (req, res) => {
           _id: 1,
           name: 1,
           description: 1,
+          remarks: 1,
           owner: {
             _id: 1,
             fullName: 1,
@@ -348,7 +349,7 @@ module.exports.changeRemark = async (req, res) => {
   const isRemarked = req.body.isRemarked;
 
   const user = await User.findOne({
-    _id: new mongoose.Types.ObjectId(id),
+    _id: new mongoose.Types.ObjectId(userId),
     deleted: false,
   });
 
