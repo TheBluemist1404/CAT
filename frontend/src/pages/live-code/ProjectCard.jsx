@@ -28,7 +28,7 @@ function ProjectCard({ info, token, fetchProjects }) {
     try {
       await axios.patch(
         `http://localhost:3000/api/v1/projects/${info._id}/remarks`,
-        { user: { id: user._id }, isRemarked: !starred },
+        { isRemarked: !starred },
         { headers: { Authorization: `Bearer ${token.accessToken}` } }        
       );      
     } catch (error) {

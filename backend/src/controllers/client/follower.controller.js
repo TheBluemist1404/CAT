@@ -55,10 +55,10 @@ module.exports.unfollowUser = async (req, res) => {
   }
 };
 
-// [GET] /api/v1/users/followers
+// [GET] /api/v1/users/:id/followers
 module.exports.getFollowers = async (req, res) => {
   try {
-    const followeeId = req.user.id;
+    const followeeId = req.params.id;
 
     const followers = await followService.getFollowers(followeeId);
     res.status(200).json(followers);
