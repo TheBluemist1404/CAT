@@ -22,7 +22,7 @@ module.exports.createProject = async (req, res) => {
     const project = new Project({
       name,
       description,
-      owner: new mongoose.Types.ObjectId(req.user.id),
+      owner: new mongoose.Types.ObjectId('' + req.user.id),
       files,
       folders: folders || [],
     });
