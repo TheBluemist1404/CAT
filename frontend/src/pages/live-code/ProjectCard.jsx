@@ -1,15 +1,45 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../authentication/AuthProvider";
 
 function ProjectCard({ info, token, fetchProjects }) {
+  const { user } = useContext(AuthContext);
+  // console.log(info);
   const navigate = useNavigate();
   const [createAt, setCreatedAt] = useState(0);
+  const [starred, setStarred] = useState(false);
   const [display, setDisplay] = useState(false);
 
+  function handleCick() {
+    navigate(`/live-code/preview/${info._id}`, { replace: true });
+  }
+
+  // star
+  useEffect(() => {
+    const starUsers = info.remarks;
+    if (starUsers && starUsers.includes(user._id)) {
+      setStarred(true);
+    }
+  }, []);
+
+  async function star() {
+    setStarred(!starred)
+    try {
+      await axios.patch(
+        `http://localhost:3000/api/v1/projects/${info._id}/remarks`,
+        { user: { id: user._id }, isRemarked: !starred },
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }        
+      );      
+    } catch (error) {
+      console.error("get star failed", error);
+    }
+  }
+
+  // settings
   async function deleteProject() {
     try {
-      const response = await axios.delete(
+      await axios.delete(
         `http://localhost:3000/api/v1/projects/${info._id}`,
         { headers: { Authorization: `Bearer ${token.accessToken}` } }
       );
@@ -22,6 +52,8 @@ function ProjectCard({ info, token, fetchProjects }) {
   const toggleOpen = () => {
     setDisplay(!display);
   };
+
+  // set created date
 
   useEffect(() => {
     const date = new Date(info.createdAt);
@@ -40,9 +72,6 @@ function ProjectCard({ info, token, fetchProjects }) {
     return `${day}/${month}/${year}`;
   }
 
-  function handleCick() {
-    navigate(`/live-code/preview/${info._id}`, { replace: true });
-  }
   return (
     <div className="project-card">
       <div className="like"></div>
@@ -51,20 +80,25 @@ function ProjectCard({ info, token, fetchProjects }) {
           {info.name}
         </div>
         <div className="card-icons">
-          <div className="star">
+          <div className="star" onClick={star}>
             <svg
               preserveAspectRatio="xMidYMin"
               width="16"
               height="16"
               viewBox="0 0 24 24"
-              fill="white"
+              fill={starred ? "#f2e088" : "var(--box-color)"}
               aria-hidden="true"
-              style={{size: "16px", rotate: "0deg", width: "16px", height: "16px"}}
+              style={{
+                size: "16px",
+                rotate: "0deg",
+                width: "16px",
+                height: "16px",
+              }}
             >
               <path
-                fill-rule="evenodd"
+                fillRule="evenodd"
                 d="M12 1.25a.75.75 0 0 1 .673.418l2.915 5.907 6.52.953a.75.75 0 0 1 .415 1.28l-4.717 4.594 1.113 6.491a.75.75 0 0 1-1.088.79L12 18.618l-5.83 3.067a.75.75 0 0 1-1.09-.79l1.114-6.492-4.717-4.595a.75.75 0 0 1 .415-1.28l6.52-.952 2.915-5.907A.75.75 0 0 1 12 1.25Z"
-                clip-rule="evenodd"
+                clipRule="evenodd"
               ></path>
             </svg>
           </div>
@@ -74,9 +108,7 @@ function ProjectCard({ info, token, fetchProjects }) {
               width="20"
               height="20"
               viewBox="0 0 24 24"
-              fill="currentColor"
               aria-hidden="true"
-              className="css-492dz9"
               style={{
                 size: "20px",
                 rotate: "0deg",
