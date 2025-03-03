@@ -14,9 +14,7 @@ function ProfileMain({ user, token, profileData, id ,posts,isPrivate,setView}) {
     setShowConfirm(true);
   };
 
-  const handleYesClick = () => {
-    window.location.reload();
-  };
+  
 
   const handleCancelClick = () => {
     setShowConfirm(false);
@@ -27,8 +25,10 @@ function ProfileMain({ user, token, profileData, id ,posts,isPrivate,setView}) {
     setShowConfirm(true);
   };
   // School
-  const [schools, setSchools] = useState([]);
+  const [schools, setSchools] = useState([]); 
+  const [unsavedSchools, setUnsavedSchools] = useState([]); 
   const [newSchool, setNewSchool] = useState("");
+
 
   useEffect(() => {
     const fetchSchools = async () => {
@@ -53,81 +53,36 @@ function ProfileMain({ user, token, profileData, id ,posts,isPrivate,setView}) {
     fetchSchools();
   }, [user, token]);
 
-const handleAddSchool = async () => {
-  if (newSchool.trim() === "") return;
-
-  if (schools.length >= 2) {
-    alert("The limit for schools is 2. Please delete one and enter again.");
-    return;
-  }
-
-  const updatedSchools = [...schools, newSchool];
-  setSchools(updatedSchools);
-  setNewSchool("");
-
-  try {
-    const response = await axios.patch(
-      `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-      {
-        schools: updatedSchools,
-        user: { id: user._id },
-        fullName: user.fullName,
-        companies,
-        description,
-        avatar: user.avatar,
-      },
-      {
-        headers: {
-          "Authorization": `Bearer ${token.accessToken}`,
-        },
-      }
-    );
-
-    if (response.status === 200 && Array.isArray(response.data.schools)) {
-      setSchools(response.data.schools);
+  const handleAddSchool = () => {
+    if (newSchool.trim() === "") return;
+  
+    if ([...schools, ...unsavedSchools].length >= 2) {
+      alert("The limit for schools is 2. Please delete one and enter again.");
+      return;
     }
-  } catch (err) {
-    console.error("Error:", err.response?.data?.message || err.message);
-  }
-};
-
-
-  const handleRemoveSchool = async (indexToRemove) => {
-    if (schools.length > 0) {
-      const updatedSchools = schools.filter((_, index) => index !== indexToRemove);
+  
+    setUnsavedSchools([...unsavedSchools, newSchool]); 
+    setNewSchool(""); 
+  };
+  
+  const handleRemoveSchool = (index) => {
+    if (index < schools.length) {
+      const updatedSchools = schools.filter((_, i) => i !== index);
       setSchools(updatedSchools);
-
-      try {
-        const response = await axios.patch(
-          `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-          {
-            schools: updatedSchools,
-            user: { id: user._id },
-            fullName: user.fullName,
-            companies,
-            description,
-            avatar: user.avatar,
-          },
-          {
-            headers: {
-              "Authorization": `Bearer ${token.accessToken}`,
-            },
-          }
-        );
-
-        if (response.status === 200) {
-          console.log("School removed successfully");
-        }
-      } catch (err) {
-        console.error("Error removing school:", err.response?.data?.message || err.message);
-      }
+    } else {
+      const newIndex = index - schools.length;
+      setUnsavedSchools(unsavedSchools.filter((_, i) => i !== newIndex));
     }
   };
+  
+  
   // ---------------------------
 
   // Company
-  const [companies, setCompanies] = useState([]);
+  const [companies, setCompanies] = useState([]); 
+  const [unsavedCompanies, setUnsavedCompanies] = useState([]); 
   const [newCompany, setNewCompany] = useState("");
+
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -152,76 +107,67 @@ const handleAddSchool = async () => {
     fetchCompanies();
   }, [user, token]);
 
-  const handleAddCompany = async () => {
+  const handleAddCompany = () => {
     if (newCompany.trim() === "") return;
-  
-    if (companies.length >= 2) {
-      alert("The limit for companies is 2. Please delete one and enter again.");
+    if ([...companies, ...unsavedCompanies].length >= 3) {
+      alert("The limit for companies is 3. Please delete one and enter again.");
       return;
     }
   
-    const updatedCompanies = [...companies, newCompany];
-    setCompanies(updatedCompanies);
+    setUnsavedCompanies([...unsavedCompanies, newCompany]);
     setNewCompany("");
+  };
+  
+  const handleRemoveCompany = (index) => {
+    if (index < companies.length) {
+      const updatedCompanies = companies.filter((_, i) => i !== index);
+      setCompanies(updatedCompanies);
+    } else {
+      const newIndex = index - companies.length;
+      setUnsavedCompanies(unsavedCompanies.filter((_, i) => i !== newIndex));
+    }
+  };
+  
+
+  const handleSave = async () => {
+    const updatedSchools = [...schools, ...unsavedSchools];
+    const updatedCompanies = [...companies, ...unsavedCompanies];
   
     try {
       const response = await axios.patch(
         `http://localhost:3000/api/v1/profile/edit/${user._id}`,
         {
+          schools: updatedSchools,
           companies: updatedCompanies,
           user: { id: user._id },
           fullName: user.fullName,
-          schools,
-          description,
+          description: user.description,
           avatar: user.avatar,
         },
         {
           headers: {
-            "Authorization": `Bearer ${token.accessToken}`,
+            Authorization: `Bearer ${token.accessToken}`,
           },
         }
       );
   
-      if (response.status === 200 && Array.isArray(response.data.companies)) {
-        setCompanies(response.data.companies);
+      if (response.status === 200) {
+        setSchools(response.data.schools || []);
+        setUnsavedSchools([]);
+        setCompanies(response.data.companies || []);
+        setUnsavedCompanies([]);
+        alert("Profile saved successfully!");
       }
     } catch (err) {
-      console.error("Error:", err.response?.data?.message || err.message);
+      console.error("Error saving profile:", err.response?.data?.message || err.message);
     }
+  };
+  const handleYesClick = async () => {
+    await handleSave(); 
+    window.location.reload(); 
   };
   
-
-  const handleRemoveCompany = async (indexToRemove) => {
-    if (companies.length > 0) {
-      const updatedCompanies = companies.filter((_, index) => index !== indexToRemove);
-      setCompanies(updatedCompanies);
-
-      try {
-        const response = await axios.patch(
-          `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-          {
-            companies: updatedCompanies,
-            user: { id: user._id },
-            fullName: user.fullName,
-            schools,
-            description,
-            avatar: user.avatar,
-          },
-          {
-            headers: {
-              "Authorization": `Bearer ${token.accessToken}`,
-            },
-          }
-        );
-
-        if (response.status === 200) {
-          console.log("Company removed successfully");
-        }
-      } catch (err) {
-        console.error("Error removing company:", err.response?.data?.message || err.message);
-      }
-    }
-  };
+  
   // -------------------------------
 
   // Description
@@ -229,8 +175,11 @@ const handleAddSchool = async () => {
 
 
   const [description, setDescription] = useState("");
+  const [unsavedDescription, setUnsavedDescription] = useState(""); 
   const [newDescription, setNewDescription] = useState("");
   const [editMode, setEditMode] = useState(false);
+
+  const [showConfirm1, setShowConfirm1] = useState(false);
 
   useEffect(() => {
     const fetchDescription = async () => {
@@ -260,36 +209,40 @@ const handleAddSchool = async () => {
     const sanitizedContent = DOMPurify.sanitize(content);
     setNewDescription(sanitizedContent);
   };
-  const handleUpdateDescription = async () => {
-    if (newDescription.trim() !== "") {
-      try {
-        const response = await axios.patch(
-          `http://localhost:3000/api/v1/profile/edit/${user._id}`,
-          {
-            description: newDescription,
-            user: { id: user._id },
-            fullName: user.fullName,
-            schools,
-            companies,
-            avatar: user.avatar,
+  const handleUpdateDescription = (e) => {
+    setUnsavedDescription(e.target.value);
+  };
+  
+  const handleSaveDescription = async () => {
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+        {
+          description: newDescription, 
+          schools,
+          companies,
+          user: { id: user._id },
+          fullName: user.fullName,
+          avatar: user.avatar,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token.accessToken}`,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${token.accessToken}`,
-            },
-          }
-        );
-
-        if (response.status === 200) {
-          setDescription(response.data.description || newDescription);
-          setEditMode(false);
-          setNewDescription("");
-
         }
-      } catch (err) {
-        console.error("Error updating description:", err.response?.data?.message || err.message);
+      );
+  
+      if (response.status === 200) {
+        setDescription(response.data.description || unsavedDescription);
+        setUnsavedDescription(""); 
       }
+    } catch (err) {
+      console.error("Error saving description:", err.response?.data?.message || err.message);
     }
+  };
+  const handleYesClick1 = async () => {
+    await handleSaveDescription(); 
+    window.location.reload(); 
   };
 
   // --------------------------
@@ -312,7 +265,7 @@ const handleAddSchool = async () => {
     
     <div >
       {check ? (
-      <div style={{ padding: "50px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <div style={{ padding: "50px", display: "flex", justifyContent: "center", alignItems: "center",height:"100%" }}>
         <p>This profile is private!</p>
       </div>
       
@@ -434,19 +387,15 @@ const handleAddSchool = async () => {
 
               </div>
 
-              {schools.map((school, index) => (
-                <div
-                  key={index}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "10px",
-                    marginLeft: "20px",
-                    height: "30px",
-                    position: "relative"
-                  }}
-                  className="school-item"
-                >
+              {[...schools, ...unsavedSchools].map((school, index) => (
+                <div key={index} className="school-item" style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                  marginLeft: "20px",
+                  height: "30px",
+                  position: "relative"
+                }}>
                   <div style={{
                     fontSize: "16px",
                     lineHeight: "1",
@@ -455,10 +404,7 @@ const handleAddSchool = async () => {
                   }}>
                     {school}
                   </div>
-                  <button
-                    onClick={() => handleRemoveSchool(index)}
-                    className="delete-button"
-                  >
+                  <button onClick={() => handleRemoveSchool(index)} className="delete-button">
                     x
                   </button>
                 </div>
@@ -510,19 +456,15 @@ const handleAddSchool = async () => {
 
               </div>
 
-              {companies.map((company, index) => (
-                <div
-                  key={index}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "10px",
-                    marginLeft: "20px",
-                    height: "30px",
-                    position: "relative"
-                  }}
-                  className="company-item"
-                >
+              {[...companies, ...unsavedCompanies].map((company, index) => (
+                <div key={index} className="company-item" style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                  marginLeft: "20px",
+                  height: "30px",
+                  position: "relative"
+                }}>
                   <div style={{
                     fontSize: "16px",
                     lineHeight: "1",
@@ -531,14 +473,12 @@ const handleAddSchool = async () => {
                   }}>
                     {company}
                   </div>
-                  <button
-                    onClick={() => handleRemoveCompany(index)}
-                    className="delete-button"
-                  >
+                  <button onClick={() => handleRemoveCompany(index)} className="delete-button">
                     x
                   </button>
                 </div>
               ))}
+
 
               <style>
                 {`
@@ -774,7 +714,7 @@ const handleAddSchool = async () => {
 
               />
               <div style={{ marginTop: "10px" }}>
-                <button onClick={SaveDescription} style={{
+                <button onClick={() => setShowConfirm1(true)} style={{
                   marginLeft: '10px',
                   backgroundColor: 'black',
                   color: 'white',
@@ -783,7 +723,7 @@ const handleAddSchool = async () => {
                   borderRadius: '4px',
                   cursor: 'pointer'
                 }}>Save</button>
-                {showConfirm && (
+                {showConfirm1 && (
                 <div
                   style={{
                     position: "fixed",
@@ -806,7 +746,7 @@ const handleAddSchool = async () => {
                   />
                   <p>Are you sure with your changes?</p>
                   <button
-                    onClick={handleYesClick}
+                    onClick={handleYesClick1}
                     style={{
                       margin: "10px",
                       padding: "8px 16px",
@@ -820,7 +760,10 @@ const handleAddSchool = async () => {
                     Yes
                   </button>
                   <button
-                    onClick={handleCancelClick}
+                    onClick={() => {
+                      setEditMode(false);
+                      setShowConfirm1(false);
+                    }}
                     style={{
                       margin: "10px",
                       padding: "8px 16px",
