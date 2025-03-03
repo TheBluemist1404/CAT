@@ -20,7 +20,7 @@ const Login = () => {
 
   //OAuth setup
   const googleRootURL = "https://accounts.google.com/o/oauth2/v2/auth";
-  const facebookRootURL = "https://www.facebook.com/v12.0/dialog/oauth";
+  const facebookRootURL = "https://www.facebook.com/v22.0/dialog/oauth";
 
   const googleRedirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -43,8 +43,9 @@ const Login = () => {
     client_id: facebookClientId,
     redirect_uri: facebookRedirectUri,
     response_type: "code",
-    scope: "email,public_profile",
+    scope: "public_profile,email",
   };
+  
 
   const googleAuthURL = `${googleRootURL}?${new URLSearchParams(googleOptions)}`;
   const facebookAuthURL = `${facebookRootURL}?${new URLSearchParams(facebookOptions)}`;
@@ -132,7 +133,7 @@ const Login = () => {
                 <img src="/src/assets/facebook-svgrepo-com.svg" alt="" />
               </button>
               <button className="gg" onClick={() => (window.location.href = googleAuthURL)}>
-                <img src="/src/assets/gmail.svg" alt="" />
+                <img src="/src/assets/google.png" alt="" />
               </button>
             </div>
           </div>

@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
 // [GET] /api/v1/oauth/google
-module.exports.oauth = async (req, res) => {
+module.exports.googleOAuth = async (req, res) => {
   const code = req.query.code;
   const url = 'https://oauth2.googleapis.com/token';
   const values = {
@@ -89,7 +89,6 @@ module.exports.facebookOAuth = async (req, res) => {
       return res.status(403).json({ message: "Facebook email is required" });
     }
 
-    // Check if user exists
     let user = await User.findOne({ email: facebookUser.email, deleted: false });
     if (!user) {
       user = new User({
@@ -101,10 +100,8 @@ module.exports.facebookOAuth = async (req, res) => {
       await user.save();
     }
 
-    // Generate Access & Refresh Tokens
     const { accessToken, refreshToken } = await generateToken(user);
 
-    // Redirect to frontend with tokens in URL
     res.redirect(
       `http://localhost:5173/#access_token=${accessToken}&refresh_token=${refreshToken}`
     );
