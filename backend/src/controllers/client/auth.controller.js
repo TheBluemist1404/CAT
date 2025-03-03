@@ -26,6 +26,9 @@ module.exports.signup = async (req, res) => {
       return;
     }
 
+    // console.log("under testing")
+    // return;
+
     const password = await hashPassword.hash(req.body.password);
 
     const user = new User({
@@ -110,22 +113,7 @@ module.exports.logout = async (req, res) => {
 module.exports.forgot = async (req, res) => {
   try {
     const email = req.body.email;
-    // const data = {
-    //   api_key: process.env.EMAIL_VERIFY_API_KEY,
-    //   email_address: email
-    // };
-
-    // const mailVerify = await axios.post('https://verify.maileroo.net/check', data, {
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   }
-    // })
-    // if (mailVerify.data && mailVerify.data.error_code !== '') {
-    //   res.status(404).json({
-    //     message: 'Invalid email!',
-    //   });
-    //   return;
-    // }
+    
     const user = await User.findOne({
       email: email,
       deleted: false,
