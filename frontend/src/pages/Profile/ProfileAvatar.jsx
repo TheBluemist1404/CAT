@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import AvatarEditor from "react-avatar-editor";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 function ProfileAvatar({ user, profileData, token, id }) {
   const [showAvatarChange, setShowAvatarChange] = useState(false);
@@ -17,7 +18,7 @@ function ProfileAvatar({ user, profileData, token, id }) {
       setSelectedFile(file);
     }
   };
-  console.log("Token:", token);
+  
 
   const handleUpload = async () => {
     if (!selectedFile) {
@@ -77,36 +78,47 @@ function ProfileAvatar({ user, profileData, token, id }) {
       }, "image/png");
     }
   };
-  console.log(user._id);
+  
 
   // Status bar
 
-  const codeSecs = profileData.duration || 0;
-  const codeHrs = Math.round(codeSecs / 36) / 100;
+  // const codeSecs = profileData.duration || 0;
+  // const codeHrs = Math.round(codeSecs / 36) / 100;
+  const getHours = (seconds) => Math.floor(seconds / 3600) + " hours";
 
-  const [followers, setFollowers] = useState(0);
+
+
+
+  const [followers, setFollowers] = useState([]);
+
   useEffect(() => {
     const getFollowers = async () => {
       try {
         const response = await axios.get(
           `http://localhost:3000/api/v1/users/${id}/followers`,
-
           {
             headers: {
               Authorization: `Bearer ${token.accessToken}`,
             },
           }
         );
-        setFollowers(response?.data.length);
+        setFollowers(response?.data || []);
       } catch (error) {
-        console.error("failed return followers for profile", error);
+        console.error("Failed to fetch followers", error);
+        setFollowers([]);
       }
     };
 
     getFollowers();
-  }, []);
+  }, [id, token]);
 
+  console.log("followers:",followers)
+  //----------------
+  const [modal, setModal] = useState(false);
+  //navigate
+  const navigate=useNavigate();
   return (
+    <>
     <div className="image">
       <div className="profile-avatar">
         <img className="ava" src={profileData?.avatar} alt="" />
@@ -274,16 +286,42 @@ function ProfileAvatar({ user, profileData, token, id }) {
         </div>
         <div className="divider"></div>
         <div className="box-item">
-          <span className="number">{codeHrs} hours</span>
+          <span className="number">{getHours(profileData.duration)}</span>
           <span className="label">Coding</span>
         </div>
         <div className="divider"></div>
         <div className="box-item">
-          <span className="number">{followers}</span>
+          <span className="number" onClick={() => setModal(true)}>{followers.length}</span>
           <span className="label">Followers</span>
         </div>
       </div>
+      
     </div>
+    {modal && (
+      <>
+        <div className="modal-overlay" onClick={() => setModal(false)}></div>
+        <div className="modal">
+          
+          <span className="close-icon" onClick={() => setModal(false)}>✖</span>
+
+          <h3>Followers</h3>
+          <ul className="followers-list">
+            {followers.map((follower) => (
+              <li key={follower._id} className="follower-item">
+                <img
+                  src={follower.avatar}
+                  alt={follower.fullName}
+                  className="follower-avatar"
+                />
+                <span className="follower-name" onClick={() => (setModal(false), navigate(`/profile/${follower._id}`))}>{follower.fullName}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </>
+    )}
+
+    </>
   );
 }
 

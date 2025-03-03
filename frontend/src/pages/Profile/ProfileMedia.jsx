@@ -9,7 +9,7 @@ function ProfileMedia({ posts = [] }) {
 
   return (
     <div >
-      <h1 style={{ margin: "20px 20px 20px 90px" }}>Image Gallery</h1>
+      <h1 style={{ margin: "2% 2% 2% 5%" }}>Image Gallery</h1>
 
       <div 
         className="flex-container" 
@@ -19,6 +19,7 @@ function ProfileMedia({ posts = [] }) {
           gridAutoRows: "250px", 
           gap: "20px",
           justifyContent:"center",
+          minHeight:"100vh"
           
         }}
       >

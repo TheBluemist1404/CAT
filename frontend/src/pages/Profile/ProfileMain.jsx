@@ -6,7 +6,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import DOMPurify from "dompurify";
 
 
-function ProfileMain({ user, token, profileData, id ,posts,isPrivate}) {
+function ProfileMain({ user, token, profileData, id ,posts,isPrivate,setView}) {
   // edit school and company modal
   const [showModal, setShowModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -52,7 +52,7 @@ function ProfileMain({ user, token, profileData, id ,posts,isPrivate}) {
 
     fetchSchools();
   }, [user, token]);
-console.log("check profile private",profileData?.isPrivate)
+
 const handleAddSchool = async () => {
   if (newSchool.trim() === "") return;
 
@@ -303,12 +303,11 @@ const handleAddSchool = async () => {
   //----------------------------
   //Image
   const [previewImage, setPreviewImage] = useState(null);
-  console.log("id other", id);
-  console.log("user id",user._id);
+  
   const information = id === user._id ? user : profileData;
   //--------------
   const check = id !== user._id && profileData.isPrivate;
-  console.log("check",check)
+  
   return (
     
     <div >
@@ -661,7 +660,7 @@ const handleAddSchool = async () => {
       <div className='im'>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "20px" }}>
   <h1>Images</h1>
-  <p className="view-button" onClick={() => setView("Media")}>View full</p>
+  <button className="view-button" onClick={() => setView("Media")}>View full</button>
 </div>
   <div className="flex-container">
     {Array.from({ length: 4 }).map((_, index) => {

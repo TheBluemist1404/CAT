@@ -83,8 +83,7 @@ const Profile = ({offset = 0, limit = 999, token }) => {
     
         fetchPosts();
     }, [profileData, offset, limit, token]);
-    console.log("id in main",id);
-    console.log("user id in main",user._id);
+    
     
     
     return (
@@ -95,7 +94,7 @@ const Profile = ({offset = 0, limit = 999, token }) => {
                 <ProfileAvatar user={user} profileData={profileData} id={id} token={token}  />
                 <ProfileTab view={view} setView={setView} user={user} profileData={profileData} id={id} token={token} isPrivate={isPrivate} setIsPrivate={setIsPrivate}  />
                 
-                {view === "posts" && <ProfileMain user={user} profileData={profileData} token={token} id={id} posts={posts} isPrivate={isPrivate}  />}
+                {view === "posts" && <ProfileMain user={user} profileData={profileData} token={token} id={id} posts={posts} isPrivate={isPrivate} setView={setView} />}
                 {view === "Media" && <ProfileMedia user={user} profileData={profileData} token={token} id={id} posts={posts} isPrivate={isPrivate}/>}
                 {view === "Saved" && <ProfileSavedPost user={user} profileData={profileData} id={id} />}
                 

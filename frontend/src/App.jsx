@@ -17,6 +17,8 @@ import LiveCode from "./pages/live-code/LiveCode";
 import CodeEditor from "./pages/live-code/CodeEditor";
 import EditorPreview from "./pages/live-code/EditorPreview";
 import LiveCodeLayout from "./pages/live-code/LiveCodeLayout";
+import ScrollToTopButton from "./pages/Profile/ScrollToTopButton";
+
 
 function App() {
   const { isLoggedIn, setIsLoggedIn, setUser } = useContext(AuthContext);
@@ -111,6 +113,7 @@ function App() {
   }
 
   return (
+    <>
     <Routes>
       <Route path="/">
         <Route index element={<Homepage token={token} />} />
@@ -143,6 +146,8 @@ function App() {
         </Route>
       </Route>
     </Routes>
+    <ScrollToTopButton />
+    </>
   );
 }
 
