@@ -14,9 +14,10 @@ import "prismjs/components/prism-javascript";
 import "./PostGallery.css"; 
 
 
-function Post({ post, token, update }) {
+function Post({ post: initialPost, token, update }) {
   const navigate = useNavigate();
   const { isLoggedIn, user } = useContext(AuthContext)
+  const [post, setPost] = useState(initialPost);
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [isDownvoted, setIsDownvoted] = useState(false);
   const [voteCount, setVoteCount] = useState(post.upvotes.length - post.downvotes.length)
@@ -173,67 +174,99 @@ function Post({ post, token, update }) {
     setDropdownVisible(dropdownVisible === index ? null : index);
   };
 
+  const [localComments, setLocalComments] = useState([]); // Temporary comments
+
   const handleAddComment = async () => {
     if (commentInput.trim()) {
       if (!isLoggedIn) {
-        navigate('/auth/login')
+        navigate('/auth/login');
       } else {
-        const commentContent = editorRef.current?.getContent();
+        const commentContent = editorRef.current?.getContent().trim();
+        if (!commentContent) return; // Prevent empty comments
+  
+        const tempComment = {
+          _id: `temp-${Date.now()}`, // Unique temporary ID
+          content: commentContent,
+          userDetails: {
+            avatar: user.avatar, // Use current user's avatar
+            fullName: user.fullName, // Use current user's name
+          },
+          createdAt: new Date().toISOString(),
+        };
+  
+        // 1️⃣ Instantly update UI by adding temp comment
+        setLocalComments((prev) => [...prev, tempComment]);
+  
         try {
-          const response = await axios.post(`http://localhost:3000/api/v1/forum/comment/${post._id}`,
+          const response = await axios.post(
+            `http://localhost:3000/api/v1/forum/comment/${post._id}`,
             { content: commentContent, user: { id: user._id } },
-            { headers: { "Authorization": `Bearer ${token.accessToken}` } },);
+            { headers: { Authorization: `Bearer ${token.accessToken}` } }
+          );
+  
           console.log(response);
-          if (editorRef.current) editorRef.current.setCommentContent('');
         } catch (error) {
-          if (error.response && error.response.status === 403) {
-            const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
-            const newAccessToken = getToken.data.accessToken
-            token.accessToken = newAccessToken;
-            localStorage.setItem('token', JSON.stringify(token))
-
-            const response = await axios.post(`http://localhost:3000/api/v1/forum/comment/${post._id}`,
-              { content: commentContent, user: { id: user._id } },
-              { headers: { "Authorization": `Bearer ${newAccessToken}` } },)
-            console.log(response)
-          }
+          console.error("Error adding comment:", error);
         }
+  
+        // 2️⃣ Properly reset input field
         setCommentInput('');
-        console.log(comments)
-        update();
+        if (editorRef.current) {
+          editorRef.current.setContent(''); // Ensure editor input clears
+        }
       }
     }
   };
-
+  
+  
+  // Display both real and temporary comments
+  const allComments = [...post.comments, ...localComments];
+  
   const [activeReply, setActiveReply] = useState(null); 
   const toggleReplyEditor = (commentId) => {
     setActiveReply(activeReply === commentId ? null : commentId); 
   };
 
+  const [localReplies, setLocalReplies] = useState({}); // Temporary replies storage
+
   const handleAddReply = async (commentId) => {
     const editorContent = editorRef.current[commentId]?.getContent();
     if (!editorContent.trim()) return;
-
+  
+    // 1️⃣ Create a temporary reply object
+    const tempReply = {
+      _id: `temp-${Date.now()}`, // Unique temporary ID
+      content: editorContent,
+      userDetails: {
+        avatar: user.avatar, // Use current user's avatar
+        fullName: user.fullName, // Use current user's name
+      },
+      createdAt: new Date().toISOString(),
+    };
+  
+    // 2️⃣ Update localReplies state (UI only)
+    setLocalReplies((prev) => ({
+      ...prev,
+      [commentId]: [...(prev[commentId] || []), tempReply],
+    }));
+  
     try {
       const response = await axios.post(
         `http://localhost:3000/api/v1/forum/reply/${commentId}`,
         { content: editorContent },
         { headers: { Authorization: `Bearer ${token.accessToken}` } }
       );
+  
       console.log("Reply posted:", response.data);
-
-      const updatedPost = { ...post };
-      const commentIndex = updatedPost.comments.findIndex((c) => c._id === commentId);
-      updatedPost.comments[commentIndex].replies.push(response.data);
-      setPost(updatedPost);
-
-      editorRef.current[commentId]?.setContent("");
-      setActiveReply(null);
     } catch (error) {
       console.error("Error posting reply:", error);
     }
-    update();
+  
+    // 3️⃣ Clear the editor content
+    editorRef.current[commentId]?.setContent("");
+    setActiveReply(null);
   };
+  
 
 
   const toggleCommentBox = () => {
@@ -444,7 +477,7 @@ function Post({ post, token, update }) {
 
   const renderComments = () => (
     <div className="comments-list">
-      {comments.map((comment) => {
+      {allComments.map((comment) => {
         const sanitizedContent = DOMPurify.sanitize(comment.content); 
         const isReplyEditorOpen = activeReply === comment._id;
         return (
@@ -514,6 +547,17 @@ function Post({ post, token, update }) {
                 </button>
               </div>
             )}
+              {localReplies[comment._id]?.map((reply) => (
+                <div key={reply._id} className="reply temp-reply">
+                  <div className="comment-header">
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden' }}>
+                      <img src={reply.userDetails.avatar} alt="Avatar" className="comment-avatar" style={{ width: '40px' }} />
+                    </div>
+                    <span className="comment-user-name">{reply.userDetails.fullName}</span>
+                  </div>
+                  <div className="comment-body" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(reply.content) }}></div>
+                </div>
+              ))}
             <hr className="post-line" style={{ marginTop: '10px' }} />
           </div>
         );
@@ -540,19 +584,22 @@ function Post({ post, token, update }) {
       navigate("/auth/login");
     }
   };
+  const [isDeleted, setIsDeleted] = useState(false);
 
   const handleDeletePost = async () => {
     try {
       const response = await axios.delete(`http://localhost:3000/api/v1/forum/delete/${post._id}`, {
         headers: { "Authorization": `Bearer ${token.accessToken}` },
       });
+  
       if (response.status === 200) {
-        update();  
+        setIsDeleted(true); // Hide the post instead of removing it
       }
     } catch (error) {
       console.error("Error deleting the post:", error);
     }
   };
+  
   const [isOpen, setIsOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
 
@@ -576,6 +623,8 @@ function Post({ post, token, update }) {
   
   const defaultAvatar = "https://res.cloudinary.com/cat-project/image/upload/v1735743336/coder-sign-icon-programmer-symbol-vector-2879989_ecvn23.webp";
 
+
+  if (isDeleted) return null;
   return (
     <div className="post">
       <div className="post-header">
@@ -656,6 +705,8 @@ function Post({ post, token, update }) {
               <Editor
                 apiKey={textEditorAPI}
                 onInit={(_, editor) => (editorRef.current = editor)}
+                value={commentInput}
+                onEditorChange={(newContent) => setCommentInput(newContent)}
                 onFocus={handleFocus}
                 init={{
                   height: 150,
