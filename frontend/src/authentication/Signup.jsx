@@ -10,13 +10,44 @@ import Header from "../Header";
 
 
 const Signup = () => {
-  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
   const [error, setError] = useState(null);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const navigate = useNavigate();
+  //OAuth setup
+  const googleRootURL = "https://accounts.google.com/o/oauth2/v2/auth";
+  const facebookRootURL = "https://www.facebook.com/v22.0/dialog/oauth";
+
+  const googleRedirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const facebookClientId = import.meta.env.VITE_FACEBOOK_CLIENT_ID;
+  const facebookRedirectUri = import.meta.env.VITE_FACEBOOK_REDIRECT_URI;
+
+  const googleOptions = {
+    redirect_uri: googleRedirectUri,
+    client_id: googleClientId,
+    access_type: "offline",
+    response_type: "code",
+    prompt: "consent",
+    scope: [
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email",
+    ].join(" "),
+  };
+
+  const facebookOptions = {
+    client_id: facebookClientId,
+    redirect_uri: facebookRedirectUri,
+    response_type: "code",
+    scope: "public_profile,email",
+  };
+  
+
+  const googleAuthURL = `${googleRootURL}?${new URLSearchParams(googleOptions)}`;
+  const facebookAuthURL = `${facebookRootURL}?${new URLSearchParams(facebookOptions)}`;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -100,7 +131,7 @@ const Signup = () => {
                   </div>
 
                 </div>
-                <button type="submit">Sign up</button>
+                <button className="submit-signup" type="submit">Sign up</button>
                 <div className="reg">
                   Already have an account?<p onClick={() => {navigate('/auth/login')}} > Login</p>
                 </div>
@@ -108,12 +139,12 @@ const Signup = () => {
             </div>
 
             <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'row', gap: '50px' }}>
-              <a className="fb">
-                <img src="/src/assets/facebook-svgrepo-com.svg" alt="" style={{ width: '50px' }} />
-              </a>
-              <a className="gg" style={{ width: '50px' }}>
-                <img src="/src/assets/gmail.svg" alt="" />
-              </a>
+              <button className="fb" onClick={() => (window.location.href = facebookAuthURL)}>
+                <img src="/src/assets/facebook-svgrepo-com.svg" alt="" />
+              </button>
+              <button className="gg" onClick={() => (window.location.href = googleAuthURL)}>
+                <img src="/src/assets/google.png" alt="" />
+              </button>
             </div>
           </div>
         </form>

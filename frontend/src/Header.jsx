@@ -6,6 +6,21 @@ import { AuthContext } from "./authentication/AuthProvider";
 function Header({token, isAuth}) {
     const {isLoggedIn, setIsLoggedIn, user} = useContext(AuthContext);
     const [hoveredIndex, setHoveredIndex] = useState(null);
+    const [avatar, setAvatar] = useState()
+    const [username, setUsername] = useState("...")
+    useEffect(()=>{
+        if (user) {
+            setAvatar(user.avatar)
+            if (user.fullName) {
+                if (user.fullName.length <15) {
+                    setUsername(user.fullName)
+                } else {
+                    setUsername(user.fullName.substr(0, 10))
+                }
+            }
+        }
+    },[user])
+    
     const linkRefs = useRef([])
 
     const navigate = useNavigate();
@@ -65,8 +80,8 @@ function Header({token, isAuth}) {
                     </div>) : (
                         <div style={{ position: 'absolute', top: '-25px', right: '20px' }}>
                             <div className='logged-in' onClick={toggleDropdown}>
-                                <div className="avatar"><img src={user && user.avatar} alt="" /></div>
-                                <div className='username'>{user.fullName? (user.fullName.length <= 15 ? user.fullName: user.fullName.substr(0, 10)): "..."}</div>
+                                <div className="avatar"><img src={avatar} alt="" /></div>
+                                <div className='username'>{username}</div>
                             </div>
                             <div className="action" style={{ height: dropdown ? '100px' : '0' }}>
                                 <div className="container">
