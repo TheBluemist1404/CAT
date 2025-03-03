@@ -19,21 +19,35 @@ const Login = () => {
   const navigate = useNavigate();
 
   //OAuth setup
-  const rootURL = 'https://accounts.google.com/o/oauth2/v2/auth';
-  const redirectUri = import.meta.env.VITE_REDIRECT_URI;
-  const clientId = import.meta.env.VITE_CLIENT_ID;
-  const options = {
-    redirect_uri: redirectUri,
-    client_id: clientId,
-    access_type: 'offline',
-    response_type: 'code',
-    prompt: 'consent',
+  const googleRootURL = "https://accounts.google.com/o/oauth2/v2/auth";
+  const facebookRootURL = "https://www.facebook.com/v12.0/dialog/oauth";
+
+  const googleRedirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const facebookClientId = import.meta.env.VITE_FACEBOOK_CLIENT_ID;
+  const facebookRedirectUri = import.meta.env.VITE_FACEBOOK_REDIRECT_URI;
+
+  const googleOptions = {
+    redirect_uri: googleRedirectUri,
+    client_id: googleClientId,
+    access_type: "offline",
+    response_type: "code",
+    prompt: "consent",
     scope: [
-      'https://www.googleapis.com/auth/userinfo.profile',
-      'https://www.googleapis.com/auth/userinfo.email',
-    ].join(' '),
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email",
+    ].join(" "),
   };
-  const qs = new URLSearchParams(options);
+
+  const facebookOptions = {
+    client_id: facebookClientId,
+    redirect_uri: facebookRedirectUri,
+    response_type: "code",
+    scope: "email,public_profile",
+  };
+
+  const googleAuthURL = `${googleRootURL}?${new URLSearchParams(googleOptions)}`;
+  const facebookAuthURL = `${facebookRootURL}?${new URLSearchParams(facebookOptions)}`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -107,19 +121,19 @@ const Login = () => {
                 </div>
               </div>
               <div className="forget" onClick={() => { navigate('/auth/forgot') }}>Forget password?</div>
-              <button type="submit">Login</button>
+              <button className="submit-login" type="submit">Login</button>
               <div className="reg">
                 Don't have an account?<p onClick={toLogin}> Register</p>
               </div>
             </div>
 
             <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'row', gap: '50px' }}>
-              <a className="fb">
-                <img src="/src/assets/facebook-svgrepo-com.svg" alt="" style={{ width: '50px' }} />
-              </a>
-              <a className="gg" href={`${rootURL}?${qs.toString()}`} style={{ width: '50px' }}>
+              <button className="fb" onClick={() => (window.location.href = facebookAuthURL)}>
+                <img src="/src/assets/facebook-svgrepo-com.svg" alt="" />
+              </button>
+              <button className="gg" onClick={() => (window.location.href = googleAuthURL)}>
                 <img src="/src/assets/gmail.svg" alt="" />
-              </a>
+              </button>
             </div>
           </div>
         </form>
