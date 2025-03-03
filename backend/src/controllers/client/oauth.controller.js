@@ -12,9 +12,9 @@ module.exports.oauth = async (req, res) => {
   const url = 'https://oauth2.googleapis.com/token';
   const values = {
     code,
-    client_id: process.env.CLIENT_ID,
-    client_secret: process.env.CLIENT_SECRET,
-    redirect_uri: process.env.REDIRECT_URI,
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    redirect_uri: process.env.GOOGLE_REDIRECT_URI,
     grant_type: 'authorization_code',
   };
 
@@ -56,5 +56,61 @@ module.exports.oauth = async (req, res) => {
     res.status(400).json({
       message: err.message,
     });
+  }
+};
+
+// [GET] /api/v1/oauth/facebook
+module.exports.facebookOAuth = async (req, res) => {
+  const code = req.query.code;
+  if (!code) {
+    return res.status(400).json({ message: "Authorization code is missing" });
+  }
+
+  const url = "https://graph.facebook.com/v12.0/oauth/access_token";
+  const values = {
+    client_id: process.env.FACEBOOK_CLIENT_ID,
+    client_secret: process.env.FACEBOOK_CLIENT_SECRET,
+    redirect_uri: process.env.FACEBOOK_REDIRECT_URI,
+    code,
+  };
+
+  try {
+    // Exchange auth code for access token
+    const result = await axios.get(`${url}?${qs.stringify(values)}`);
+    const { access_token } = result.data;
+
+    // Get user details from Facebook Graph API
+    const userInfo = await axios.get(
+      `https://graph.facebook.com/me?fields=id,name,email,picture&access_token=${access_token}`
+    );
+
+    const facebookUser = userInfo.data;
+    if (!facebookUser.email) {
+      return res.status(403).json({ message: "Facebook email is required" });
+    }
+
+    // Check if user exists
+    let user = await User.findOne({ email: facebookUser.email, deleted: false });
+    if (!user) {
+      user = new User({
+        email: facebookUser.email,
+        avatar: facebookUser.picture.data.url,
+        fullName: facebookUser.name,
+        password: await bcrypt.hash(crypto.randomBytes(20).toString("hex"), parseInt(process.env.saltRounds)),
+      });
+      await user.save();
+    }
+
+    // Generate Access & Refresh Tokens
+    const { accessToken, refreshToken } = await generateToken(user);
+
+    // Redirect to frontend with tokens in URL
+    res.redirect(
+      `http://localhost:5173/#access_token=${accessToken}&refresh_token=${refreshToken}`
+    );
+
+  } catch (err) {
+    console.error("Facebook OAuth Error:", err.response?.data || err.message);
+    res.status(500).json({ message: "Failed to authenticate with Facebook" });
   }
 };

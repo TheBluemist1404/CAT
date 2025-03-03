@@ -168,7 +168,7 @@
     text-decoration: underline;
   }
 
-  button {
+  .submit-login {
     position: absolute;
     bottom: 170px;
     background-color: #2B2B3B;
@@ -183,7 +183,7 @@
     z-index: 3;
     font-size: 20px;
   }
-  button:hover {
+  .submit-login:hover {
     opacity: 0.8;
   }
   .reg p{
@@ -204,18 +204,14 @@
     z-index: 3;
     text-align: center;
   }
-  .fb{
-    width: 50px;
-  }
-  .fb:hover{
-    transform: scale(1.1);
-    cursor: pointer;
-  }
-  .gg{
+  
+  .fb, .gg{
+    background-color: transparent;
+    border: none;
     width: 50px;
   }
     
-  .gg:hover{ 
+  .fb:hover, .gg:hover{ 
     transform: scale(1.1); 
     cursor: pointer;
   }
