@@ -45,6 +45,7 @@ const ScrollToTopButton = () => {
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
           transform: `translateY(${bounce}px)`,
           transition: "transform 0.3s ease-in-out",
+          zIndex:1000,
         }}
       >
         <img
