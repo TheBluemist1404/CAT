@@ -24,7 +24,7 @@ const Signup = () => {
       navigate('/auth/login') 
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setError("invalid email format!")
+        setError("invalid email!")
       } else if 
       (error.response && error.response.status === 409) {
         setError("email already used!")

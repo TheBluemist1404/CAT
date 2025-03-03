@@ -1,5 +1,6 @@
-const axios = require('axios')
+const axios = require('axios');
 const Token = require('../../models/client/token.model');
+const { checkEmailExists } = require('../../utils/verifyEmail');
 module.exports.validateLogin = (req, res, next) => {
   if (!req.body.email) {
     res.status(400).json({
@@ -36,22 +37,31 @@ module.exports.validateSignup = async (req, res, next) => {
     return;
   }
   const email = req.body.email;
-    const data = {
-      api_key: process.env.EMAIL_VERIFY_API_KEY,
-      email_address: email
-    };
+  
+  // const data = {
+  //   api_key: process.env.EMAIL_VERIFY_API_KEY,
+  //   email_address: email,
+  // };
 
-    const mailVerify = await axios.post('https://verify.maileroo.net/check', data, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    if (mailVerify.data && !mailVerify.data.data.format_valid) {
-      res.status(404).json({
-        message: 'Invalid email!',
-      });
-      return;
-    }
+  // const mailVerify = await axios.post(
+  //   'https://verify.maileroo.net/check',
+  //   data,
+  //   {
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //   },
+  // );
+
+  
+  const verify = await checkEmailExists(email)
+
+  if (!verify) {
+    res.status(404).json({
+      message: 'Invalid email!',
+    });
+    return;
+  }
   next();
 };
 
@@ -101,22 +111,26 @@ module.exports.validateForgot = async (req, res, next) => {
     return;
   }
   const email = req.body.email;
-    const data = {
-      api_key: process.env.EMAIL_VERIFY_API_KEY,
-      email_address: email
-    };
+  const data = {
+    api_key: process.env.EMAIL_VERIFY_API_KEY,
+    email_address: email,
+  };
 
-    const mailVerify = await axios.post('https://verify.maileroo.net/check', data, {
+  const mailVerify = await axios.post(
+    'https://verify.maileroo.net/check',
+    data,
+    {
       headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    if (mailVerify.data && !mailVerify.data.data.format_valid) {
-      res.status(404).json({
-        message: 'Invalid email!',
-      });
-      return;
-    }
+        'Content-Type': 'application/json',
+      },
+    },
+  );
+  if (mailVerify.data && !mailVerify.data.data.format_valid) {
+    res.status(404).json({
+      message: 'Invalid email!',
+    });
+    return;
+  }
   next();
 };
 
