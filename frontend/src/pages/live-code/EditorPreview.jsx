@@ -11,31 +11,46 @@ import { AuthContext } from "../../authentication/AuthProvider";
 import CodeEditor from "./CodeEditor";
 import Button from "./Button";
 import Member from "./Member";
+import NotFound from "../../NotFound";
 
 function EditorPreview({ token, preview }) {
   const projectId = window.location.href.split("/").pop();
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const [isOwner, setIsOwner] = useState(false)
   const [detail, setDetail] = useState({});
   const [renderInvite, setRenderInvite] = useState(false);
   const [display, setDisplay] = useState(false);
   const [email, setEmail] = useState("");
 
   async function fetchProject() {
-    const response = await axios.get(
-      `http://localhost:3000/api/v1/projects/${projectId}`,
-      { headers: { Authorization: `Bearer ${token.accessToken}` } }
-    );
-    if (response) {
-      setDetail(response.data);
-      console.log(response.data.owner[0]._id === user._id);
-      setRenderInvite(response.data.owner[0]._id === user._id); // Collaborators wont be able to invite others
+    try {      
+      const response = await axios.get(
+        `http://localhost:3000/api/v1/projects/${projectId}`,
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      );
+
+      if (response && response.status === 200) {
+        setIsOwner(true)
+        setDetail(response.data);
+        setRenderInvite(response.data.owner[0]._id === user._id); // Collaborators wont be able to invite others
+      }
+    } catch (error) {
+      console.error("failed fetching at CodePreview:", error)
+      if (!isOwner) {
+        return(
+          <div style={{fontFamily: "var(--code-font)"}}>
+            <div>Sorry, you cannot access this page</div>
+            <button onClick={()=>{navigate('/')}}>Click to head back</button>
+          </div>
+        )
+      }
     }
   }
 
   useEffect(() => {
-    fetchProject();
+    fetchProject();    
   }, [projectId]);
 
   function handleName(event) {
@@ -98,6 +113,12 @@ function EditorPreview({ token, preview }) {
         </div>
       );
     }
+  }
+
+  if (!isOwner) {
+    return(
+      <NotFound/>
+    )
   }
 
   return (

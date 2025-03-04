@@ -11,6 +11,7 @@ import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import logo from "@code-editor-assets/logo.svg";
+import NotFound from "../../NotFound";
 
 function getRandomColor() {
   // Generate a random color only once per client.
@@ -25,20 +26,29 @@ function CodeEditor({ token, preview }) {
   if (projectId.slice(-1) === '#') {
     projectId = projectId.slice(0, -1)
   }
+  const [isOwner, setIsOwner] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [projectContent, setProjectContent] = useState({});
   const editorRef = useRef(null);
 
   useEffect(() => {
     async function fetchProject() {
-      const response = await axios.get(
-        `http://localhost:3000/api/v1/projects/${projectId}`,
-        { headers: { Authorization: `Bearer ${token.accessToken}` } }
-      );
-      setProjectName(response.data.name);
-      setProjectContent(response.data.files[0]);
-      console.log(response.data.files[0]);
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/v1/projects/${projectId}`,
+          { headers: { Authorization: `Bearer ${token.accessToken}` } }
+        );
+        if (response.status === 200) {
+          setIsOwner(true)
+          setProjectName(response.data.name);
+          setProjectContent(response.data.files[0]);
+          setLang(response.data.files[0].language)
+        }
+      } catch (error) {
+        console.error("failed fetching at CodeEditor:",error)
+      }
     }
+    
     fetchProject();
   }, [projectId]);
 
@@ -297,40 +307,6 @@ function CodeEditor({ token, preview }) {
   const [mode, setMode] = useState("default");
   const [codeDisplay, setCodeDisplay] = useState([]);
   const [errorDisplay, setErrorDisplay] = useState("");
-
-  //Resize editor properly since it is not dynamic
-  const editorContainerRef = useRef(null);
-  const [dimensions, setDimensions] = useState({
-    width: "100%",
-    height: "100%",
-  });
-
-  useEffect(() => {
-    const observer = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        setDimensions({
-          width: entry.contentRect.width,
-          height: entry.contentRect.height,
-        });
-      }
-    });
-
-    if (editorContainerRef.current) {
-      observer.observe(editorContainerRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  function getHeight(mode) {
-    if (mode == "default") {
-      return dimensions.height + "px";
-    } else {
-      let resizeHeight = dimensions.height - 110;
-      return resizeHeight + "px";
-    }
-  }
-
   // ----------------------
 
   const execute = async () => {
@@ -424,7 +400,12 @@ function CodeEditor({ token, preview }) {
       },
       { headers: { Authorization: `Bearer ${token.accessToken}` } }
     );
-    console.log(response.data);
+  }
+
+  if (!isOwner) {
+    return(
+      <NotFound/>
+    )
   }
 
   return (
@@ -480,7 +461,7 @@ function CodeEditor({ token, preview }) {
             </button>
           </div>
           <div className="codespace">
-            <div className="code-input" ref={editorContainerRef}>
+            <div className="code-input">
               <div className="text-editor"> 
                 <Editor
                   language={lang}
