@@ -105,7 +105,7 @@
   .wave-group .bar {
     position: relative;
     display: block;
-    width: 100%;
+    width: calc(99% - 10px);
     text-align: center;
   }
   
@@ -139,6 +139,7 @@
     position: absolute; 
     bottom: 0; 
     right: 0; 
+    transform: translateX(-10px);
   }
   
   .name, .email, .password {
@@ -160,7 +161,7 @@
   .submit-signup {
     position: absolute;
     bottom: 170px;
-    background-color: #2B2B3B;
+    background-color: var(--box-color);
     border-radius: 10px;
     color: white;
     margin-top: 50px;
@@ -210,7 +211,7 @@
   }
 
   .gg img{
-    transform: scale(0.9);
+    transform: scale(0.87);
   }
     
   .fb:hover, .gg:hover{ 
