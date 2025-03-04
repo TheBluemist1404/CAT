@@ -18,6 +18,7 @@ import CodeEditor from "./pages/live-code/CodeEditor";
 import EditorPreview from "./pages/live-code/EditorPreview";
 import LiveCodeLayout from "./pages/live-code/LiveCodeLayout";
 import ScrollToTopButton from "./pages/Profile/ScrollToTopButton";
+import NotFound from "./NotFound";
 
 
 function App() {
@@ -54,7 +55,7 @@ function App() {
       );
       return userResponse.data;
     } catch (error) {
-      if (error.response && error.response.status === 403) {
+      if (error.response && error.response.status === 403) { // accessToken expired
         try {
           const response = await axios.post(
             "http://localhost:3000/api/v1/token",
@@ -70,7 +71,7 @@ function App() {
           );
           return userResponse.data;
         } catch (error) {
-          if (error.response && error.response.status === 400) {
+          if (error.response && error.response.status === 400) { //refreshToken expired
             logout();
           }
         }
@@ -145,6 +146,7 @@ function App() {
           />
         </Route>
       </Route>
+      <Route path="*" element={<NotFound/>}/>
     </Routes>
     <ScrollToTopButton />
     </>
