@@ -1,47 +1,61 @@
 version: "3"
 services:
-  # backend:
-  #   build: ./backend
-  #   container_name: backend-container
-  #   restart: always
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./backend:/app
-  #     - /app/node_modules
-  #     - /var/run/docker.sock:/var/run/docker.sock  # ✅ Allow backend to run Docker commands
-  #   depends_on:
-  #     - sandbox-js
-  #     - sandbox-python
-  #     - sandbox-cpp
-  #     - redis
+    # backend:
+    #   build: ./backend
+    #   container_name: backend-container
+    #   restart: always
+    #   ports:
+    #     - "3000:3000"
+    #   volumes:
+    #     - ./backend:/app
+    #     - /app/node_modules
+    #     - /var/run/docker.sock:/var/run/docker.sock  # ✅ Allow backend to run Docker commands
+    #   depends_on:
+    #     - sandbox-js
+    #     - sandbox-python
+    #     - sandbox-cpp
+    #     - redis
 
-  sandbox-js:
-    build: ./sandbox-js
-    container_name: sandbox-js
-    stdin_open: true
-    tty: true
+    sandbox-js:
+        build: ./sandbox-js
+        container_name: sandbox-js
+        stdin_open: true
+        tty: true
 
-  sandbox-python:
-    build: ./sandbox-python
-    container_name: sandbox-python
-    stdin_open: true
-    tty: true
+    sandbox-python:
+        build: ./sandbox-python
+        container_name: sandbox-python
+        stdin_open: true
+        tty: true
 
-  sandbox-cpp:
-    build: ./sandbox-cpp
-    container_name: sandbox-cpp
-    stdin_open: true
-    tty: true
+    sandbox-cpp:
+        build: ./sandbox-cpp
+        container_name: sandbox-cpp
+        stdin_open: true
+        tty: true
 
-  redis:
-    image: redis:latest
-    container_name: redis-container
-    restart: always
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
+    redis:
+        image: redis:latest
+        container_name: redis-container
+        restart: always
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis-data:/data
+    rabbitmq:
+        image: rabbitmq:3-management
+        container_name: rabbitmq-container
+        restart: always
+        ports:
+            - "5672:5672" # Default RabbitMQ port
+            - "15672:15672" # Management UI port
+        environment:
+            RABBITMQ_DEFAULT_USER: admin
+            RABBITMQ_DEFAULT_PASS: admin
+        volumes:
+            - rabbitmq-data:/var/lib/rabbitmq
 
 volumes:
-  redis-data:
+    redis-data:
+    rabbitmq-data:
+
