@@ -6,6 +6,7 @@ const Tag = require('../../models/client/tag.model');
 const slugify = require('slugify');
 const { getDetail } = require('../../services/client/getDetail.service');
 const { initializeRedisClient } = require('../../utils/redis');
+const { publishNotification } = require('../../utils/notificationWorker');
 
 // [GET] /api/v1/forum?offset=...&limit=...
 module.exports.index = async (req, res) => {
@@ -178,6 +179,8 @@ module.exports.create = async (req, res) => {
     user.posts = user.posts.concat(savedPost._id);
     await user.save();
 
+    await publishNotification(notificationProducer, 'notification', savedPost, req.user);
+
     //update cache
     const key = `${process.env.CACHE_PREFIX}:profile:${req.user.id}`;
     const checkCacheExist = await redisClient.get(key);
@@ -207,7 +210,11 @@ module.exports.detail = async (req, res) => {
     const id = req.params.id;
     const [post, cacheHit] = await getDetail(id);
 
-    if (!post || post.status === 'private' && req.user.id !== post.userCreated._id.toString()) {
+    if (
+      !post ||
+      (post.status === 'private' &&
+        req.user.id !== post.userCreated._id.toString())
+    ) {
       res.status(404).json({
         message: 'Cannot find post!',
       });

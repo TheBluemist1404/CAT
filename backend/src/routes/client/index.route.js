@@ -1,11 +1,13 @@
 const authRoutes = require('./auth.route');
-const oauthRoutes = require('./oauth.route')
+const oauthRoutes = require('./oauth.route');
 const tokenRoutes = require('./token.route');
 const postRoutes = require('./post.route');
 const profileRoutes = require('./profile.route');
-const codeRoutes = require('./code.route')
+const codeRoutes = require('./code.route');
 const projectRoutes = require('./project.route');
 const followerRoutes = require('./follower.route');
+const notificationRoutes = require('./notification.route');
+
 module.exports = app => {
   const version = '/api/v1';
 
@@ -16,5 +18,6 @@ module.exports = app => {
   app.use(version + '/profile', profileRoutes);
   app.use(version + '/code', codeRoutes);
   app.use(version + '/projects', projectRoutes);
-  app.use(version+ '/users', followerRoutes);
+  app.use(version + '/users', followerRoutes);
+  app.use(version + '/notifications', notificationRoutes);
 };
