@@ -6,8 +6,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import Prism from "prismjs";
 import hljs from "highlight.js/lib/core"; 
 import cpp from "highlight.js/lib/languages/cpp";
-import "prismjs/themes/prism.css"; 
-import "highlight.js/styles/monokai-sublime.css"; 
+import "prismjs/themes/prism-okaidia.css"; 
+import "highlight.js/styles/dark.css"; 
 import "prismjs/components/prism-python"; 
 import "prismjs/components/prism-javascript";
 import DOMPurify from 'dompurify';
@@ -57,6 +57,125 @@ function Detail({ token }) {
       fetchData();
     }
   }, [])
+
+  useEffect(() => {
+    const addButtons = () => {
+      document.querySelectorAll("pre code").forEach((codeBlock, index) => {
+        const pre = codeBlock.parentElement;
+  
+        if (pre.querySelector(".copy-button") || pre.querySelector(".download-button")) return;
+  
+        const langClass = codeBlock.className.match(/language-(\w+)/);
+        const language = langClass ? langClass[1] : "txt";
+        const fileExtension = getFileExtension(language);
+        const defaultFileName = `snippet-${index + 1}.${fileExtension}`;
+  
+        const copyIconPath = "/src/pages/forum/assets/Copy.svg";
+        const downloadIconPath = "/src/pages/forum/assets/Download.svg";
+  
+        const copyButton = document.createElement("button");
+        copyButton.className = "copy-button";
+        copyButton.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 1px;">
+            <img src="${copyIconPath}" alt="Copy" class="copy-icon" style="width: 16px; height: 16px; filter: invert(1);">
+            <span class="copy-text">Copy</span>
+          </div>`;
+        Object.assign(copyButton.style, {
+          position: "absolute",
+          top: "5px",
+          right: "100px",
+          padding: "5px 10px",
+          fontSize: "12px",
+          border: "none",
+          background: "none",
+          color: "white",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          zIndex: "10",
+        });
+  
+        copyButton.addEventListener("click", () => {
+          navigator.clipboard.writeText(codeBlock.innerText);
+          copyButton.querySelector(".copy-text").innerText = "Copied!";
+          setTimeout(() => {
+            copyButton.querySelector(".copy-text").innerText = "Copy";
+          }, 2000);
+        });
+  
+        const downloadButton = document.createElement("button");
+        downloadButton.className = "download-button";
+        downloadButton.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 1px;">
+            <img src="${downloadIconPath}" alt="Download" class="download-icon" style="width: 16px; height: 16px; filter: invert(1);">
+            <span class="download-text">Download</span>
+          </div>`;
+        Object.assign(downloadButton.style, {
+          position: "absolute",
+          top: "5px",
+          right: "5px",
+          padding: "5px 10px",
+          fontSize: "12px",
+          border: "none",
+          background: "none",
+          color: "white",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          zIndex: "10",
+        });
+  
+        downloadButton.addEventListener("click", () => {
+          const fileName = prompt("Enter file name:", defaultFileName);
+          if (!fileName) return; 
+  
+          const blob = new Blob([codeBlock.innerText], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+  
+          downloadButton.querySelector(".download-text").innerText = "Downloaded!";
+          setTimeout(() => {
+            downloadButton.querySelector(".download-text").innerText = "Download";
+          }, 2000);
+        });
+  
+        pre.style.position = "relative";
+        pre.appendChild(copyButton);
+        pre.appendChild(downloadButton);
+      });
+    };
+  
+    addButtons();
+  }, [post ? post.content : ""]);
+  
+  const getFileExtension = (language) => {
+    const extensions = {
+      javascript: "js",
+      html: "html",
+      css: "css",
+      python: "py",
+      java: "java",
+      c: "c",
+      cpp: "cpp",
+      php: "php",
+      ruby: "rb",
+      swift: "swift",
+      go: "go",
+      rust: "rs",
+      kotlin: "kt",
+      ts: "ts",
+      sql: "sql",
+      bash: "sh",
+    };
+    return extensions[language] || "txt";
+  };
+ 
 
   hljs.registerLanguage("cpp", cpp); 
 
@@ -341,26 +460,39 @@ function Detail({ token }) {
   const renderDropdown = (index) => (
     <div
       className="post-navigate-dropdown"
-      style={{ display: dropdownVisible === index ? 'block' : 'none' }}
+      style={{ display: dropdownVisible === index ? "block" : "none" }}
     >
-      <div className="dropdown-item" onClick={handleSavePost}>{isSaved ? "Unsave" : "Save"}</div>
+      <div className="dropdown-item" onClick={handleSavePost}>
+        <img 
+          src={`/src/pages/forum/assets/${isSaved ? "unsave" : "save"}.svg`} 
+          alt="Save" 
+          style={{ width: 16, height: 16, marginRight: 8 }}
+        />
+        {isSaved ? "Unsave" : "Save"}
+      </div>
       <hr className="post-navigate-line" />
       {post?.userCreated._id === user._id ? (
-        <div
-        className="dropdown-item"
-        style={{ color: '#FF4B5C' }}
-        onClick={handleDeletePost}
-        >
-        Delete
-        </div>):(
-        <div
-        className="dropdown-item"
-        style={{ color: '#FF4B5C' }}
-        >
-        Report
-        </div>)}
+        <div className="dropdown-item" style={{ color: "#FF4B5C" }} onClick={handleDeletePost}>
+          <img 
+            src="/src/pages/forum/assets/delete.svg" 
+            alt="Delete" 
+            style={{ width: 16, height: 16, marginRight: 8 }}
+          />
+          Delete
+        </div>
+      ) : (
+        <div className="dropdown-item" style={{ color: "#FF4B5C" }}>
+          <img 
+            src="/src/pages/forum/assets/report.svg" 
+            alt="Report" 
+            style={{ width: 16, height: 16, marginRight: 8 }}
+          />
+          Report
+        </div>
+      )}
     </div>
   );
+  
 
   //Render comments ---------------------------
   const comments = post ? post.comments : []
