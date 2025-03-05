@@ -291,7 +291,7 @@ function ProfileAvatar({ user, profileData, token, id }) {
         </div>
         <div className="divider"></div>
         <div className="box-item">
-          <span className="number" onClick={() => setModal(true)}>{followers.length}</span>
+          <span className="number" onClick={() => setModal(true)} style={{cursor:"pointer"}}>{followers.length}</span>
           <span className="label">Followers</span>
         </div>
       </div>
