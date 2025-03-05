@@ -265,7 +265,7 @@ function ProfileMain({ user, token, profileData, id ,posts,isPrivate,setView}) {
     
     <div >
       {check ? (
-      <div style={{ padding: "50px", display: "flex", justifyContent: "center", alignItems: "center",height:"100%" }}>
+      <div style={{ padding: "50px", display: "flex", justifyContent: "center", alignItems: "center",minHeight: "calc(100vh - 500px)" }}>
         <p>This profile is private!</p>
       </div>
       

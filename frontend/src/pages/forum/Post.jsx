@@ -44,44 +44,53 @@ function Post({ post: initialPost, token, update }) {
       document.querySelectorAll("pre code").forEach((codeBlock, index) => {
         const pre = codeBlock.parentElement;
   
-        // Avoid duplicates
         if (pre.querySelector(".copy-button") || pre.querySelector(".download-button")) return;
   
-        // Extract language from class (e.g., "language-javascript" -> "javascript")
         const langClass = codeBlock.className.match(/language-(\w+)/);
         const language = langClass ? langClass[1] : "txt";
         const fileExtension = getFileExtension(language);
         const defaultFileName = `snippet-${index + 1}.${fileExtension}`;
   
-        // Create Copy Button
+        const copyIconPath = "/src/pages/forum/assets/Copy.svg";
+        const downloadIconPath = "/src/pages/forum/assets/Download.svg";
+  
         const copyButton = document.createElement("button");
-        copyButton.innerText = "Copy";
         copyButton.className = "copy-button";
+        copyButton.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 1px;">
+            <img src="${copyIconPath}" alt="Copy" class="copy-icon" style="width: 16px; height: 16px; filter: invert(1);">
+            <span class="copy-text">Copy</span>
+          </div>`;
         Object.assign(copyButton.style, {
           position: "absolute",
           top: "5px",
-          right: "80px",
+          right: "100px",
           padding: "5px 10px",
           fontSize: "12px",
           border: "none",
-          background: "#007bff",
+          background: "none",
           color: "white",
           cursor: "pointer",
-          borderRadius: "3px",
+          display: "flex",
+          alignItems: "center",
           zIndex: "10",
         });
   
-        // Copy to clipboard functionality
         copyButton.addEventListener("click", () => {
           navigator.clipboard.writeText(codeBlock.innerText);
-          copyButton.innerText = "Copied!";
-          setTimeout(() => (copyButton.innerText = "Copy"), 2000);
+          copyButton.querySelector(".copy-text").innerText = "Copied!";
+          setTimeout(() => {
+            copyButton.querySelector(".copy-text").innerText = "Copy";
+          }, 2000);
         });
   
-        // Create Download Button
         const downloadButton = document.createElement("button");
-        downloadButton.innerText = "Download";
         downloadButton.className = "download-button";
+        downloadButton.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 1px;">
+            <img src="${downloadIconPath}" alt="Download" class="download-icon" style="width: 16px; height: 16px; filter: invert(1);">
+            <span class="download-text">Download</span>
+          </div>`;
         Object.assign(downloadButton.style, {
           position: "absolute",
           top: "5px",
@@ -89,16 +98,18 @@ function Post({ post: initialPost, token, update }) {
           padding: "5px 10px",
           fontSize: "12px",
           border: "none",
-          background: "#28a745",
+          background: "none",
           color: "white",
           cursor: "pointer",
-          borderRadius: "3px",
+          display: "flex",
+          alignItems: "center",
           zIndex: "10",
         });
   
-        // Download functionality with language-based file naming
         downloadButton.addEventListener("click", () => {
-          const fileName = prompt("Enter file name:", defaultFileName) || defaultFileName;
+          const fileName = prompt("Enter file name:", defaultFileName);
+          if (!fileName) return; 
+  
           const blob = new Blob([codeBlock.innerText], { type: "text/plain" });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
@@ -108,9 +119,13 @@ function Post({ post: initialPost, token, update }) {
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
+  
+          downloadButton.querySelector(".download-text").innerText = "Downloaded!";
+          setTimeout(() => {
+            downloadButton.querySelector(".download-text").innerText = "Download";
+          }, 2000);
         });
   
-        // Attach buttons inside <pre>
         pre.style.position = "relative";
         pre.appendChild(copyButton);
         pre.appendChild(downloadButton);
@@ -119,7 +134,6 @@ function Post({ post: initialPost, token, update }) {
   
     addButtons();
   }, [post.content]);
-
   
   const getFileExtension = (language) => {
     const extensions = {
@@ -142,6 +156,7 @@ function Post({ post: initialPost, token, update }) {
     };
     return extensions[language] || "txt";
   };
+ 
   
   hljs.registerLanguage("cpp", cpp); 
 
@@ -194,7 +209,6 @@ function Post({ post: initialPost, token, update }) {
           createdAt: new Date().toISOString(),
         };
   
-        // 1️⃣ Instantly update UI by adding temp comment
         setLocalComments((prev) => [...prev, tempComment]);
   
         try {
@@ -209,7 +223,6 @@ function Post({ post: initialPost, token, update }) {
           console.error("Error adding comment:", error);
         }
   
-        // 2️⃣ Properly reset input field
         setCommentInput('');
         if (editorRef.current) {
           editorRef.current.setContent(''); // Ensure editor input clears
@@ -219,7 +232,6 @@ function Post({ post: initialPost, token, update }) {
   };
   
   
-  // Display both real and temporary comments
   const allComments = [...post.comments, ...localComments];
   
   const [activeReply, setActiveReply] = useState(null); 
@@ -227,24 +239,22 @@ function Post({ post: initialPost, token, update }) {
     setActiveReply(activeReply === commentId ? null : commentId); 
   };
 
-  const [localReplies, setLocalReplies] = useState({}); // Temporary replies storage
+  const [localReplies, setLocalReplies] = useState({}); 
 
   const handleAddReply = async (commentId) => {
     const editorContent = editorRef.current[commentId]?.getContent();
     if (!editorContent.trim()) return;
   
-    // 1️⃣ Create a temporary reply object
     const tempReply = {
-      _id: `temp-${Date.now()}`, // Unique temporary ID
+      _id: `temp-${Date.now()}`, 
       content: editorContent,
       userDetails: {
-        avatar: user.avatar, // Use current user's avatar
-        fullName: user.fullName, // Use current user's name
+        avatar: user.avatar, 
+        fullName: user.fullName, 
       },
       createdAt: new Date().toISOString(),
     };
   
-    // 2️⃣ Update localReplies state (UI only)
     setLocalReplies((prev) => ({
       ...prev,
       [commentId]: [...(prev[commentId] || []), tempReply],
@@ -262,7 +272,6 @@ function Post({ post: initialPost, token, update }) {
       console.error("Error posting reply:", error);
     }
   
-    // 3️⃣ Clear the editor content
     editorRef.current[commentId]?.setContent("");
     setActiveReply(null);
   };
@@ -432,49 +441,44 @@ function Post({ post: initialPost, token, update }) {
     }
   };
 
-  const renderDropdown = (index) => (
-    <div
-      className="post-navigate-dropdown"
-      style={{ display: dropdownVisible === index ? 'block' : 'none' }}
-    >
-      <div className="dropdown-item" onClick={handleSavePost}>{isSaved ? "Unsave" : "Save"}</div> 
-      <hr className="post-navigate-line" />
-      {post.userCreated._id === user._id ? (
-        <div
-        className="dropdown-item"
-        style={{ color: '#FF4B5C' }}
-        onClick={handleDeletePost}
-        >
-        Delete
-        </div>):(
-        <div
-        className="dropdown-item"
-        style={{ color: '#FF4B5C' }}
-        >
-        Report
-        </div>)}
-    </div>
-  );
-
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        postRef.current &&
-        !postRef.current.contains(event.target) &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownVisible(null); 
       }
     };
-
-    document.addEventListener('click', handleClickOutside);
-
+  
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
+  
+  const renderDropdown = (index) => (
+    <div
+      ref={dropdownRef}
+      className="post-navigate-dropdown"
+      style={{ display: dropdownVisible === index ? "block" : "none" }}
+    >
+      <div className="dropdown-item" onClick={handleSavePost} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+        <img src={`/src/pages/forum/assets/${isSaved ? "unsave" : "save"}.svg`} alt="Save" width="14" height="14" />
+        {isSaved ? "Unsave" : "Save"}
+      </div>
+      <hr className="post-navigate-line" />
+      {post.userCreated._id === user._id ? (
+        <div className="dropdown-item" onClick={handleDeletePost} style={{ display: "flex", alignItems: "center", gap: "6px", color: "#FF4B5C" }}>
+          <img src="/src/pages/forum/assets/delete.svg" alt="Delete" width="14" height="14" />
+          Delete
+        </div>
+      ) : (
+        <div className="dropdown-item" style={{ display: "flex", alignItems: "center", gap: "6px", color: "#FF4B5C" }}>
+          <img src="/src/pages/forum/assets/report.svg" alt="Report" width="14" height="14" />
+          Report
+        </div>
+      )}
+    </div>
+  );
+  
   const renderComments = () => (
     <div className="comments-list">
       {allComments.map((comment) => {
@@ -619,8 +623,7 @@ function Post({ post: initialPost, token, update }) {
     if (count === 3) return "post-gallery-grid-3";
     if (count === 4) return "post-gallery-grid-4";
     return "post-gallery-grid-5plus";
-  };
-  
+  };  
   const defaultAvatar = "https://res.cloudinary.com/cat-project/image/upload/v1735743336/coder-sign-icon-programmer-symbol-vector-2879989_ecvn23.webp";
 
 
