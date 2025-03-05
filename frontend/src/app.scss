@@ -28,12 +28,20 @@ body {
 
 /* HEADER */
 .header {
+  position: sticky;
+  top: 30px;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  background-color: #1e1e2f8a;
   font-family: var(--text-font);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin: 0 30px;
+  width: 80%;
+  margin-left: 10%;
+  padding: 0 20px;
+  border-radius: 50px;
 
 
   .navbar {
@@ -42,7 +50,7 @@ body {
     flex-direction: row;
     align-items: center;
     justify-content: space-around;
-    transform: translateX(30px);
+    transform: translateX(40px);
   }
 
   .navbar div {
@@ -137,6 +145,7 @@ body {
       padding: 5px 0;
       flex-direction: column;
       background-color: #ffffff31;
+      border-radius: 5px;
 
       div {
         box-sizing: border-box;
