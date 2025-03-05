@@ -211,10 +211,16 @@ const Header = ({token}) => {
                     <div className="username">{user.fullName}</div>
 
                     <div className={`action ${dropdown ? "open" : ""}`}>
-                        <div className="container">
-                            <div className="to-profile" onClick={() => navigate(`/profile/${user._id}`)}>Profile</div>
-                            <div className="logout" style={{ color: '#FF4B5C' }} onClick={logout}>Logout</div>
+                    <div className="container">
+                        <div className="to-profile" onClick={() => navigate(`/profile/${user._id}`)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <img src="/src/pages/forum/assets/profile.svg" alt="Profile" width="14" height="14" />
+                        Profile
                         </div>
+                        <div className="logout" onClick={logout} style={{ display: "flex", alignItems: "center", gap: "6px", color: "#FF4B5C" }}>
+                        <img src="/src/pages/forum/assets/logout.svg" alt="Logout" width="14" height="14" />
+                        Logout
+                        </div>
+                    </div>
                     </div>
                 </div>
             )}
