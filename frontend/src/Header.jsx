@@ -61,7 +61,7 @@ function Header({token, isAuth}) {
 
     return (
         <div className="header">
-            <img src="/src/assets/logo.svg" alt="" onClick={() => navigate('/')} style={{ cursor: 'pointer' }} />
+            <img src="/src/assets/logo.svg" alt="" onClick={() => navigate('/')} style={{ cursor: 'pointer', width: "80px", height: "80px", marginLeft: "30px", transform: "translateY(5px)" }} />
                 <div className="navbar">
                     {navbar.map((obj, index) => (
                         <div key={index} ref={el => linkRefs.current[index] = el}
@@ -79,6 +79,9 @@ function Header({token, isAuth}) {
                         <div className="signup-button" onClick={() => { navigate('/auth/signup') }}>Join us</div>
                     </div>) : (
                         <div style={{ position: 'absolute', top: '-25px', right: '20px' }}>
+                            <div className="noti-icon">
+                                
+                            </div>
                             <div className='logged-in' onClick={toggleDropdown}>
                                 <div className="avatar"><img src={avatar} alt="" /></div>
                                 <div className='username'>{username}</div>
@@ -86,7 +89,7 @@ function Header({token, isAuth}) {
                             <div className="action" style={{ height: dropdown ? '100px' : '0' }}>
                                 <div className="container">
                                     <div className="to-profile" onClick={() => { navigate(`/profile/${user._id}`) }}>Profile</div>
-                                    <div className="logout" onClick={logout}>Logout</div>
+                                    <div className="logout" onClick={logout} style={{color: "var(--highlight-red)"}}>Logout</div>
                                 </div>
                             </div>
                         </div>

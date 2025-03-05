@@ -81,63 +81,63 @@ const Login = () => {
     <div className="login">
       <div className="bg" style={{ '--backgroundImage': `url(${background})` }}>
         <Header isAuth={true} />
-        <form action="action_page.php" method="post" onSubmit={handleSubmit}>
-          <div className='con'>
-            <div className="auth-con">
-              <div className="heading">Login</div>
-              <div style={{ marginTop: '15px', color: correctPass? 'transparent': 'var(--highlight-red)'}}>Password or email not correct</div>
-
-              <div className="name">
-                <div className="wave-group">
-                  <a className="user">
-                    <img src="/src/assets/user.svg" alt="" />
-                  </a>
-                  <input required type="text" className="input" value={email} onChange={(e) => setEmail(e.target.value)} />
-                  <span className="bar"></span>
-                  <label className="label">
-                    <span className="label-char" style={{ "--index": 0 }}>E</span>
-                    <span className="label-char" style={{ "--index": 1 }}>m</span>
-                    <span className="label-char" style={{ "--index": 2 }}>a</span>
-                    <span className="label-char" style={{ "--index": 3 }}>i</span>
-                    <span className="label-char" style={{ "--index": 4 }}>l</span>
-                  </label>
+        <div className="container" style={{marginTop: "10vh" ,transform: "translateY(30px)"}}>
+          <form action="action_page.php" method="post" onSubmit={handleSubmit}>
+            <div className='con'>
+              <div className="auth-con">
+                <div className="heading">Login</div>
+                <div style={{ marginTop: '15px', color: correctPass? 'transparent': 'var(--highlight-red)'}}>Password or email not correct</div>
+                <div className="name">
+                  <div className="wave-group">
+                    <a className="user">
+                      <img src="/src/assets/user.svg" alt="" />
+                    </a>
+                    <input required type="text" className="input" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <span className="bar"></span>
+                    <label className="label">
+                      <span className="label-char" style={{ "--index": 0 }}>E</span>
+                      <span className="label-char" style={{ "--index": 1 }}>m</span>
+                      <span className="label-char" style={{ "--index": 2 }}>a</span>
+                      <span className="label-char" style={{ "--index": 3 }}>i</span>
+                      <span className="label-char" style={{ "--index": 4 }}>l</span>
+                    </label>
+                  </div>
+                </div>
+                <div className="password">
+                  <div className="wave-group">
+                    <a className="lock">
+                      <img src="/src/assets/lock.svg" alt="" />
+                    </a>
+                    <input required type="password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <span className="bar"></span>
+                    <label className="label">
+                      <span className="label-char" style={{ "--index": 0 }}>P</span>
+                      <span className="label-char" style={{ "--index": 1 }}>a</span>
+                      <span className="label-char" style={{ "--index": 2 }}>s</span>
+                      <span className="label-char" style={{ "--index": 3 }}>w</span>
+                      <span className="label-char" style={{ "--index": 4 }}>o</span>
+                      <span className="label-char" style={{ "--index": 5 }}>r</span>
+                      <span className="label-char" style={{ "--index": 6 }}>d</span>
+                    </label>
+                  </div>
+                </div>
+                <div className="forget" onClick={() => { navigate('/auth/forgot') }}>Forget password?</div>
+                <button className="submit-login" type="submit">Login</button>
+                <div className="reg">
+                  Don't have an account?<p onClick={toLogin}> Register</p>
                 </div>
               </div>
-              <div className="password">
-                <div className="wave-group">
-                  <a className="lock">
-                    <img src="/src/assets/lock.svg" alt="" />
-                  </a>
-                  <input required type="password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} />
-                  <span className="bar"></span>
-                  <label className="label">
-                    <span className="label-char" style={{ "--index": 0 }}>P</span>
-                    <span className="label-char" style={{ "--index": 1 }}>a</span>
-                    <span className="label-char" style={{ "--index": 2 }}>s</span>
-                    <span className="label-char" style={{ "--index": 3 }}>w</span>
-                    <span className="label-char" style={{ "--index": 4 }}>o</span>
-                    <span className="label-char" style={{ "--index": 5 }}>r</span>
-                    <span className="label-char" style={{ "--index": 6 }}>d</span>
-                  </label>
-                </div>
-              </div>
-              <div className="forget" onClick={() => { navigate('/auth/forgot') }}>Forget password?</div>
-              <button className="submit-login" type="submit">Login</button>
-              <div className="reg">
-                Don't have an account?<p onClick={toLogin}> Register</p>
+              <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'row', gap: '50px' }}>
+                <button className="fb" onClick={() => (window.location.href = facebookAuthURL)}>
+                  <img src="/src/assets/facebook-svgrepo-com.svg" alt="" />
+                </button>
+                <button className="gg" onClick={() => (window.location.href = googleAuthURL)}>
+                  <img src="/src/assets/google.png" alt="" />
+                </button>
               </div>
             </div>
-
-            <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'row', gap: '50px' }}>
-              <button className="fb" onClick={() => (window.location.href = facebookAuthURL)}>
-                <img src="/src/assets/facebook-svgrepo-com.svg" alt="" />
-              </button>
-              <button className="gg" onClick={() => (window.location.href = googleAuthURL)}>
-                <img src="/src/assets/google.png" alt="" />
-              </button>
-            </div>
-          </div>
-        </form>
+          </form>
+        </div>
 
       </div>
     </div>

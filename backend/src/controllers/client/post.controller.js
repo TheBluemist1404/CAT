@@ -2,6 +2,7 @@ const Post = require('../../models/client/post.model');
 const User = require('../../models/client/user.model');
 const Like = require('../../models/client/like.model');
 const Comment = require('../../models/client/comment.model');
+const Follower = require('../../models/client/follower.model');
 const Tag = require('../../models/client/tag.model');
 const slugify = require('slugify');
 const { getDetail } = require('../../services/client/getDetail.service');
@@ -171,7 +172,6 @@ module.exports.create = async (req, res) => {
     const redisClient = await initializeRedisClient();
 
     const user = await User.findById(req.user.id);
-    req.body.userCreated = user._id;
 
     const post = new Post(req.body);
     const savedPost = await post.save();
@@ -179,7 +179,10 @@ module.exports.create = async (req, res) => {
     user.posts = user.posts.concat(savedPost._id);
     await user.save();
 
-    await publishNotification(notificationProducer, 'notification', savedPost, req.user);
+    const followers = await Follower.find({ followeeId: user._id });
+
+    await publishNotification(notificationProducer, 'notification', 'post', user._id, followers.map(f => f.followerId), `${user.fullName} has just created a post`, { postId: post._id });
+
 
     //update cache
     const key = `${process.env.CACHE_PREFIX}:profile:${req.user.id}`;

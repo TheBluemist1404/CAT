@@ -19,6 +19,8 @@ import EditorPreview from "./pages/live-code/EditorPreview";
 import LiveCodeLayout from "./pages/live-code/LiveCodeLayout";
 import ScrollToTopButton from "./pages/Profile/ScrollToTopButton";
 import NotFound from "./NotFound";
+import Notifications from "./pages/notification/Notification";
+import NotificationIcon from "./pages/notification/NotificationIcon";
 
 
 function App() {
@@ -145,10 +147,15 @@ function App() {
             element={<EditorPreview token={token} preview={true} />}
           />
         </Route>
+        <Route path="notifications">
+          <Route index element={<Notifications token={token}/>}/>
+          <Route path=":page" element={<Notifications token={token}/>}/>
+        </Route>
       </Route>
       <Route path="*" element={<NotFound/>}/>
     </Routes>
     <ScrollToTopButton />
+    <NotificationIcon/>
     </>
   );
 }

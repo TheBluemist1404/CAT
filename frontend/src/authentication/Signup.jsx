@@ -68,86 +68,84 @@ const Signup = () => {
     <div className="signup">
       <div className="bg" style={{ '--backgroundImage': `url(${background})` }}>
         <Header isAuth={true} />
-        <form action="action_page.php" method="post" onSubmit={handleSubmit}>
-          <div className="con">
-            <div className="auth-con">
-              <auth>
-                <div className="heading">Join The CATs</div>
-                {error && <div style={{position: 'absolute', width:'100%', left: '0', transform: 'translateY(10px)', color: 'var(--highlight-red)', fontSize: '16px'}}>{error}</div>}
-                <div className="name">
-                  <div className="wave-group">
-                    <a className="user">
-                      <img src="/src/assets/user.svg" alt="" />
-                    </a>
-                    <input required type="text" className="input" value={fullName} onChange={(e) => { setFullName(e.target.value) }} />
-                    <span className="bar"></span>
-                    <label className="label">
-                      <span className="label-char" style={{ "--index": 0 }}>F</span>
-                      <span className="label-char" style={{ "--index": 1 }}>u</span>
-                      <span className="label-char" style={{ "--index": 2 }}>l</span>
-                      <span className="label-char" style={{ "--index": 3 }}>l</span>
-                      <span className="label-char" style={{ "--index": 4, marginRight: "10px" }}> </span>
-                      <span className="label-char" style={{ "--index": 5 }}>N</span>
-                      <span className="label-char" style={{ "--index": 6 }}>a</span>
-                      <span className="label-char" style={{ "--index": 7 }}>m</span>
-                      <span className="label-char" style={{ "--index": 8 }}>e</span>
-                    </label>
+        <div className="container" style={{marginTop: "10vh" ,transform: "translateY(30px)"}}>
+          <form action="action_page.php" method="post" onSubmit={handleSubmit}>
+            <div className="con">
+              <div className="auth-con">
+                <auth>
+                  <div className="heading">Join The CATs</div>
+                  {error && <div style={{position: 'absolute', width:'100%', left: '0', transform: 'translateY(10px)', color: 'var(--highlight-red)', fontSize: '16px'}}>{error}</div>}
+                  <div className="name">
+                    <div className="wave-group">
+                      <a className="user">
+                        <img src="/src/assets/user.svg" alt="" />
+                      </a>
+                      <input required type="text" className="input" value={fullName} onChange={(e) => { setFullName(e.target.value) }} />
+                      <span className="bar"></span>
+                      <label className="label">
+                        <span className="label-char" style={{ "--index": 0 }}>F</span>
+                        <span className="label-char" style={{ "--index": 1 }}>u</span>
+                        <span className="label-char" style={{ "--index": 2 }}>l</span>
+                        <span className="label-char" style={{ "--index": 3 }}>l</span>
+                        <span className="label-char" style={{ "--index": 4, marginRight: "10px" }}> </span>
+                        <span className="label-char" style={{ "--index": 5 }}>N</span>
+                        <span className="label-char" style={{ "--index": 6 }}>a</span>
+                        <span className="label-char" style={{ "--index": 7 }}>m</span>
+                        <span className="label-char" style={{ "--index": 8 }}>e</span>
+                      </label>
+                    </div>
                   </div>
-
-                </div>
-                <div className="email">
-                  <div className="wave-group">
-                    <a className="e">
-                      <img src="/src/assets/email.svg" alt="email" />
-                    </a>
-                    <input required type="text" className="input" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    <span className="bar"></span>
-                    <label className="label">
-                      <span className="label-char" style={{ "--index": 0 }}>E</span>
-                      <span className="label-char" style={{ "--index": 1 }}>m</span>
-                      <span className="label-char" style={{ "--index": 2 }}>a</span>
-                      <span className="label-char" style={{ "--index": 3 }}>i</span>
-                      <span className="label-char" style={{ "--index": 4 }}>l</span>
-                    </label>
+                  <div className="email">
+                    <div className="wave-group">
+                      <a className="e">
+                        <img src="/src/assets/email.svg" alt="email" />
+                      </a>
+                      <input required type="text" className="input" value={email} onChange={(e) => setEmail(e.target.value)} />
+                      <span className="bar"></span>
+                      <label className="label">
+                        <span className="label-char" style={{ "--index": 0 }}>E</span>
+                        <span className="label-char" style={{ "--index": 1 }}>m</span>
+                        <span className="label-char" style={{ "--index": 2 }}>a</span>
+                        <span className="label-char" style={{ "--index": 3 }}>i</span>
+                        <span className="label-char" style={{ "--index": 4 }}>l</span>
+                      </label>
+                    </div>
                   </div>
-
-                </div>
-                <div className="password">
-                  <div className="wave-group">
-                    <a className="lock">
-                      <img src="/src/assets/lock.svg" alt="" />
-                    </a>
-                    <input required type="password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} />
-                    <span className="bar"></span>
-                    <label className="label">
-                      <span className="label-char" style={{ "--index": 0 }}>P</span>
-                      <span className="label-char" style={{ "--index": 1 }}>a</span>
-                      <span className="label-char" style={{ "--index": 2 }}>s</span>
-                      <span className="label-char" style={{ "--index": 3 }}>w</span>
-                      <span className="label-char" style={{ "--index": 4 }}>o</span>
-                      <span className="label-char" style={{ "--index": 5 }}>r</span>
-                      <span className="label-char" style={{ "--index": 6 }}>d</span>
-                    </label>
+                  <div className="password">
+                    <div className="wave-group">
+                      <a className="lock">
+                        <img src="/src/assets/lock.svg" alt="" />
+                      </a>
+                      <input required type="password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} />
+                      <span className="bar"></span>
+                      <label className="label">
+                        <span className="label-char" style={{ "--index": 0 }}>P</span>
+                        <span className="label-char" style={{ "--index": 1 }}>a</span>
+                        <span className="label-char" style={{ "--index": 2 }}>s</span>
+                        <span className="label-char" style={{ "--index": 3 }}>w</span>
+                        <span className="label-char" style={{ "--index": 4 }}>o</span>
+                        <span className="label-char" style={{ "--index": 5 }}>r</span>
+                        <span className="label-char" style={{ "--index": 6 }}>d</span>
+                      </label>
+                    </div>
                   </div>
-
-                </div>
-                <button className="submit-signup" type="submit">Sign up</button>
-                <div className="reg">
-                  Already have an account?<p onClick={() => {navigate('/auth/login')}} > Login</p>
-                </div>
-              </auth>
+                  <button className="submit-signup" type="submit">Sign up</button>
+                  <div className="reg">
+                    Already have an account?<p onClick={() => {navigate('/auth/login')}} > Login</p>
+                  </div>
+                </auth>
+              </div>
+              <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'row', gap: '50px' }}>
+                <button className="fb" onClick={() => (window.location.href = facebookAuthURL)}>
+                  <img src="/src/assets/facebook-svgrepo-com.svg" alt="" />
+                </button>
+                <button className="gg" onClick={() => (window.location.href = googleAuthURL)}>
+                  <img src="/src/assets/google.png" alt="" />
+                </button>
+              </div>
             </div>
-
-            <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'row', gap: '50px' }}>
-              <button className="fb" onClick={() => (window.location.href = facebookAuthURL)}>
-                <img src="/src/assets/facebook-svgrepo-com.svg" alt="" />
-              </button>
-              <button className="gg" onClick={() => (window.location.href = googleAuthURL)}>
-                <img src="/src/assets/google.png" alt="" />
-              </button>
-            </div>
-          </div>
-        </form>
+          </form>
+        </div>
 
       </div>
     </div>
