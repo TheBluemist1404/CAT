@@ -12,10 +12,13 @@ function Notifications({ token, newNoti, setNewNoti }) {
   const notiType = notificationClass[page];
 
   const [notifications, setNotifications] = useState([]);  
+  const [value, setValue] = useState(-1)
+  const filterRef = useRef()
 
   async function fetchNotifications() {
+    setNotifications([]); //Empty it to avoid unexpected behaviour
     try {
-      const response = await axios.get("http://localhost:3000/api/v1/notifications", {
+      const response = await axios.get(`http://localhost:3000/api/v1/notifications?isRead=${value}`, {
         headers: { Authorization: `Bearer ${token.accessToken}` },
       });
       setNotifications(response.data.reverse());
@@ -25,24 +28,27 @@ function Notifications({ token, newNoti, setNewNoti }) {
   }
   useEffect(() => {
     fetchNotifications();
-  }, []); // Add dependency to re-fetch when token changes
+  }, [value]); // Add dependency to re-fetch when token changes
 
   //--------------------
   function updateNotis() {
-    console.log("update notis")
     fetchNotifications()
     setNewNoti(false)
+  }
+
+  function handleFilter() {
+    setValue(prev => filterRef.current.value)
   }
 
   
   return (
     <div className="notifications">
-      <Header />
+      <Header token={token} isAuth={false}/>
       <div className="new-notification" style={{display: !newNoti && "none"}}>
         <div className="title" onClick={updateNotis}>New Notification</div>
       </div>
       <div className="noti-container">
-        <div className="sidebar">
+        <div className="sidebar">          
           <div className="all" style={{ background: !notiType && "var(--box-color)" }} onClick={() => navigate("/notifications")}>
             All
           </div>
@@ -55,6 +61,11 @@ function Notifications({ token, newNoti, setNewNoti }) {
           <div className="invites" style={{ background: notiType === "project_invite" && "var(--box-color)" }} onClick={() => navigate("/notifications/invites")}>
             Invites
           </div>
+          <select className="filter" name="filter" id="" onChange={handleFilter} ref={filterRef}>
+            <option value={-1}>All notifications</option>
+            <option value={0}>Unread notifications</option>
+            <option value={1}>Read notifications</option>
+          </select>
         </div>
         <div className="main">
           {notifications.map((noti, index) => (

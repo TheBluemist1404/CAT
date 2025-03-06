@@ -134,7 +134,7 @@ function ProfileAvatar({ user, profileData, token, id }) {
               position: "absolute",
               bottom: "5px",
               left: "90px",
-              zIndex: 1000,
+              zIndex: 2000,
             }}
           />
         )}

@@ -1,11 +1,20 @@
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../authentication/AuthProvider";
 
 
 function NotificationIcon({token, newNoti}) {
+  const {isLoggedIn } = useContext(AuthContext)
   const navigate = useNavigate()
 
   function handleCLick() {
     navigate('/notifications')
+  }
+
+  if (!isLoggedIn) {
+    return(
+      <></>
+    )
   }
   return (
     <div
