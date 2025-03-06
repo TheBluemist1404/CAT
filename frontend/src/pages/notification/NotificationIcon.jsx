@@ -1,10 +1,15 @@
 import { useNavigate } from "react-router-dom";
 
-function NotificationIcon() {
+
+function NotificationIcon({token, newNoti}) {
   const navigate = useNavigate()
+
+  function handleCLick() {
+    navigate('/notifications')
+  }
   return (
     <div
-    onClick={()=>{navigate('/notifications')}}
+    onClick={handleCLick}
       style={{
         width: "50px",
         height: "50px",
@@ -14,7 +19,7 @@ function NotificationIcon() {
         position: "fixed",
         bottom: "30px",
         right: "20px",
-        background: "#ffffff",
+        background: newNoti ? "#818cf8": "white",
         border: "none",
         padding: "10px",
         borderRadius: "50%",
@@ -32,6 +37,7 @@ function NotificationIcon() {
         role="img"
         aria-labelledby="aokwjs78mu9eue2ieuqpddf8fidyp7t3"
         class="crayons-icon"
+        fill={newNoti ? "white": "black"}
       >
         <title id="aokwjs78mu9eue2ieuqpddf8fidyp7t3">Notifications</title>
         <path d="M20 17h2v2H2v-2h2v-7a8 8 0 1116 0v7zm-2 0v-7a6 6 0 10-12 0v7h12zm-9 4h6v2H9v-2z"></path>
