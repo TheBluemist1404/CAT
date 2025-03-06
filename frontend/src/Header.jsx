@@ -10,7 +10,7 @@ function Header({token, isAuth}) {
     const [username, setUsername] = useState("...")
     useEffect(()=>{
         if (user) {
-            setAvatar(user.avatar)
+            setAvatar(user?.avatar)
             if (user.fullName) {
                 if (user.fullName.length <15) {
                     setUsername(user.fullName)
@@ -61,27 +61,24 @@ function Header({token, isAuth}) {
 
     return (
         <div className="header">
-            <img src="/src/assets/logo.svg" alt="" onClick={() => navigate('/')} style={{ cursor: 'pointer', width: "80px", height: "80px", marginLeft: "30px", transform: "translateY(5px)" }} />
-                <div className="navbar">
-                    {navbar.map((obj, index) => (
-                        <div key={index} ref={el => linkRefs.current[index] = el}
-                            onMouseEnter={() => setHoveredIndex(index)}
-                            onMouseLeave={() => setHoveredIndex(null)}
-                            onClick={() => navigate(obj.link)}>
-                            {obj.sect}
-                        </div>
-                    ))}
-                </div>
+            <img src="/src/assets/logo.svg" alt="" onClick={() => navigate('/')} style={{ cursor: 'pointer', width: "60px", height: "60px", marginLeft: "30px", transform: "translateY(5px)" }} />
+            <div className="navbar">
+                {navbar.map((obj, index) => (
+                    <div key={index} ref={el => linkRefs.current[index] = el}
+                        onMouseEnter={() => setHoveredIndex(index)}
+                        onMouseLeave={() => setHoveredIndex(null)}
+                        onClick={() => navigate(obj.link)}>
+                        {obj.sect}
+                     </div>
+                ))}
+            </div>
             <div className='login' style={{position:'relative', opacity: isAuth? 0: 1, minWidth: '180px'}}>
                 {
                     !isLoggedIn ? (<div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
                         <div className="login-button" onClick={() => { navigate('/auth/login') }}>Login</div>
                         <div className="signup-button" onClick={() => { navigate('/auth/signup') }}>Join us</div>
                     </div>) : (
-                        <div style={{ position: 'absolute', top: '-25px', right: '20px' }}>
-                            <div className="noti-icon">
-                                
-                            </div>
+                        <div style={{ position: 'absolute', top: '-20px', right: '-10px' }}>
                             <div className='logged-in' onClick={toggleDropdown}>
                                 <div className="avatar"><img src={avatar} alt="" /></div>
                                 <div className='username'>{username}</div>

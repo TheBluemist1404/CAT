@@ -1,5 +1,7 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { io } from "socket.io-client";
+
 
 import "./app.scss";
 import { Routes, Route } from "react-router-dom";
@@ -111,6 +113,32 @@ function App() {
     }
   }, [isLoggedIn, navigate]);
 
+  //Listen to notification
+  const [newNoti, setNewNoti] = useState(false)
+
+  useEffect(() => {
+    console.log("noti rendering...")
+    const socket = io("http://localhost:3000", {
+      auth: { token: token.accessToken },
+    });
+
+    socket.on("connect", () => console.log("Connected to server"));
+    socket.on("disconnect", () => console.log("Disconnected from server"));
+
+    socket.on("newNotification", (data) => {
+      console.log("Receive Message", data)
+      if (data?.post) {
+        console.log("update noti")
+        setNewNoti(true)
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [token.accessToken]); // Ensures socket is reinitialized only when token changes
+
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -148,14 +176,14 @@ function App() {
           />
         </Route>
         <Route path="notifications">
-          <Route index element={<Notifications token={token}/>}/>
+          <Route index element={<Notifications token={token} newNoti={newNoti} setNewNoti={setNewNoti}/>}/>
           <Route path=":page" element={<Notifications token={token}/>}/>
         </Route>
       </Route>
       <Route path="*" element={<NotFound/>}/>
     </Routes>
     <ScrollToTopButton />
-    <NotificationIcon/>
+    <NotificationIcon token={token} newNoti={newNoti}/>
     </>
   );
 }
