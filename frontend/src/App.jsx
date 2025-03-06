@@ -23,6 +23,7 @@ import ScrollToTopButton from "./pages/Profile/ScrollToTopButton";
 import NotFound from "./NotFound";
 import Notifications from "./pages/notification/Notification";
 import NotificationIcon from "./pages/notification/NotificationIcon";
+import NotificationLayout from "./pages/notification/NotificationLayaout";
 
 
 function App() {
@@ -117,26 +118,27 @@ function App() {
   const [newNoti, setNewNoti] = useState(false)
 
   useEffect(() => {
-    console.log("noti rendering...")
-    const socket = io("http://localhost:3000", {
-      auth: { token: token.accessToken },
-    });
+    if (token) {
+      const socket = io("http://localhost:3000", {
+        auth: { token: token.accessToken },
+      });
+  
+      socket.on("connect", () => console.log("Connected to server"));
+      socket.on("disconnect", () => console.log("Disconnected from server"));
+  
+      socket.on("newNotification", (data) => {
+        console.log("Receive Message", data)
+        if (data?.post) {
+          console.log("update noti")
+          setNewNoti(true)
+        }
+      });
 
-    socket.on("connect", () => console.log("Connected to server"));
-    socket.on("disconnect", () => console.log("Disconnected from server"));
-
-    socket.on("newNotification", (data) => {
-      console.log("Receive Message", data)
-      if (data?.post) {
-        console.log("update noti")
-        setNewNoti(true)
-      }
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [token.accessToken]); // Ensures socket is reinitialized only when token changes
+      return () => {
+        socket.disconnect();
+      };
+    }    
+  }, [token]); // Ensures socket is reinitialized only when token changes
 
 
   if (isLoading) {
@@ -175,7 +177,7 @@ function App() {
             element={<EditorPreview token={token} preview={true} />}
           />
         </Route>
-        <Route path="notifications">
+        <Route path="notifications" element={<NotificationLayout/>}>
           <Route index element={<Notifications token={token} newNoti={newNoti} setNewNoti={setNewNoti}/>}/>
           <Route path=":page" element={<Notifications token={token}/>}/>
         </Route>

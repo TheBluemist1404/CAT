@@ -9,7 +9,7 @@ router.get(
   notificationController.getNotifications,
 );
 router.patch(
-  '/',
+  '/:id',
   auth.authenticateToken,
   notificationController.updateNotifications,
 );

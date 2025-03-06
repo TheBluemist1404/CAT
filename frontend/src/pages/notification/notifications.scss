@@ -2,15 +2,15 @@
   position: relative;
 
   font-family: var(--text-font);
-  background-color: black;
+  background: linear-gradient(30deg, rgb(13, 13, 20) 40%, rgb(71, 65, 99) 80%, rgb(84, 84, 105) 92%);
 
   min-height: 100vh;
   width: 100%;
   display: flex;
-  flex-direction: column; 
-  
+  flex-direction: column;
 
-  .new-notification{
+
+  .new-notification {
     background-color: #818cf8;
     padding: 5px 10px;
     border-radius: 5px;
@@ -20,18 +20,18 @@
     top: 110px;
     left: 50%;
     transform: translateX(-50%);
-    
+
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
-  .new-notification:hover{
+  .new-notification:hover {
     cursor: pointer;
     background-color: #939efd;
   }
-  
-  .noti-container{
+
+  .noti-container {
     flex: 1;
     width: 100%;
     min-height: calc(100% - 200px);
@@ -41,7 +41,7 @@
     flex-direction: row;
     gap: 20px;
 
-    .sidebar{
+    .sidebar {
       position: sticky;
       top: 200px;
       flex: 1;
@@ -56,19 +56,29 @@
       font-family: var(--text-font);
       font-size: 20px;
 
-      div{
+      div {
         cursor: pointer;
         padding: 8px 15px;
         border-radius: 5px;
         transition: background-color 300ms ease;
       }
 
-      div:hover{
+      div:hover {
         background-color: var(--box-color);
+      }
+
+      .filter{
+        margin-top: 20px;
+        font-family: var(--text-font);
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: var(--box-color);
+        color: white;
       }
     }
 
-    .main{
+    .main {
       flex: 1;
       height: fit-content;
       // max-height: 100%;
@@ -79,7 +89,7 @@
       overflow: auto;
       scrollbar-width: thin;
 
-      .noti{
+      .noti {
         font-family: var(--code-font);
         font-size: 16px;
         border: 2px solid var(--primary-color);
@@ -89,38 +99,39 @@
         display: flex;
         flex-direction: column;
         gap: 20px;
-      
-        .message{
+
+        .message {
           display: flex;
           flex-direction: row;
           gap: 20px;
           align-items: center;
 
-          .avatar{
+          .avatar {
             height: 40px;
             width: 40px;
             border-radius: 50%;
             overflow: hidden;
             object-fit: cover;
 
-            img{
+            img {
               width: 100%;
               height: 100%;
             }
           }
 
-          .text{
+          .text {
             display: flex;
             flex-direction: column;
             gap: 10px;
 
-            .time{
+            .time {
               font-size: 14px;
               color: var(--secondary-color);
             }
           }
         }
-        .post{
+
+        .post {
           background-color: var(--box-color);
           border-radius: 5px;
           padding: 20px;
@@ -131,28 +142,71 @@
             font-size: 26px;
           }
 
-          .title:hover{
+          .title:hover {
             cursor: pointer;
             color: #818cf8;
           }
 
-          .tags{
+          .tags {
             margin-top: 20px;
             display: flex;
             flex-direction: row;
             gap: 10px;
             font-size: 14px;
 
-            .tag{
+            .tag {
               width: fit-content;
               padding: 5px 10px;
               border-radius: 5px;
               background-color: var(--primary-color);
-              box-shadow: 1px 1px 10px  #4f4c60;
+              box-shadow: 1px 1px 10px #4f4c60;
+            }
+          }
+        }
+
+        .mark-as-read {
+          .br {
+            content: '';
+            background-color: var(--primary-color);
+            width: 100%;
+            height: 1px;
+          }
+
+          .mark {
+            margin-top: 10px;
+            height: 30px;
+            width: fit-content;
+
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+
+            .icon {
+              height: 100%;
+              width: fit-content;
+
+              svg{
+                height: 100%;
+                g{
+                  stroke: #f2f2f2;                  
+                }
+              }
+            }
+          }
+
+          .mark:hover{
+            cursor: pointer;
+            color: var(--highlight-blue);
+
+            svg{
+              g{
+                stroke: var(--highlight-blue);
+              }
             }
           }
         }
       }
     }
-  }  
+  }
 }
