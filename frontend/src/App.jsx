@@ -24,6 +24,9 @@ import NotFound from "./NotFound";
 import Notifications from "./pages/notification/Notification";
 import NotificationIcon from "./pages/notification/NotificationIcon";
 import NotificationLayout from "./pages/notification/NotificationLayaout";
+import NotificationPosts from "./pages/notification/NotificationPosts";
+import NotificationComments from "./pages/notification/NotificationComments";
+import NotificationInvites from "./pages/notification/NotificationInvites";
 
 
 function App() {
@@ -128,7 +131,7 @@ function App() {
   
       socket.on("newNotification", (data) => {
         console.log("Receive Message", data)
-        if (data?.post) {
+        if (data?.post || data?.project) {
           console.log("update noti")
           setNewNoti(true)
         }
@@ -179,7 +182,9 @@ function App() {
         </Route>
         <Route path="notifications" element={<NotificationLayout/>}>
           <Route index element={<Notifications token={token} newNoti={newNoti} setNewNoti={setNewNoti}/>}/>
-          <Route path=":page" element={<Notifications token={token}/>}/>
+          <Route path='posts' element={<NotificationPosts token={token} newNoti={newNoti} setNewNoti={setNewNoti}/>}/>
+          <Route path='comments' element={<NotificationComments token={token} newNoti={newNoti} setNewNoti={setNewNoti}/>}/>
+          <Route path='invites' element={<NotificationInvites token={token} newNoti={newNoti} setNewNoti={setNewNoti}/>}/>
         </Route>
       </Route>
       <Route path="*" element={<NotFound/>}/>

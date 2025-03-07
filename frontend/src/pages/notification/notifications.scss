@@ -2,7 +2,7 @@
   position: relative;
 
   font-family: var(--text-font);
-  background: linear-gradient(30deg, rgb(13, 13, 20) 40%, rgb(71, 65, 99) 80%, rgb(84, 84, 105) 92%);
+  background: linear-gradient(90deg,rgb(13, 13, 20) 40%, rgb(71, 65, 99) 90%, rgb(84, 84, 105) 97%);
 
   min-height: 100vh;
   width: 100%;
@@ -83,7 +83,7 @@
       height: fit-content;
       // max-height: 100%;
       display: flex;
-      flex-direction: column-reverse;
+      flex-direction: column;
       gap: 20px;
 
       overflow: auto;
