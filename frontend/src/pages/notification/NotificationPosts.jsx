@@ -2,7 +2,7 @@ import "./notifications.scss";
 import Header from "../../Header";
 import Noti from "./Noti";
 import { useNavigate } from "react-router-dom";
-import { useState, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import useInfiniteScroll from "./useInfiniteScroll";
 
 function Notifications({ token, newNoti, setNewNoti }) {
@@ -15,7 +15,6 @@ function Notifications({ token, newNoti, setNewNoti }) {
     invites: "project_invite",
   };
   const notiType = notificationClass[page] || "all";
-  console.log(notiType);
 
   // const [notifications, setNotifications] = useState([]);
   const [value, setValue] = useState(-1);
@@ -27,7 +26,7 @@ function Notifications({ token, newNoti, setNewNoti }) {
     token,
     value,
     pageNumber,
-    notiType, 
+    notiType,
     newNoti
   );
 
@@ -110,23 +109,14 @@ function Notifications({ token, newNoti, setNewNoti }) {
         </div>
         <div className="main">
           {notifications.map((noti, index) => {
-            if (notiType === "all" || noti.type === notiType) {
-              if (index + 1 === notifications.length) {
-                console.log("visible");
-                return (
-                  <div ref={lastNotificationRef} style={{ minHeight: "200px" }}>
-                    <Noti key={index} token={token} noti={noti} />
-                  </div>
-                );
-              } else {
-                return (
-                  <div style={{ minHeight: "200px" }}>
-                    <Noti key={index} token={token} noti={noti} />
-                  </div>
-                );
-              }
-            }
+            return (
+              <div key={index} style={{ minHeight: "200px" }}>
+                <Noti token={token} noti={noti} />
+              </div>
+            );
           })}
+          {/* Sentinel element for IntersectionObserver */}
+          <div ref={lastNotificationRef} style={{ minHeight: "20px" }} />
         </div>
       </div>
     </div>

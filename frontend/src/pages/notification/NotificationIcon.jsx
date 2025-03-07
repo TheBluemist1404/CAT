@@ -45,7 +45,7 @@ function NotificationIcon({token, newNoti}) {
         viewBox="0 0 24 24"
         role="img"
         aria-labelledby="aokwjs78mu9eue2ieuqpddf8fidyp7t3"
-        class="crayons-icon"
+        className="crayons-icon"
         fill={newNoti ? "white": "black"}
       >
         <title id="aokwjs78mu9eue2ieuqpddf8fidyp7t3">Notifications</title>
