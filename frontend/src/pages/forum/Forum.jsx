@@ -11,22 +11,16 @@ import Detail from './Detail_post';
 import Search from './SearchResults';
 
 const Forum = ({ token, render }) => {
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, fetch } = useContext(AuthContext);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
 
   const fetchTotalPosts = async () => {
-    try {
-      const response = await axios.get(`http://localhost:3000/api/v1/forum?offset=0&limit=0`);
-      const posts = response.data[0].metadata[0].total;
-      console.log(posts)
-      setTotalPages(Math.floor(posts / 10) + 1);
-      console.log(totalPages);
-    } catch (error) {
-      console.error("Failed to fetch posts:", error);
-    }
+    const data = await fetch(token, axios.get(`${import.meta.env.VITE_APP_API_URL}/api/v1/forum?offset=0&limit=0`));
+    const posts = data[0].metadata[0].total;
+    setTotalPages(Math.floor(posts / 10) + 1);
   };
 
   useEffect(() => {
@@ -65,7 +59,7 @@ const Forum = ({ token, render }) => {
   return (
     <div>
       {render === "forum" || render === "search" ? (<div className="forum">
-        <Header />
+        <Header token={token}/>
         <div className="main-layout">
           <Sidebar handleCreatePostToggle={handleCreatePostToggle} token={token} />
           {render === "forum" ? (

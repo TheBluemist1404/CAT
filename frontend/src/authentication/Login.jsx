@@ -53,7 +53,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const reponse = await axios.post('http://localhost:3000/api/v1/auth/login', { email: email, password: password })
+      const reponse = await axios.post(`${import.meta.env.VITE_APP_AAPI_URL}/api/v1/auth/login`, { email: email, password: password })
       const token = reponse.data;
       localStorage.removeItem('token')
       localStorage.setItem('token', JSON.stringify(token));

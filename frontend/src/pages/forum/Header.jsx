@@ -42,7 +42,7 @@ const Header = ({token}) => {
             setIsLoading(true);
 
             try {
-                const response = await axios.get('http://localhost:3000/api/v1/forum/search', {
+                const response = await axios.get(`${import.meta.env.VITE_APP_API_URL}/api/v1/forum/search`, {
                     params: {
                         type: queryType,
                         q: trimmedQuery,
@@ -122,7 +122,7 @@ const Header = ({token}) => {
     const logout = async () => {
         try {
             const refreshToken = token.refreshToken;
-            await axios.delete('http://localhost:3000/api/v1/auth/logout', {data: {refreshToken: refreshToken}}) 
+            await axios.delete(`${import.meta.env.VITE_APP_API_URL}/api/v1/auth/logout`, {data: {refreshToken: refreshToken}}) 
             setIsLoggedIn(false)
             localStorage.removeItem('token')
         } catch (error) {

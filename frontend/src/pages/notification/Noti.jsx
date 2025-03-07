@@ -1,26 +1,35 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../authentication/AuthProvider";
 
 function Noti({ token, noti }) {
+  const {fetch} = useContext(AuthContext)
   const navigate = useNavigate();
   const [sender, setSender] = useState();
 
   useEffect(() => {
     async function getSender() {
-      try {
-        const response = await axios.get(
-          `http://localhost:3000/api/v1/profile/detail/${noti.sender}`,
-          { headers: { Authorization: `Bearer ${token.accessToken}` } }
-        );
-        setSender(response.data);
-      } catch (error) {
-        console.error("failed to get sender", error);
-      }
+      const data = await fetch(token, axios.get(
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/profile/detail/${noti.sender}`,
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      ))
+      setSender(data);
     }
 
     getSender();
   }, []);
+
+  //Mark as read
+  const [mark, setMark] = useState(noti.isRead);
+  async function markAsRead() {
+    setMark(true);
+    const data = await fetch(token, axios.patch(
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/notifications/${noti._id}`,
+      null,
+      { headers: { Authorization: `Bearer ${token.accessToken}` } }
+    ))
+  }
 
   //Return
 
@@ -30,18 +39,11 @@ function Noti({ token, noti }) {
 
     useEffect(() => {
       async function fetchPost() {
-        try {
-          const response = await axios.get(
-            `http://localhost:3000/api/v1/forum/detail/${postId}`,
-            { headers: { Authorization: `Bearer ${token.accessToken}` } }
-          );
-          setPost(response.data);
-        } catch (error) {
-          console.error(error);
-          if (error.status === 404) {
-            console.log("this post is gone");
-          }
-        }
+        const data = await fetch(token, axios.get(
+          `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/detail/${postId}`,
+          { headers: { Authorization: `Bearer ${token.accessToken}` } }
+        ))
+        setPost(data);
       }
 
       fetchPost();
@@ -72,21 +74,6 @@ function Noti({ token, noti }) {
         }
       }
     }, [post]);
-
-    //Mark as read
-    const [mark, setMark] = useState(noti.isRead);
-    async function markAsRead() {
-      try {
-        setMark(true);
-        const response = await axios.patch(
-          `http://localhost:3000/api/v1/notifications/${noti._id}`,
-          null,
-          { headers: { Authorization: `Bearer ${token.accessToken}` } }
-        );
-      } catch (error) {
-        console.error("failed when marking", error);
-      }
-    }
 
     if (!post) {
       return <div>Cannot find post {postId}</div>;
@@ -160,18 +147,11 @@ function Noti({ token, noti }) {
 
     useEffect(() => {
       async function fetchProject() {
-        try {
-          const response = await axios.get(
-            `http://localhost:3000/api/v1/projects/${projectId}`,
-            { headers: { Authorization: `Bearer ${token.accessToken}` } }
-          );
-          setProject(response.data);
-        } catch (error) {
-          console.error(error);
-          if (error.status === 404) {
-            console.log("this project is gone");
-          }
-        }
+        const data = await fetch(token, axios.get(
+          `${import.meta.env.VITE_APP_API_URL}/api/v1/projects/${projectId}`,
+          { headers: { Authorization: `Bearer ${token.accessToken}` } }
+        ))
+        setProject(response.data);
       }
 
       fetchProject();
@@ -202,21 +182,6 @@ function Noti({ token, noti }) {
         }
       }
     }, [project]);
-
-    //Mark as read
-    const [mark, setMark] = useState(noti.isRead);
-    async function markAsRead() {
-      try {
-        setMark(true);
-        const response = await axios.patch(
-          `http://localhost:3000/api/v1/notifications/${noti._id}`,
-          null,
-          { headers: { Authorization: `Bearer ${token.accessToken}` } }
-        );
-      } catch (error) {
-        console.error("failed when marking", error);
-      }
-    }
 
     if (!project) {
       return <div>Cannot find project {projectId}</div>;

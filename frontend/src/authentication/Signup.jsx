@@ -51,7 +51,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/api/v1/auth/signup', { fullName: fullName, email: email, password: password })
+      const response = await axios.post(`${import.meta.env.VITE_APP_AAPI_URL}/api/v1/auth/signup`, { fullName: fullName, email: email, password: password })
       navigate('/auth/login') 
     } catch (error) {
       if (error.response && error.response.status === 404) {
