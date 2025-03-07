@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useContext } from "react";
+import { AuthContext } from "../../authentication/AuthProvider";
 
 function ProfileTab({
   view,
@@ -11,6 +13,7 @@ function ProfileTab({
   isPrivate,
   setIsPrivate,
 }) {
+  const {fetch} = useContext(AuthContext)
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [follow, setFollow] = useState(false);
@@ -31,25 +34,16 @@ function ProfileTab({
 
   useEffect(() => {
     const fetchPrivate = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:3000/api/v1/profile/detail/${user._id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token.accessToken}`,
-            },
-          }
-        );
-
-        if (response.status === 200 && response.data.isPrivate) {
-          setIsPrivate(response.data.isPrivate);
+      const data = await fetch(token, axios.get(
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/profile/detail/${user._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token.accessToken}`,
+          },
         }
-      } catch (err) {
-        console.error(
-          "Error fetching description:",
-          err.response?.data?.message || err.message
-        );
-      }
+      ))
+
+      setIsPrivate(data.isPrivate);
     };
 
     fetchPrivate();
@@ -58,40 +52,32 @@ function ProfileTab({
   const handleTogglePrivacy = async () => {
     if (!user) return;
 
-    try {
-      const updatedStatus = isPrivate ? "public" : "private"; // Toggle between public & private
+    const updatedStatus = isPrivate ? "public" : "private"; // Toggle between public & private
 
-      const response = await axios.patch(
-        `http://localhost:3000/api/v1/profile/change-status/${user._id}`,
-        { status: updatedStatus }, // Sending only required field
-        {
-          headers: {
-            Authorization: `Bearer ${token.accessToken}`,
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        setIsPrivate(updatedStatus === "private"); // Update state based on response
+    const data = fetch(token, axios.patch(
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/profile/change-status/${user._id}`,
+      { status: updatedStatus }, // Sending only required field
+      {
+        headers: {
+          Authorization: `Bearer ${token.accessToken}`,
+        },
       }
-    } catch (err) {
-      console.error("Error:", err.response?.data?.message || err.message);
+    ))
+
+    if (data)  {
+      setIsPrivate(updatedStatus === "private")
     }
   };
 
   // Action for visitor
   useEffect(()=>{
     const fetchFollow = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/api/v1/users/followees', {headers: {Authorization: `Bearer ${token.accessToken}`}})
-        const followers = response.data.map(follower => follower._id)
+      const data = await fetch(token, axios.get(`${import.meta.env.VITE_APP_API_URL}/api/v1/users/followees`, {headers: {Authorization: `Bearer ${token.accessToken}`}}))
+        const followers = data.map(follower => follower._id)
         console.log(followers)
         if (followers.includes(id)) {
           setFollow(true)
         }
-      } catch (error) {
-        console.error("failed get follow status", error)
-      }
     }
 
     if (id !== user._id) {
@@ -103,10 +89,10 @@ function ProfileTab({
   const handleFollow = async () =>{
     if (!follow) {                      
       setFollow(!follow)
-      await axios.post('http://localhost:3000/api/v1/users/follows', {id: id}, {headers: {Authorization: `Bearer ${token.accessToken}`}})
+      await fetch(token, axios.post(`${import.meta.env.VITE_APP_API_URL}/api/v1/users/follows`, {id: id}, {headers: {Authorization: `Bearer ${token.accessToken}`}}))
     } else {
       setFollow(!follow)
-      await axios.delete('http://localhost:3000/api/v1/users/follows', {headers: {Authorization: `Bearer ${token.accessToken}`}, data:{id: id}})
+      await fetch(token, axios.delete(`${import.meta.env.VITE_APP_API_URL}/api/v1/users/follows`, {headers: {Authorization: `Bearer ${token.accessToken}`}, data:{id: id}}))
     }
 
   }

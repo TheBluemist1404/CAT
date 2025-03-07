@@ -5,7 +5,7 @@ import TimeMe from "timeme.js";
 import { AuthContext } from "../../authentication/AuthProvider";
 
 export function useSessionTimeTracker(token) {
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser, fetch } = useContext(AuthContext);
   const location = useLocation();
   const currentPath = useRef("");
 
@@ -21,17 +21,15 @@ export function useSessionTimeTracker(token) {
 
     const handleSessionEnd = async () => {
       const timeSpent = TimeMe.getTimeOnPageInSeconds(location.pathname);
-      console.log("Unmounted route:", location.pathname, timeSpent);
-      const response = await axios.patch(
-        `http://localhost:3000/api/v1/profile/edit/${user._id}`,
+      const data = await axios.patch(
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/profile/edit/${user._id}`,
         { fullName: user.fullName, duration: user.duration + timeSpent },
         { headers: { Authorization: `Bearer ${token.accessToken}` } }
-      );
+      )
 
       TimeMe.resetRecordedPageTime(location.pathname);
 
-      if (response) {
-        console.log(response.data);
+      if (data) {
         setUser((prevUser) =>({
           ...prevUser,
           duration: prevUser.duration + timeSpent

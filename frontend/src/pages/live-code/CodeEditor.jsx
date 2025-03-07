@@ -7,11 +7,12 @@ import Editor from "@monaco-editor/react";
 import { MonacoBinding } from "y-monaco";
 
 import axios from "axios";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 import logo from "@code-editor-assets/logo.svg";
 import NotFound from "../../NotFound";
+import { AuthContext } from "../../authentication/AuthProvider";
 
 function getRandomColor() {
   // Generate a random color only once per client.
@@ -26,6 +27,7 @@ function CodeEditor({ token, preview }) {
   if (projectId.slice(-1) === '#') {
     projectId = projectId.slice(0, -1)
   }
+  const {fetch} = useContext(AuthContext)
   const [isOwner, setIsOwner] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [projectContent, setProjectContent] = useState({});
@@ -33,19 +35,16 @@ function CodeEditor({ token, preview }) {
 
   useEffect(() => {
     async function fetchProject() {
-      try {
-        const response = await axios.get(
-          `http://localhost:3000/api/v1/projects/${projectId}`,
-          { headers: { Authorization: `Bearer ${token.accessToken}` } }
-        );
-        if (response.status === 200) {
-          setIsOwner(true)
-          setProjectName(response.data.name);
-          setProjectContent(response.data.files[0]);
-          setLang(response.data.files[0].language)
-        }
-      } catch (error) {
-        console.error("failed fetching at CodeEditor:",error)
+      const data = await fetch(token, axios.get(
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/projects/${projectId}`,
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      ))
+
+      if (data) {
+        setIsOwner(true)
+        setProjectName(data.name);
+        setProjectContent(data.files[0]);
+        setLang(data.files[0].language)
       }
     }
     
@@ -317,7 +316,7 @@ function CodeEditor({ token, preview }) {
         const code = editorRef.current.getValue();
         const input = inputRef.current ? inputRef.current.value : "";
         const response = await axios.post(
-          "http://localhost:3000/api/v1/code/execute",
+          `${import.meta.env.VITE_APP_API_URL}/api/v1/code/execute`,
           { code: code, input: input, language: lang }
         );
         const executionId = response.data.executionId;
@@ -394,7 +393,7 @@ function CodeEditor({ token, preview }) {
   async function handleChange() {
     const code = editorRef.current.getValue();
     const response = await axios.patch(
-      `http://localhost:3000/api/v1/projects/${projectId}`,
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/projects/${projectId}`,
       {
         files: [{ name: "main", content: code, language: lang }],
       },

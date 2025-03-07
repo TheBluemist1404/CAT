@@ -23,14 +23,14 @@ import ScrollToTopButton from "./pages/Profile/ScrollToTopButton";
 import NotFound from "./NotFound";
 import Notifications from "./pages/notification/Notification";
 import NotificationIcon from "./pages/notification/NotificationIcon";
-import NotificationLayout from "./pages/notification/NotificationLayaout";
+import NotificationLayout from "./pages/notification/NotificationLayout";
 import NotificationPosts from "./pages/notification/NotificationPosts";
 import NotificationComments from "./pages/notification/NotificationComments";
 import NotificationInvites from "./pages/notification/NotificationInvites";
 
 
 function App() {
-  const { isLoggedIn, setIsLoggedIn, setUser } = useContext(AuthContext);
+  const { isLoggedIn, setIsLoggedIn, setUser, fetch } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -55,52 +55,11 @@ function App() {
   const user = token ? jwtDecode(token.accessToken) : null;
   const userId = user ? user.id : null;
 
-  const fetch = async () => {
-    try {
-      const userResponse = await axios.get(
-        `http://localhost:3000/api/v1/profile/detail/${userId}`,
-        { headers: { Authorization: `Bearer ${token.accessToken}` } }
-      );
-      return userResponse.data;
-    } catch (error) {
-      if (error.response && error.response.status === 403) { // accessToken expired
-        try {
-          const response = await axios.post(
-            "http://localhost:3000/api/v1/token",
-            { refreshToken: token.refreshToken }
-          );
-          const newAccessToken = response.data.accessToken;
-          token.accessToken = newAccessToken;
-          localStorage.setItem("token", JSON.stringify(token));
-
-          const userResponse = await axios.get(
-            `http://localhost:3000/api/v1/profile/detail/${userId}`,
-            { headers: { Authorization: `Bearer ${newAccessToken}` } }
-          );
-          return userResponse.data;
-        } catch (error) {
-          if (error.response && error.response.status === 400) { //refreshToken expired
-            logout();
-          }
-        }
-      }
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await axios.delete("http://localhost:3000/api/v1/auth/logout", {
-        data: { refreshToken: token.refreshToken },
-      }); //axios.delete is treated different
-      setIsLoggedIn(false);
-      localStorage.removeItem("token");
-    } catch (error) {
-      console.error("logout failed", error);
-    }
-  };
-
   const getUser = async () => {
-    const response = await fetch();
+    const response = await fetch(token, axios.get(
+      `http://localhost:3000/api/v1/profile/detail/${userId}`,
+      { headers: { Authorization: `Bearer ${token.accessToken}` } }
+    ));
     console.log("get user: ",response);
     setUser(response);
     setIsLoading(false);

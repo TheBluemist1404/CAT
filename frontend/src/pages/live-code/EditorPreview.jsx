@@ -27,7 +27,7 @@ function EditorPreview({ token, preview }) {
   async function fetchProject() {
     try {      
       const response = await axios.get(
-        `http://localhost:3000/api/v1/projects/${projectId}`,
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/projects/${projectId}`,
         { headers: { Authorization: `Bearer ${token.accessToken}` } }
       );
 
@@ -37,7 +37,6 @@ function EditorPreview({ token, preview }) {
         setRenderInvite(response.data.owner[0]._id === user._id); // Collaborators wont be able to invite others
       }
     } catch (error) {
-      console.error("failed fetching at CodePreview:", error)
       if (!isOwner) {
         return(
           <div style={{fontFamily: "var(--code-font)"}}>
@@ -56,12 +55,11 @@ function EditorPreview({ token, preview }) {
   function handleName(event) {
     async function updateDesc(e) {
       const input = e.target.innerHTML;
-      const response = await axios.patch(
-        `http://localhost:3000/api/v1/projects/${projectId}`,
+      await axios.patch(
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/projects/${projectId}`,
         { name: input },
         { headers: { Authorization: `Bearer ${token.accessToken}` } }
       );
-      console.log(response.data);
     }
 
     updateDesc(event);
@@ -70,30 +68,25 @@ function EditorPreview({ token, preview }) {
   function handleDesc(event) {
     async function updateDesc(e) {
       const input = e.target.innerHTML;
-      const response = await axios.patch(
-        `http://localhost:3000/api/v1/projects/${projectId}`,
+      await axios.patch(
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/projects/${projectId}`,
         { description: input },
         { headers: { Authorization: `Bearer ${token.accessToken}` } }
       );
-      console.log(response.data);
     }
 
     updateDesc(event);
   }
 
   async function addMember() {
-    try {
-      const response = await axios.patch(
-        `http://localhost:3000/api/v1/projects/${projectId}/collaborators`,
-        { email: email },
-        { headers: { Authorization: `Bearer ${token.accessToken}` } }
-      );
-      if (response) {
-        console.log(response.data);
-        fetchProject();
-      }
-    } catch (error) {
-      console.error("error adding member", error);
+    const data = await fetch(token, axios.patch(
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/projects/${projectId}/collaborators`,
+      { email: email },
+      { headers: { Authorization: `Bearer ${token.accessToken}` } }
+    ))
+
+    if (data) {
+      fetchProject()
     }
   }
 
