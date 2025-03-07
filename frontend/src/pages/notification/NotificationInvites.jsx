@@ -108,7 +108,7 @@ function Notifications({ token, newNoti, setNewNoti }) {
           </select>
         </div>
         <div className="main">
-          {notifications.map((noti, index) => {
+          {notifications && notifications.map((noti, index) => {
             return (
               <div key={index} style={{ minHeight: "200px" }}>
                 <Noti token={token} noti={noti} />

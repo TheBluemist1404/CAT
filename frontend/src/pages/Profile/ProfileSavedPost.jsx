@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-function ProfileSavedPost({user,profileData,token,id}) {
+function ProfileSavedPost({profileData}) {
   // Post
   const navigate = useNavigate()
   const handlePostClick = (postId) => {

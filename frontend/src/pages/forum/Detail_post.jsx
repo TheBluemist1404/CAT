@@ -4,75 +4,83 @@ import { useEffect, useState, useContext, useRef } from "react";
 import { AuthContext } from "../../authentication/AuthProvider";
 import { useParams, useNavigate } from "react-router-dom";
 import Prism from "prismjs";
-import hljs from "highlight.js/lib/core"; 
+import hljs from "highlight.js/lib/core";
 import cpp from "highlight.js/lib/languages/cpp";
-import "prismjs/themes/prism-okaidia.css"; 
-import "highlight.js/styles/dark.css"; 
-import "prismjs/components/prism-python"; 
+import "prismjs/themes/prism-okaidia.css";
+import "highlight.js/styles/dark.css";
+import "prismjs/components/prism-python";
 import "prismjs/components/prism-javascript";
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 
 function Detail({ token }) {
   const navigate = useNavigate();
-  const { isLoggedIn, user } = useContext(AuthContext)
+  const { isLoggedIn, user, fetch } = useContext(AuthContext);
   const [post, setPost] = useState();
 
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [isDownvoted, setIsDownvoted] = useState(false);
-  const [voteCount, setVoteCount] = useState(post ? post.upvotes.length - post.downvotes.length : 0)
+  const [voteCount, setVoteCount] = useState(
+    post ? post.upvotes.length - post.downvotes.length : 0
+  );
 
-  const [commentInput, setCommentInput] = useState('a');
+  const [commentInput, setCommentInput] = useState("a");
   const [dropdownVisible, setDropdownVisible] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const editorRef = useRef(null);
 
-
   const { id } = useParams();
   const fetchData = async () => {
-    const response = await axios.get(`http://localhost:3000/api/v1/forum/detail/${id}`, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
-    const postDetail = response.data
-    console.log(postDetail)
-    if (postDetail) {
-      setPost(postDetail)
-      const upvote = postDetail.upvotes;
-      const userUpvote = upvote.find((voter) => voter.userId === user._id)
+    const data = await fetch(token, axios.get(
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/detail/${id}`,
+      { headers: { Authorization: `Bearer ${token.accessToken}` } }
+    ))
+    
+    if (data) {
+      setPost(data);
+      const upvote = data.upvotes;
+      const userUpvote = upvote.find((voter) => voter.userId === user._id);
       if (userUpvote) {
-        setIsUpvoted(true)
+        setIsUpvoted(true);
       }
 
-      const downvote = postDetail.downvotes;
-      const userDownvote = downvote.find((voter) => voter.userId === user._id)
+      const downvote = data.downvotes;
+      const userDownvote = downvote.find(
+        (voter) => voter.userId === user._id
+      );
       if (userDownvote) {
-        setIsDownvoted(true)
+        setIsDownvoted(true);
       }
-      setVoteCount(upvote.length - downvote.length)
+      setVoteCount(upvote.length - downvote.length);
     }
-
-  }
+  };
 
   useEffect(() => {
     if (!isLoggedIn) {
-      navigate('/auth/login');
+      navigate("/auth/login");
     } else {
       fetchData();
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     const addButtons = () => {
       document.querySelectorAll("pre code").forEach((codeBlock, index) => {
         const pre = codeBlock.parentElement;
-  
-        if (pre.querySelector(".copy-button") || pre.querySelector(".download-button")) return;
-  
+
+        if (
+          pre.querySelector(".copy-button") ||
+          pre.querySelector(".download-button")
+        )
+          return;
+
         const langClass = codeBlock.className.match(/language-(\w+)/);
         const language = langClass ? langClass[1] : "txt";
         const fileExtension = getFileExtension(language);
         const defaultFileName = `snippet-${index + 1}.${fileExtension}`;
-  
+
         const copyIconPath = "/src/pages/forum/assets/Copy.svg";
         const downloadIconPath = "/src/pages/forum/assets/Download.svg";
-  
+
         const copyButton = document.createElement("button");
         copyButton.className = "copy-button";
         copyButton.innerHTML = `
@@ -94,7 +102,7 @@ function Detail({ token }) {
           alignItems: "center",
           zIndex: "10",
         });
-  
+
         copyButton.addEventListener("click", () => {
           navigator.clipboard.writeText(codeBlock.innerText);
           copyButton.querySelector(".copy-text").innerText = "Copied!";
@@ -102,7 +110,7 @@ function Detail({ token }) {
             copyButton.querySelector(".copy-text").innerText = "Copy";
           }, 2000);
         });
-  
+
         const downloadButton = document.createElement("button");
         downloadButton.className = "download-button";
         downloadButton.innerHTML = `
@@ -124,11 +132,11 @@ function Detail({ token }) {
           alignItems: "center",
           zIndex: "10",
         });
-  
+
         downloadButton.addEventListener("click", () => {
           const fileName = prompt("Enter file name:", defaultFileName);
-          if (!fileName) return; 
-  
+          if (!fileName) return;
+
           const blob = new Blob([codeBlock.innerText], { type: "text/plain" });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
@@ -138,22 +146,24 @@ function Detail({ token }) {
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-  
-          downloadButton.querySelector(".download-text").innerText = "Downloaded!";
+
+          downloadButton.querySelector(".download-text").innerText =
+            "Downloaded!";
           setTimeout(() => {
-            downloadButton.querySelector(".download-text").innerText = "Download";
+            downloadButton.querySelector(".download-text").innerText =
+              "Download";
           }, 2000);
         });
-  
+
         pre.style.position = "relative";
         pre.appendChild(copyButton);
         pre.appendChild(downloadButton);
       });
     };
-  
+
     addButtons();
   }, [post ? post.content : ""]);
-  
+
   const getFileExtension = (language) => {
     const extensions = {
       javascript: "js",
@@ -175,27 +185,26 @@ function Detail({ token }) {
     };
     return extensions[language] || "txt";
   };
- 
 
-  hljs.registerLanguage("cpp", cpp); 
+  hljs.registerLanguage("cpp", cpp);
 
-    useEffect(() => {
-      Prism.highlightAll(); 
-  
-      document.querySelectorAll("pre code.language-cpp").forEach((block) => {
-        block.classList.remove("language-cpp"); 
-        block.classList.add("cpp"); 
-        block.removeAttribute("data-highlighted"); 
-        hljs.highlightElement(block); 
-      });
-    }, [post ? post.content : ""]);
+  useEffect(() => {
+    Prism.highlightAll();
+
+    document.querySelectorAll("pre code.language-cpp").forEach((block) => {
+      block.classList.remove("language-cpp");
+      block.classList.add("cpp");
+      block.removeAttribute("data-highlighted");
+      hljs.highlightElement(block);
+    });
+  }, [post ? post.content : ""]);
 
   const sanitizedContent = DOMPurify.sanitize(post ? post.content : "");
   //Handle time display
   const timestamp = post ? post.createdAt : new Date();
   const createdDate = new Date(timestamp);
   const now = new Date();
-  const timeDiff = (now - createdDate); //in miliseconds
+  const timeDiff = now - createdDate; //in miliseconds
 
   let timeDisplay;
   if (timeDiff < 60 * 1000) {
@@ -203,13 +212,13 @@ function Detail({ token }) {
     timeDisplay = `${seconds} seconds ago`;
   } else if (timeDiff < 60 * 60 * 1000) {
     const minutes = Math.floor(timeDiff / (1000 * 60));
-    timeDisplay = `${minutes} minutes ago`
+    timeDisplay = `${minutes} minutes ago`;
   } else if (timeDiff < 24 * 60 * 60 * 1000) {
     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-    timeDisplay = `${hours} hours ago`
+    timeDisplay = `${hours} hours ago`;
   } else {
     const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    timeDisplay = `${days} days ago`
+    timeDisplay = `${days} days ago`;
   }
 
   const toggleDropdown = (index) => {
@@ -223,35 +232,19 @@ function Detail({ token }) {
   const handleAddComment = async () => {
     if (commentInput.trim()) {
       if (!isLoggedIn) {
-        navigate('/auth/login')
+        navigate("/auth/login");
       } else {
         const commentContent = editorRef.current?.getContent();
-        try {
-          const response = await axios.post(`http://localhost:3000/api/v1/forum/comment/${post._id}`,
-            { content: commentContent, user: { id: user._id } },
-            { headers: { "Authorization": `Bearer ${token.accessToken}` } },);
-          console.log(response);
-          if (editorRef.current) editorRef.current.setContent('');
-          
-          // Refetch the post data to get the updated comments
-          fetchData();  // This triggers the re-render
-  
-        } catch (error) {
-          if (error.response && error.response.status === 403) {
-            const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
-            const newAccessToken = getToken.data.accessToken
-            token.accessToken = newAccessToken;
-            localStorage.setItem('token', JSON.stringify(token))
-  
-            const response = await axios.post(`http://localhost:3000/api/v1/forum/comment/${post._id}`,
-              { content: commentContent, user: { id: user._id } },
-              { headers: { "Authorization": `Bearer ${newAccessToken}` } })
-            console.log(response)
-  
-            fetchData();  // Refetch to get the updated post with comments
-          }
-        }
-        setCommentInput('');
+        const data = await fetch(token, axios.post(
+          `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/comment/${post._id}`,
+          { content: commentContent, user: { id: user._id } },
+          { headers: { Authorization: `Bearer ${token.accessToken}` } }
+        ))
+        if (editorRef.current) editorRef.current.setContent("");
+
+        // Refetch the post data to get the updated comments
+        fetchData(); // This triggers the re-render
+        setCommentInput("");
       }
     }
   };
@@ -266,113 +259,80 @@ function Detail({ token }) {
   const handleAddReply = async (commentId) => {
     const editorContent = editorRef.current[commentId]?.getContent();
     if (!editorContent.trim()) return;
-  
-    try {
-      const response = await axios.post(
-        `http://localhost:3000/api/v1/forum/reply/${commentId}`,
-        { content: editorContent },
-        { headers: { Authorization: `Bearer ${token.accessToken}` } }
-      );
-      console.log("Reply posted:", response.data);
-  
-      editorRef.current[commentId]?.setContent("");
-      setActiveReply(null);
-  
-      fetchData();  
-  
-    } catch (error) {
-      console.error("Error posting reply:", error);
-    }
+
+    const data = await axios.post(
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/reply/${commentId}`,
+      { content: editorContent },
+      { headers: { Authorization: `Bearer ${token.accessToken}` } }
+    );
+
+    editorRef.current[commentId]?.setContent("");
+    setActiveReply(null);
+
+    fetchData();
   };
-  
 
   const updateUpvote = async () => {
-    try {
-      console.log("update")
-      const response = await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`,
-        { user: { id: user._id } },
-        { headers: { "Authorization": `Bearer ${token.accessToken}` } })
-      console.log(response)
-      if (response) {
-        const postUpdate = await fetchPosts();
-        console.log(response, postUpdate)
-      } else { console.log("no response at all") }
-    } catch (error) {
-      if (error.response && error.response.status === 403) {
-        const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
-        const newAccessToken = getToken.data.accessToken
-        token.accessToken = newAccessToken;
-        localStorage.setItem('token', JSON.stringify(token))
-
-        await axios.patch(`http://localhost:3000/api/v1/forum/vote/upvote/${post._id}`,
-          { user: { id: user._id } },
-          { headers: { "Authorization": `Bearer ${newAccessToken}` } })
-      }
-    }
-  }
+    const data = await fetch(token, axios.patch(
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/vote/upvote/${post._id}`,
+      { user: { id: user._id } },
+      { headers: { Authorization: `Bearer ${token.accessToken}` } }
+    ))
+    if (data) {
+      await fetchPosts();
+    } 
+  };
 
   const updateDownvote = async () => {
-    try {
-      console.log("update")
-      const response = await axios.patch(`http://localhost:3000/api/v1/forum/vote/downvote/${post._id}`, { user: { id: user._id } }, { headers: { "Authorization": `Bearer ${token.accessToken}` } })
-      console.log(response)
-      if (response) {
-        const postUpdate = await fetchPosts();
-        console.log(response, postUpdate)
-      } else { console.log("no response at all") }
-    } catch (error) {
-      if (error.response && error.response.status === 403) {
-        const getToken = await axios.post('http://localhost:3000/api/v1/token', { refreshToken: token.refreshToken })
-        const newAccessToken = getToken.data.accessToken
-        token.accessToken = newAccessToken;
-        localStorage.setItem('token', JSON.stringify(token))
-
-        await axios.patch(`http://localhost:3000/api/v1/forum/vote/downvote/${post._id}`,
-          { user: { id: user._id } },
-          { headers: { "Authorization": `Bearer ${newAccessToken}` } })
-      }
-    }
-  }
+    const data = await fetch(token, axios.patch(
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/vote/downvote/${post._id}`,
+      { user: { id: user._id } },
+      { headers: { Authorization: `Bearer ${token.accessToken}` } }
+    ))
+    if (data) {
+      await fetchPosts();
+    } 
+  };
 
   const handleUpvote = async () => {
-    console.log("upvote")
+    console.log("upvote");
     if (!isLoggedIn) {
-      navigate('/auth/login')
+      navigate("/auth/login");
     } else {
       if (isDownvoted) {
         setIsDownvoted(false);
-        setVoteCount((count) => count + 1)
+        setVoteCount((count) => count + 1);
         updateDownvote();
       }
       if (!isUpvoted) {
         setIsUpvoted(!isUpvoted);
-        setVoteCount((count) => !isUpvoted ? count + 1 : count)
+        setVoteCount((count) => (!isUpvoted ? count + 1 : count));
         updateUpvote();
       } else {
         setIsUpvoted(!isUpvoted);
-        setVoteCount((count) => isUpvoted ? count - 1 : count)
+        setVoteCount((count) => (isUpvoted ? count - 1 : count));
         updateUpvote();
       }
     }
   };
 
   const handleDownvote = async () => {
-    console.log("downvote")
+    console.log("downvote");
     if (!isLoggedIn) {
-      navigate('/auth/login')
+      navigate("/auth/login");
     } else {
       if (isUpvoted) {
         setIsUpvoted(false);
-        setVoteCount((count) => count - 1)
+        setVoteCount((count) => count - 1);
         updateUpvote();
       }
       if (!isDownvoted) {
         setIsDownvoted(!isDownvoted);
-        setVoteCount((count) => !isDownvoted ? count - 1 : count)
+        setVoteCount((count) => (!isDownvoted ? count - 1 : count));
         updateDownvote();
       } else {
         setIsDownvoted(!isDownvoted);
-        setVoteCount((count) => isDownvoted ? count + 1 : count)
+        setVoteCount((count) => (isDownvoted ? count + 1 : count));
         updateDownvote();
       }
     }
@@ -382,22 +342,38 @@ function Detail({ token }) {
     <div className="updown-button">
       <img
         className="upvote"
-        src={`/src/pages/forum/assets/Upvote${isUpvoted ? '-chosen' : ''}.svg`}
+        src={`/src/pages/forum/assets/Upvote${isUpvoted ? "-chosen" : ""}.svg`}
         alt="Upvote"
         onClick={handleUpvote}
-        onMouseEnter={(e) => { if (!isUpvoted) e.target.src = '/src/pages/forum/assets/Upvote-hover.svg'; }} //mouseEnter is actually better than mouseOver here, research for more info
-        onMouseLeave={(e) => { if (!isUpvoted) e.target.src = '/src/pages/forum/assets/Upvote.svg'; }}
+        onMouseEnter={(e) => {
+          if (!isUpvoted)
+            e.target.src = "/src/pages/forum/assets/Upvote-hover.svg";
+        }} //mouseEnter is actually better than mouseOver here, research for more info
+        onMouseLeave={(e) => {
+          if (!isUpvoted) e.target.src = "/src/pages/forum/assets/Upvote.svg";
+        }}
       />
-      <span className="vote-count" style={{ color: isUpvoted ? '#FF4B5C' : isDownvoted ? '#42C8F5' : '' }}>
+      <span
+        className="vote-count"
+        style={{ color: isUpvoted ? "#FF4B5C" : isDownvoted ? "#42C8F5" : "" }}
+      >
         {voteCount}
       </span>
       <img
         className="downvote"
-        src={`/src/pages/forum/assets/Downvote${isDownvoted ? '-chosen' : ''}.svg`}
+        src={`/src/pages/forum/assets/Downvote${
+          isDownvoted ? "-chosen" : ""
+        }.svg`}
         alt="Downvote"
         onClick={handleDownvote}
-        onMouseEnter={(e) => { if (!isDownvoted) e.target.src = '/src/pages/forum/assets/Downvote-hover.svg'; }}
-        onMouseLeave={(e) => { if (!isDownvoted) e.target.src = '/src/pages/forum/assets/Downvote.svg'; }}
+        onMouseEnter={(e) => {
+          if (!isDownvoted)
+            e.target.src = "/src/pages/forum/assets/Downvote-hover.svg";
+        }}
+        onMouseLeave={(e) => {
+          if (!isDownvoted)
+            e.target.src = "/src/pages/forum/assets/Downvote.svg";
+        }}
       />
     </div>
   );
@@ -408,9 +384,9 @@ function Detail({ token }) {
       console.error("Post is undefined or missing _id.");
       return;
     }
-  
+
     console.log(post._id); // Debugging post._id value
-  
+
     if (user.savedPosts && Array.isArray(user.savedPosts)) {
       const isPostSaved = user.savedPosts.some(
         (savedPost) => savedPost._id.toString() === post._id.toString() // Updated comparison
@@ -418,73 +394,71 @@ function Detail({ token }) {
       setIsSaved(isPostSaved);
     }
   }, [post, user.savedPosts]); // Make sure post is also included in the dependencies
-  
+
   const handleSavePost = async () => {
     // Ensure post is defined before making the API call
     if (!post || !post._id) {
       console.error("Post is undefined, can't save the post.");
       return;
     }
-  
-    try {
-      const response = await axios.post(
-        `http://localhost:3000/api/v1/forum/save/${post._id}`,
-        {},
-        { headers: { Authorization: `Bearer ${token.accessToken}` } }
-      );
-  
-      console.log(response.data); // Debugging the response
-      if (response.status === 200) {
-        setIsSaved(!isSaved); // Toggle the save status
-      } else {
-        console.error("Error updating save status:", response.data.message);
-      }
-    } catch (error) {
-      console.error("Error saving the post:", error);
+
+    const data = await fetch(token, axios.post(
+      `http://localhost:3000/api/v1/forum/save/${post._id}`,
+      {},
+      { headers: { Authorization: `Bearer ${token.accessToken}` } }
+    ))
+
+    if (data) {
+      setIsSaved(!isSaved); // Toggle the save status
+    } else {
+      console.error("Error updating save status:", response.data.message);
     }
   };
 
   const handleDeletePost = async () => {
-    try {
-      const response = await axios.delete(`http://localhost:3000/api/v1/forum/delete/${post._id}`, {
-        headers: { "Authorization": `Bearer ${token.accessToken}` },
-      });
-      if (response.status === 200) {
-        navigate(`/forum`);
+    const data = await axios.delete(
+      `http://localhost:3000/api/v1/forum/delete/${post._id}`,
+      {
+        headers: { Authorization: `Bearer ${token.accessToken}` },
       }
-    } catch (error) {
-      console.error("Error deleting the post:", error);
+    );
+    if (data) {
+      navigate(`/forum`);
     }
   };
-  
+
   const renderDropdown = (index) => (
     <div
       className="post-navigate-dropdown"
       style={{ display: dropdownVisible === index ? "block" : "none" }}
     >
       <div className="dropdown-item" onClick={handleSavePost}>
-        <img 
-          src={`/src/pages/forum/assets/${isSaved ? "unsave" : "save"}.svg`} 
-          alt="Save" 
+        <img
+          src={`/src/pages/forum/assets/${isSaved ? "unsave" : "save"}.svg`}
+          alt="Save"
           style={{ width: 16, height: 16, marginRight: 8 }}
         />
         {isSaved ? "Unsave" : "Save"}
       </div>
       <hr className="post-navigate-line" />
       {post?.userCreated._id === user._id ? (
-        <div className="dropdown-item" style={{ color: "#FF4B5C" }} onClick={handleDeletePost}>
-          <img 
-            src="/src/pages/forum/assets/delete.svg" 
-            alt="Delete" 
+        <div
+          className="dropdown-item"
+          style={{ color: "#FF4B5C" }}
+          onClick={handleDeletePost}
+        >
+          <img
+            src="/src/pages/forum/assets/delete.svg"
+            alt="Delete"
             style={{ width: 16, height: 16, marginRight: 8 }}
           />
           Delete
         </div>
       ) : (
         <div className="dropdown-item" style={{ color: "#FF4B5C" }}>
-          <img 
-            src="/src/pages/forum/assets/report.svg" 
-            alt="Report" 
+          <img
+            src="/src/pages/forum/assets/report.svg"
+            alt="Report"
             style={{ width: 16, height: 16, marginRight: 8 }}
           />
           Report
@@ -492,10 +466,9 @@ function Detail({ token }) {
       )}
     </div>
   );
-  
 
   //Render comments ---------------------------
-  const comments = post ? post.comments : []
+  const comments = post ? post.comments : [];
   const sortComments = [...comments].reverse();
   const renderComments = () => (
     <div className="comments-list">
@@ -505,19 +478,28 @@ function Detail({ token }) {
         return (
           <div key={comment.id} className="comment">
             <div className="comment-header">
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden' }}>
-                <img 
-                  src={comment.userDetails.avatar} 
-                  className="comment-avatar" 
-                  alt="Avatar" 
-                  style={{ width: '40px' }} 
+              <div
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                }}
+              >
+                <img
+                  src={comment.userDetails.avatar}
+                  className="comment-avatar"
+                  alt="Avatar"
+                  style={{ width: "40px" }}
                 />
               </div>
-              <span className="comment-user-name">{comment.userDetails.fullName}</span>
+              <span className="comment-user-name">
+                {comment.userDetails.fullName}
+              </span>
               {/* <span className="comment-time">{comment.time}</span> */}
             </div>
-            <div 
-              className="comment-body" 
+            <div
+              className="comment-body"
               dangerouslySetInnerHTML={{ __html: sanitizedContent }} // Use sanitized HTML content
             ></div>
             <div className="comment-footer">
@@ -525,17 +507,31 @@ function Detail({ token }) {
                 className="comment-reply"
                 onClick={() => toggleReplyEditor(comment._id)}
               >
-                <img 
-                  src="/src/pages/forum/assets/Comment Icon.svg" 
-                  className="comment-action" 
-                  alt="Reply" 
-                /> 
+                <img
+                  src="/src/pages/forum/assets/Comment Icon.svg"
+                  className="comment-action"
+                  alt="Reply"
+                />
                 Reply
               </button>
             </div>
             {isReplyEditorOpen && (
               <div className="create-comment-header">
-                <div style={{ width: '40px', height: '40px', borderRadius: '20px', overflow: 'hidden' }}><img src={user.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
+                <div
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <img
+                    src={user.avatar}
+                    className="comment-avatar"
+                    alt="Avatar"
+                    style={{ width: "40px" }}
+                  />
+                </div>
                 <Editor
                   apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
                   onInit={(_, editor) => {
@@ -578,12 +574,19 @@ function Detail({ token }) {
               {comment.replies.map((reply) => (
                 <div key={reply._id} className="reply">
                   <div className="comment-header">
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                      }}
+                    >
                       <img
                         src={reply.userDetails.avatar}
                         alt="Avatar"
                         className="comment-avatar"
-                        style={{ width: '40px' }} 
+                        style={{ width: "40px" }}
                       />
                     </div>
                     <span className="comment-user-name">
@@ -599,7 +602,7 @@ function Detail({ token }) {
                 </div>
               ))}
             </div>
-            <hr className="post-line" style={{ marginTop: '10px' }} />
+            <hr className="post-line" style={{ marginTop: "10px" }} />
           </div>
         );
       })}
@@ -615,15 +618,16 @@ function Detail({ token }) {
       setTags(titles);
     }
   };
-  
+
   useEffect(() => {
     handleSubmit();
-  }, [post]); 
+  }, [post]);
 
   const [isOpen, setIsOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
 
-  if (!post || !post.images) return <div className="post-gallery-container"></div>;
+  if (!post || !post.images)
+    return <div className="post-gallery-container"></div>;
 
   const images = post.images.slice(0, 5);
   const remainingCount = post.images.length - 5;
@@ -645,117 +649,214 @@ function Detail({ token }) {
 
   const textEditorAPI = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
 
-  return (
-    <section className="detail-post-box" style={{ minHeight: `${screenHeight}px` }}>
-    <div className="post">
-      <div className="post-header">
-        <img src={post ? post.userCreated.avatar : "/src/pages/forum/assets/Post avatar.svg"} alt="User Avatar" className="user-avatar" />
-        <div className="user-name">{post ? post.userCreated.fullName : "unknown"}</div>
-        <div className="post-time">{timeDisplay}</div>
-        <div className="post-navigate-button" onClick={() => toggleDropdown(1)}>
-          <span className="post-navigate-icon">...</span>
-        </div>
-        {renderDropdown(1)}
-      </div>
-      <div className="post-body">
-        <h1 className="post-title" onMouseDown={() => { navigate(`/forum/${post._id}`) }}>{post ? post.title : ""}</h1>
-        <p className="post-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }}></p>
-        <div className="post-gallery-container">
-        <div className={`post-gallery-grid-container ${getGridClass(images.length)}`}>
-          {images.map((img, index) => (
-            index === 4 && remainingCount > 0 ? (
-              <div key={index} className="post-gallery-overlay-container" style={{ gridColumn: 'span 2' }} onClick={() => handleClick(index)}>
-                <img src={img} alt={`img-${index}`} className="post-gallery-blurred-image" />
-                <div className="post-gallery-overlay-text">+{remainingCount}</div>
-              </div>
-            ) : (
-              <img
-                key={index}
-                src={img}
-                alt={`img-${index}`}
-                onClick={() => handleClick(index)}
-                className="post-gallery-image"
-                style={index === 4 ? { gridColumn: 'span 2' } : {}}
-              />
-            )
-          ))}
-        </div>
-
-        {isOpen && (
-          <div className="post-gallery-modal">
-            <button className="post-gallery-close-button" onClick={() => setIsOpen(false)}>✖</button>
-            <button className="post-gallery-nav-button post-gallery-left" onClick={() => setPhotoIndex((photoIndex - 1 + post.images.length) % post.images.length)}>◀</button>
-
-            <img src={post.images[photoIndex]} alt="Enlarged" className="post-gallery-modal-image" />
-
-            <button className="post-gallery-nav-button post-gallery-right" onClick={() => setPhotoIndex((photoIndex + 1) % post.images.length)}>▶</button>
-
-            {/* <div className="post-gallery-index">{photoIndex + 1} / {post.images.length}</div> */}
-
-            <div className="post-gallery-dots">
-              {post.images.map((_, i) => (
-                <span key={i} className={`dot ${i === photoIndex ? "active" : ""}`} onClick={() => setPhotoIndex(i)}></span>
-              ))}
-            </div>
+  {if (post && post._id) return (
+    <section
+      className="detail-post-box"
+      style={{ minHeight: `${screenHeight}px` }}
+    >
+      <div className="post">
+        <div className="post-header">
+          <img
+            src={
+              post
+                ? post.userCreated.avatar
+                : "/src/pages/forum/assets/Post avatar.svg"
+            }
+            alt="User Avatar"
+            className="user-avatar"
+          />
+          <div className="user-name">
+            {post ? post.userCreated.fullName : "unknown"}
           </div>
-        )}
+          <div className="post-time">{timeDisplay}</div>
+          <div
+            className="post-navigate-button"
+            onClick={() => toggleDropdown(1)}
+          >
+            <span className="post-navigate-icon">...</span>
+          </div>
+          {renderDropdown(1)}
         </div>
-        <div className="tag-box">
-          {tag.map((tag, index) => (
-            <div className="post-tags" key={index}>{tag}</div>
-          ))}
+        <div className="post-body">
+          <h1
+            className="post-title"
+            onMouseDown={() => {
+              navigate(`/forum/${post._id}`);
+            }}
+          >
+            {post ? post.title : ""}
+          </h1>
+          <p
+            className="post-content"
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+          ></p>
+          <div className="post-gallery-container">
+            <div
+              className={`post-gallery-grid-container ${getGridClass(
+                images.length
+              )}`}
+            >
+              {images.map((img, index) =>
+                index === 4 && remainingCount > 0 ? (
+                  <div
+                    key={index}
+                    className="post-gallery-overlay-container"
+                    style={{ gridColumn: "span 2" }}
+                    onClick={() => handleClick(index)}
+                  >
+                    <img
+                      src={img}
+                      alt={`img-${index}`}
+                      className="post-gallery-blurred-image"
+                    />
+                    <div className="post-gallery-overlay-text">
+                      +{remainingCount}
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    key={index}
+                    src={img}
+                    alt={`img-${index}`}
+                    onClick={() => handleClick(index)}
+                    className="post-gallery-image"
+                    style={index === 4 ? { gridColumn: "span 2" } : {}}
+                  />
+                )
+              )}
+            </div>
+
+            {isOpen && (
+              <div className="post-gallery-modal">
+                <button
+                  className="post-gallery-close-button"
+                  onClick={() => setIsOpen(false)}
+                >
+                  ✖
+                </button>
+                <button
+                  className="post-gallery-nav-button post-gallery-left"
+                  onClick={() =>
+                    setPhotoIndex(
+                      (photoIndex - 1 + post.images.length) % post.images.length
+                    )
+                  }
+                >
+                  ◀
+                </button>
+
+                <img
+                  src={post.images[photoIndex]}
+                  alt="Enlarged"
+                  className="post-gallery-modal-image"
+                />
+
+                <button
+                  className="post-gallery-nav-button post-gallery-right"
+                  onClick={() =>
+                    setPhotoIndex((photoIndex + 1) % post.images.length)
+                  }
+                >
+                  ▶
+                </button>
+
+                {/* <div className="post-gallery-index">{photoIndex + 1} / {post.images.length}</div> */}
+
+                <div className="post-gallery-dots">
+                  {post.images.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`dot ${i === photoIndex ? "active" : ""}`}
+                      onClick={() => setPhotoIndex(i)}
+                    ></span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="tag-box">
+            {tag.map((tag, index) => (
+              <div className="post-tags" key={index}>
+                {tag}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-      <hr className="post-line" />
-      <div className="post-footer">
-        {renderVoteButtons()}
-        <button className="comment-button">
-          <img src="/src/pages/forum/assets/Comment Icon.svg" className="post-action" alt="Comment" /> Comment
-        </button>
-        <button className="share-button">
-          <img src="/src/pages/forum/assets/Share Icon.svg" className="post-action" alt="Share" /> Share
-        </button>
-      </div>
-      <hr className="post-line" />
-      <div className="create-comment">
-        <div className="create-comment-header">
-          <div style={{ width: '40px', height: '40px', borderRadius: '20px', overflow: 'hidden' }}><img src={user.avatar} className="comment-avatar" alt="Avatar" style={{ width: '40px' }} /></div>
-              <Editor
-                  apiKey={textEditorAPI}
-                  onInit={(_, editor) => (editorRef.current = editor)}
-                  init={{
-                    height: 150,
-                    width: 850,
-                    menubar: false,
-                    plugins: [
-                      "advlist autolink lists link image charmap preview anchor",
-                      "searchreplace visualblocks code fullscreen",
-                      "insertdatetime media table code help wordcount",
-                    ],
-                    toolbar:
-                      "undo redo | code | formatselect | bold italic underline forecolor backcolor | \
+        <hr className="post-line" />
+        <div className="post-footer">
+          {renderVoteButtons()}
+          <button className="comment-button">
+            <img
+              src="/src/pages/forum/assets/Comment Icon.svg"
+              className="post-action"
+              alt="Comment"
+            />{" "}
+            Comment
+          </button>
+          <button className="share-button">
+            <img
+              src="/src/pages/forum/assets/Share Icon.svg"
+              className="post-action"
+              alt="Share"
+            />{" "}
+            Share
+          </button>
+        </div>
+        <hr className="post-line" />
+        <div className="create-comment">
+          <div className="create-comment-header">
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "20px",
+                overflow: "hidden",
+              }}
+            >
+              <img
+                src={user.avatar}
+                className="comment-avatar"
+                alt="Avatar"
+                style={{ width: "40px" }}
+              />
+            </div>
+            <Editor
+              apiKey={textEditorAPI}
+              onInit={(_, editor) => (editorRef.current = editor)}
+              init={{
+                height: 150,
+                width: 850,
+                menubar: false,
+                plugins: [
+                  "advlist autolink lists link image charmap preview anchor",
+                  "searchreplace visualblocks code fullscreen",
+                  "insertdatetime media table code help wordcount",
+                ],
+                toolbar:
+                  "undo redo | code | formatselect | bold italic underline forecolor backcolor | \
                       alignleft aligncenter alignright alignjustify | \
                       bullist numlist outdent indent | removeformat | help",
-                    placeholder: "Write your comment here...",
-                    content_style: `
+                placeholder: "Write your comment here...",
+                content_style: `
                       body { font-family:Helvetica,Arial,sans-serif; font-size:14px;color: white;}
                       .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
                         color: grey;
                         opacity: 0.8;
                       }
                     `,
-                  }}
-                />
-          <button className="submit-comment" onClick={handleAddComment}>Post</button>
+              }}
+            />
+            <button className="submit-comment" onClick={handleAddComment}>
+              Post
+            </button>
+          </div>
+        </div>
+        <div className="comment-section-detail" style={{ padding: "10px" }}>
+          {renderComments()}
         </div>
       </div>
-      <div className="comment-section-detail" style={{ padding: '10px' }}>
-        {renderComments()}
-      </div>
-    </div>
     </section>
-  )
+  );}
 }
 
 export default Detail;
-

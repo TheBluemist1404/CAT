@@ -12,12 +12,12 @@ import ProjectCard from "./ProjectCard";
 
 function LiveCode({ token }) {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user, fetch} = useContext(AuthContext);
   const [projects, setProjects] = useState();
 
   async function fetchProjects() {
     const response = await axios.get(
-      "http://localhost:3000/api/v1/projects",
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/projects`,
       { headers: { Authorization: `Bearer ${token.accessToken}` } }
     );
     setProjects(response.data);
@@ -28,18 +28,13 @@ function LiveCode({ token }) {
   }, []);
 
   async function createProject() {
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/projects",
-        { name: "Untitled", description: "write someting..." },
-        { headers: { Authorization: `Bearer ${token.accessToken}` } }
-      );
-      if (response) {
-        console.log(response.data);
-        navigate(`/live-code/preview/${response.data._id}`);
-      }
-    } catch (error) {
-      console.error("error create project", error);
+    const data = await fetch(token, axios.post(
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/projects`,
+      { name: "Untitled", description: "write someting..." },
+      { headers: { Authorization: `Bearer ${token.accessToken}` } }
+    ))
+    if (data) {
+      navigate(`/live-code/preview/${data._id}`);
     }
   }
 

@@ -27,7 +27,7 @@ function ProjectCard({ info, token, fetchProjects }) {
     setStarred(!starred)
     try {
       await axios.patch(
-        `http://localhost:3000/api/v1/projects/${info._id}/remarks`,
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/projects/${info._id}/remarks`,
         { isRemarked: !starred },
         { headers: { Authorization: `Bearer ${token.accessToken}` } }        
       );      
@@ -40,7 +40,7 @@ function ProjectCard({ info, token, fetchProjects }) {
   async function deleteProject() {
     try {
       await axios.delete(
-        `http://localhost:3000/api/v1/projects/${info._id}`,
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/projects/${info._id}`,
         { headers: { Authorization: `Bearer ${token.accessToken}` } }
       );
       fetchProjects();

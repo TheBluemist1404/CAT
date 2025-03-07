@@ -8,11 +8,10 @@ function Member({ member, projectId, token, fetchProject }) {
   async function handleRemove() {
     try {
       const response = await axios.patch(
-        `http://localhost:3000/api/v1/projects/${projectId}/remove-collaborator`,
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/projects/${projectId}/remove-collaborator`,
         { email: member.email },
         { headers: { Authorization: `Bearer ${token.accessToken}` } }
       );
-      console.log(response.data);
       fetchProject();
     } catch (error) {
       console.error("remove member failed", error.message);

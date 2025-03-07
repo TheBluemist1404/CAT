@@ -14,7 +14,6 @@ const Sidebar = ({ handleCreatePostToggle }) => {
   };
   const forumHome = () => {navigate('/forum?page=1&limit=10');};
   const Home = () => {navigate('/');};
-  const About = () => {navigate('/');};
 
   return (
     <aside className="sidebar">

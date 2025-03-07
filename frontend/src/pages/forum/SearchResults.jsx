@@ -16,22 +16,18 @@ const SearchResults = ({ token }) => {
 
         if (query) {
             const fetchSearchResults = async () => {
-                try {
-                    const response = await axios.get('http://localhost:3000/api/v1/forum/search', {
-                        params: {
-                            type: queryType,
-                            q: query,
-                            limit: 10000,
-                        },
-                    });
-                    // Check the response format to ensure you're getting the right data
-                    if (queryType === "posts" || queryType === "tags") {
-                        setPostFeed(response.data[0]?.posts || []);
-                    } else {
-                        setPostFeed(response.data || []);
-                    }
-                } catch (error) {
-                    console.error("Error fetching search results:", error);
+                const data = await fetch(token, axios.get(`${import.meta.env.VITE_APP_API_URL}/api/v1/forum/search`, {
+                    params: {
+                        type: queryType,
+                        q: query,
+                        limit: 10000,
+                    },
+                }))
+                // Check the response format to ensure you're getting the right data
+                if (queryType === "posts" || queryType === "tags") {
+                    setPostFeed(data[0]?.posts || []);
+                } else {
+                    setPostFeed(data || []);
                 }
             };
 

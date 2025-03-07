@@ -85,19 +85,19 @@ module.exports.reply = async (req, res) => {
     });
     const savedComment = await comment.save();
 
-    // const post = await Post.findById(comment.postId)
-    // const user = await User.findById(req.user.id)
+    const post = await Post.findById(comment.postId)
+    const user = await User.findById(req.user.id)
 
 
-    // await publishNotification(
-    //   notificationProducer,
-    //   'notification',
-    //   'comment',
-    //   user._id,
-    //   [post.userCreated],
-    //   `${user.fullName} has just commented on your post`,
-    //   { postId: post._id },
-    // );
+    await publishNotification(
+      notificationProducer,
+      'notification',
+      'comment',
+      user._id,
+      [post.userCreated],
+      `${user.fullName} has just replied on your post`,
+      { postId: post._id },
+    );
 
     const redisClient = await initializeRedisClient();
     const cachedPost = await redisClient.get(
