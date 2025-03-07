@@ -172,7 +172,8 @@ module.exports.create = async (req, res) => {
     const redisClient = await initializeRedisClient();
 
     const user = await User.findById(req.user.id);
-
+    
+    req.body.userCreated = user._id;
     const post = new Post(req.body);
     const savedPost = await post.save();
 
@@ -181,8 +182,15 @@ module.exports.create = async (req, res) => {
 
     const followers = await Follower.find({ followeeId: user._id });
 
-    await publishNotification(notificationProducer, 'notification', 'post', user._id, followers.map(f => f.followerId), `${user.fullName} has just created a post`, { postId: post._id });
-
+    await publishNotification(
+      notificationProducer,
+      'notification',
+      'post',
+      user._id,
+      followers.map(f => f.followerId),
+      `${user.fullName} has just created a post`,
+      { postId: post._id },
+    );
 
     //update cache
     const key = `${process.env.CACHE_PREFIX}:profile:${req.user.id}`;

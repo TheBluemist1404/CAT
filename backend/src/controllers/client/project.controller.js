@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { Project, Folder } = require('../../models/client/project.model');
 const User = require('../../models/client/user.model');
 const wss = require('../../index');
+const { publishNotification } = require('../../utils/notificationWorker');
 
 async function getFolderStructure(folderId) {
   const folder = await Folder.findById(folderId).lean();
@@ -282,6 +283,18 @@ module.exports.addCollaborator = async (req, res) => {
       {
         new: true,
       },
+    );
+
+    const user = await User.findById(userId)
+
+    await publishNotification(
+      notificationProducer,
+      'notification',
+      'project_invite',
+      userId,
+      [collaborator._id],
+      `${user.fullName} has just invited you to join a project`,
+      { projectId: project._id },
     );
 
     if (!project) {

@@ -71,7 +71,6 @@ const Content = ({ isCreatePostOpen, handleCreatePostToggle, token, currentPage,
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", editorRef.current?.getContent());
-    formData.append("userCreated", user._id);
     formData.append("status", visibility);
     selectedTags.forEach(tag => formData.append("tags", tag));
   

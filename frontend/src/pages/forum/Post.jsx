@@ -708,7 +708,6 @@ function Post({ post: initialPost, token, update }) {
               <Editor
                 apiKey={textEditorAPI}
                 onInit={(_, editor) => (editorRef.current = editor)}
-                value={commentInput}
                 onEditorChange={(newContent) => setCommentInput(newContent)}
                 onFocus={handleFocus}
                 init={{
