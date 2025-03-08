@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../../authentication/AuthProvider';
 import axios from 'axios';
 
+import logo from "/forum/logo.svg"
+import profile from "/forum/profile.svg"
+import logoutIcon from "/forum/logout.svg"
+
 const Header = ({token}) => {
     const {isLoggedIn, setIsLoggedIn, user} = useContext(AuthContext);
     const navigate = useNavigate();
@@ -144,7 +148,7 @@ const Header = ({token}) => {
         <header className="header-guest">
             <div className="logo">
                 <img
-                    src="/src/pages/forum/assets/logo.svg"
+                    src={logo}
                     alt="N/A"
                     onClick={() => navigate('/')}
                     style={{ cursor: 'pointer' }}
@@ -213,11 +217,11 @@ const Header = ({token}) => {
                     <div className={`action ${dropdown ? "open" : ""}`}>
                     <div className="container">
                         <div className="to-profile" onClick={() => navigate(`/profile/${user._id}`)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <img src="/src/pages/forum/assets/profile.svg" alt="Profile" width="14" height="14" />
+                        <img src={profile} alt="Profile" width="14" height="14" />
                         Profile
                         </div>
                         <div className="logout" onClick={logout} style={{ display: "flex", alignItems: "center", gap: "6px", color: "#FF4B5C" }}>
-                        <img src="/src/pages/forum/assets/logout.svg" alt="Logout" width="14" height="14" />
+                        <img src={logoutIcon} alt="Logout" width="14" height="14" />
                         Logout
                         </div>
                     </div>

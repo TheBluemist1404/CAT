@@ -1,3 +1,5 @@
+import save from "/src/assets/save.svg"
+
 import { useNavigate } from "react-router-dom";
 
 function ProfileSavedPost({profileData}) {
@@ -17,7 +19,7 @@ function ProfileSavedPost({profileData}) {
             <div className='spost'>
               <div className='post-card' key={index}>
                 <div className='post-icon-title'>
-                  <img src="/src/assets/save.svg" alt="" width={30} height={30} />
+                  <img src={save} alt="" width={30} height={30} />
                   <div className='post-title' key={post._id} onClick={() => handlePostClick(post._id)}>{post.title}</div>
                 </div>
 

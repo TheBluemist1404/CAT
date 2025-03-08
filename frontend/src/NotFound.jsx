@@ -1,3 +1,5 @@
+import logo from "/src/assets/bg-logo.svg"
+
 import { useNavigate } from "react-router-dom";
 
 function NotFound() {
@@ -13,7 +15,7 @@ function NotFound() {
       >
         <div>Lets get you back home</div>
         <div className="container">
-          <img src="/src/assets/bg-logo.svg" alt="" />
+          <img src={logo} alt="" />
         </div>
       </button>
     </div>

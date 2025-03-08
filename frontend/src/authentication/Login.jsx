@@ -9,7 +9,10 @@ import background from '@homepage-assets/coding-on-laptop.jpg'
 import "./login.scss";
 import Header from "../Header";
 
-
+import userIcon from "/src/assets/user.svg"
+import lockIcon from "/src/assets/lock.svg"
+import facebook from "/src/assets/facebook-svgrepo-com.svg"
+import google from "/src/assets/google.png"
 
 const Login = () => {
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
@@ -53,7 +56,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const reponse = await axios.post(`${import.meta.env.VITE_APP_AAPI_URL}/api/v1/auth/login`, { email: email, password: password })
+      const reponse = await axios.post(`${import.meta.env.VITE_APP_API_URL}/api/v1/auth/login`, { email: email, password: password })
       const token = reponse.data;
       localStorage.removeItem('token')
       localStorage.setItem('token', JSON.stringify(token));
@@ -90,7 +93,7 @@ const Login = () => {
                 <div className="name">
                   <div className="wave-group">
                     <a className="user">
-                      <img src="/src/assets/user.svg" alt="" />
+                      <img src={userIcon} alt="" />
                     </a>
                     <input required type="text" className="input" value={email} onChange={(e) => setEmail(e.target.value)} />
                     <span className="bar"></span>
@@ -106,7 +109,7 @@ const Login = () => {
                 <div className="password">
                   <div className="wave-group">
                     <a className="lock">
-                      <img src="/src/assets/lock.svg" alt="" />
+                      <img src={lockIcon} alt="" />
                     </a>
                     <input required type="password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} />
                     <span className="bar"></span>
@@ -129,10 +132,10 @@ const Login = () => {
               </div>
               <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'row', gap: '50px' }}>
                 <button className="fb" onClick={() => (window.location.href = facebookAuthURL)}>
-                  <img src="/src/assets/facebook-svgrepo-com.svg" alt="" />
+                  <img src={facebook} alt="" />
                 </button>
                 <button className="gg" onClick={() => (window.location.href = googleAuthURL)}>
-                  <img src="/src/assets/google.png" alt="" />
+                  <img src={google} alt="" />
                 </button>
               </div>
             </div>

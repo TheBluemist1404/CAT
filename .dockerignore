@@ -1,0 +1,56 @@
+# flyctl launch added from .gitignore
+# Node.js
+**\node_modules
+
+# Logs
+**\logs
+**\*.log
+**\npm-debug.log*
+
+# Dependency directories
+**\pids
+**\logs
+**\*.pid
+**\*.seed
+**\*.pid.lock
+
+# Optional npm cache directory
+**\.npm
+
+# Optional eslint cache
+**\.eslintcache
+
+# Optional REPL history
+**\.node_repl_history
+
+# Environment variables
+**\.env*
+
+# flyctl launch added from frontend\.gitignore
+# Logs
+frontend\**\logs
+frontend\**\*.log
+frontend\**\npm-debug.log*
+frontend\**\yarn-debug.log*
+frontend\**\yarn-error.log*
+frontend\**\pnpm-debug.log*
+frontend\**\lerna-debug.log*
+
+frontend\**\node_modules
+frontend\**\.env
+frontend\**\dist
+frontend\**\dist-ssr
+frontend\**\*.local
+
+# Editor directories and files
+frontend\**\.vscode\*
+!frontend\**\.vscode\extensions.json
+frontend\**\.idea
+frontend\**\.DS_Store
+frontend\**\*.suo
+frontend\**\*.ntvs*
+frontend\**\*.njsproj
+frontend\**\*.sln
+frontend\**\*.sw?
+frontend\**\.vercel
+fly.toml

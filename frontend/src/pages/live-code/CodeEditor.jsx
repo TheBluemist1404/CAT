@@ -308,48 +308,101 @@ function CodeEditor({ token, preview }) {
   const [errorDisplay, setErrorDisplay] = useState("");
   // ----------------------
 
-  const execute = async () => {
+  // const execute = async () => {
+  //   try {
+  //     if (!preview) {
+  //       setCodeDisplay([]);
+  //       setErrorDisplay("");
+  //       const code = editorRef.current.getValue();
+  //       const input = inputRef.current ? inputRef.current.value : "";
+  //       const response = await axios.post(
+  //         `${import.meta.env.VITE_APP_API_URL}/api/v1/code/execute`,
+  //         { code: code, input: input, language: lang }
+  //       );
+  //       const executionId = response.data.executionId;
+  //       console.log("✅ Execution started. Connecting WebSocket...");
+
+  //       // ✅ Connect to WebSocket for real-time logs
+  //       const ws = new WebSocket(`ws://localhost:3001/${executionId}`);
+
+  //       ws.onmessage = (event) => {
+  //         try {
+  //           const data = JSON.parse(event.data);
+
+  //           if (data.log) {
+  //             console.log("📥 Log:", data.log); // ✅ Display log immediately
+  //             setCodeDisplay((prev) => [...prev, data.log]);
+  //           }
+
+  //           if (data.error) {
+  //             console.error("🚨 Error:", data.error); // ✅ Show errors if any
+  //             setErrorDisplay(data.error);
+  //           }
+
+  //           if (data.done) {
+  //             console.log("✅ Execution Complete.");
+  //             ws.close();
+  //           }
+  //         } catch (error) {
+  //           console.error("⚠️ Error parsing WebSocket data:", error);
+  //         }
+  //       };
+
+  //       ws.onerror = (error) => {
+  //         console.error("⚠️ WebSocket error:", error);
+  //       };
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       "❌ Axios Error:",
+  //       error.response ? error.response.data : error.message
+  //     );
+  //   }
+  // };
+
+  async function execute() {
     try {
       if (!preview) {
         setCodeDisplay([]);
         setErrorDisplay("");
         const code = editorRef.current.getValue();
         const input = inputRef.current ? inputRef.current.value : "";
+        // Send the code execution request to BE.
         const response = await axios.post(
           `${import.meta.env.VITE_APP_API_URL}/api/v1/code/execute`,
           { code: code, input: input, language: lang }
         );
         const executionId = response.data.executionId;
-        console.log("✅ Execution started. Connecting WebSocket...");
-
-        // ✅ Connect to WebSocket for real-time logs
-        const ws = new WebSocket(`ws://localhost:3001/${executionId}`);
-
-        ws.onmessage = (event) => {
+        console.log("✅ Execution started. Connecting via SSE...");
+  
+        // Open an SSE connection to the logs endpoint using the executionId.
+        const eventSource = new EventSource(
+          `${import.meta.env.VITE_APP_API_URL}/api/v1/code/logs/${executionId}`
+        );
+  
+        eventSource.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-
             if (data.log) {
-              console.log("📥 Log:", data.log); // ✅ Display log immediately
+              console.log("📥 Log:", data.log);
               setCodeDisplay((prev) => [...prev, data.log]);
             }
-
             if (data.error) {
-              console.error("🚨 Error:", data.error); // ✅ Show errors if any
+              console.error("🚨 Error:", data.error);
               setErrorDisplay(data.error);
             }
-
             if (data.done) {
               console.log("✅ Execution Complete.");
-              ws.close();
+              eventSource.close();
             }
           } catch (error) {
-            console.error("⚠️ Error parsing WebSocket data:", error);
+            console.error("⚠️ Error parsing SSE data:", error);
           }
         };
-
-        ws.onerror = (error) => {
-          console.error("⚠️ WebSocket error:", error);
+  
+        eventSource.onerror = (error) => {
+          console.error("⚠️ SSE error:", error);
+          eventSource.close();
         };
       }
     } catch (error) {
@@ -358,7 +411,8 @@ function CodeEditor({ token, preview }) {
         error.response ? error.response.data : error.message
       );
     }
-  };
+  }
+  
 
   //Set language
 

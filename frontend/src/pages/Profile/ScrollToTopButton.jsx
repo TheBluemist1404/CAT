@@ -1,3 +1,5 @@
+import up from "/src/assets/up.svg"
+
 import { useState, useEffect } from "react";
 
 const ScrollToTopButton = () => {
@@ -49,7 +51,7 @@ const ScrollToTopButton = () => {
         }}
       >
         <img
-          src="/src/assets/up.svg"
+          src={up}
           alt="Scroll to top"
           width={30}
           height={30}

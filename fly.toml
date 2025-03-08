@@ -1,0 +1,23 @@
+# fly.toml app configuration file generated for rabbitmq-container on 2025-03-08T01:07:44+07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'rabbitmq-container'
+primary_region = 'lax'
+
+[build]
+  image = 'rabbitmq:3-management'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1

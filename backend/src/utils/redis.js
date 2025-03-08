@@ -7,6 +7,10 @@ const redisClient = redis.createClient({
   }
 });
 
+// const redisClient = redis.createClient({
+//   url: process.env.REDIS_URL // ✅ Use the Fly.io Redis URL
+// });
+
 redisClient.on('error', err => {
   console.log('Redis error:', err);
 });

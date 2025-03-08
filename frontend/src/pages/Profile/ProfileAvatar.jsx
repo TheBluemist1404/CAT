@@ -1,3 +1,9 @@
+import camera from "/src/assets/camera.svg"
+import facebook from "/src/assets/facebook.svg"
+import github from "/src/assets/github.svg"
+import twitter from "/src/assets/twitter.svg"
+
+
 import { useState, useRef, useEffect, useContext } from "react";
 import axios from "axios";
 import AvatarEditor from "react-avatar-editor";
@@ -90,7 +96,7 @@ function ProfileAvatar({ user, profileData, token, id }) {
             Authorization: `Bearer ${token.accessToken}`,
           },
         }
-      ), data)
+      ))
 
       setFollowers(data || [])
     }
@@ -109,7 +115,7 @@ function ProfileAvatar({ user, profileData, token, id }) {
           {id === user._id && (
             <img
               className="cam"
-              src="/src/assets/camera.svg"
+              src={camera}
               onClick={() => setShowAvatarChange(true)}
               alt=""
               width={30}
@@ -259,9 +265,9 @@ function ProfileAvatar({ user, profileData, token, id }) {
 
         <h1 className="profile-username">{profileData?.fullName}</h1>
         <div className="social">
-          <img src="/src/assets/facebook.svg" alt="" width={30} height={30} />
-          <img src="/src/assets/github.svg" alt="" width={30} height={30} />
-          <img src="/src/assets/twitter.svg" alt="" width={30} height={30} />
+          <img src={facebook} alt="" width={30} height={30} />
+          <img src={github} alt="" width={30} height={30} />
+          <img src={twitter} alt="" width={30} height={30} />
         </div>
         <div className="box" style={{ top: "85%" }}>
           <div className="box-item">

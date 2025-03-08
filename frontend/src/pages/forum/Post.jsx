@@ -13,6 +13,21 @@ import "prismjs/components/prism-python";
 import "prismjs/components/prism-javascript";
 import "./PostGallery.css";
 
+// Import image assets
+import CopyIcon from "/forum/Copy.svg";
+import DownloadIcon from "/forum/Download.svg";
+import UpvoteIcon from "/forum/Upvote.svg";
+import UpvoteChosenIcon from "/forum/Upvote-chosen.svg";
+import DownvoteIcon from "/forum/Downvote.svg";
+import DownvoteChosenIcon from "/forum/Downvote-chosen.svg";
+import SaveIcon from "/forum/save.svg";
+import UnsaveIcon from "/forum/unsave.svg";
+import DeleteIcon from "/forum/delete.svg";
+import ReportIcon from "/forum/report.svg";
+import CommentIcon from "/forum/Comment Icon.svg";
+import ShareIcon from "/forum/Share Icon.svg";
+import PostAvatar from "/forum/Post avatar.svg";
+
 function Post({ post: initialPost, token, update }) {
   const navigate = useNavigate();
   const { isLoggedIn, user } = useContext(AuthContext);
@@ -34,11 +49,11 @@ function Post({ post: initialPost, token, update }) {
   const editorRef = useRef(null);
   const dropdownRef = useRef(null);
   const postRef = useRef(null);
-  //Handle time display
+  // Handle time display
   const timestamp = post.createdAt;
   const createdDate = new Date(timestamp);
   const now = new Date();
-  const timeDiff = now - createdDate; //in miliseconds
+  const timeDiff = now - createdDate; // in milliseconds
 
   useEffect(() => {
     const addButtons = () => {
@@ -56,14 +71,12 @@ function Post({ post: initialPost, token, update }) {
         const fileExtension = getFileExtension(language);
         const defaultFileName = `snippet-${index + 1}.${fileExtension}`;
 
-        const copyIconPath = "/src/pages/forum/assets/Copy.svg";
-        const downloadIconPath = "/src/pages/forum/assets/Download.svg";
-
+        // Instead of using string paths, we use the imported assets.
         const copyButton = document.createElement("button");
         copyButton.className = "copy-button";
         copyButton.innerHTML = `
           <div style="display: flex; align-items: center; gap: 1px;">
-            <img src="${copyIconPath}" alt="Copy" class="copy-icon" style="width: 16px; height: 16px; filter: invert(1);">
+            <img src="${CopyIcon}" alt="Copy" class="copy-icon" style="width: 16px; height: 16px; filter: invert(1);">
             <span class="copy-text">Copy</span>
           </div>`;
         Object.assign(copyButton.style, {
@@ -93,7 +106,7 @@ function Post({ post: initialPost, token, update }) {
         downloadButton.className = "download-button";
         downloadButton.innerHTML = `
           <div style="display: flex; align-items: center; gap: 1px;">
-            <img src="${downloadIconPath}" alt="Download" class="download-icon" style="width: 16px; height: 16px; filter: invert(1);">
+            <img src="${DownloadIcon}" alt="Download" class="download-icon" style="width: 16px; height: 16px; filter: invert(1);">
             <span class="download-text">Download</span>
           </div>`;
         Object.assign(downloadButton.style, {
@@ -209,8 +222,8 @@ function Post({ post: initialPost, token, update }) {
           _id: `temp-${Date.now()}`, // Unique temporary ID
           content: commentContent,
           userDetails: {
-            avatar: user.avatar, // Use current user's avatar
-            fullName: user.fullName, // Use current user's name
+            avatar: user.avatar,
+            fullName: user.fullName,
           },
           createdAt: new Date().toISOString(),
         };
@@ -230,7 +243,7 @@ function Post({ post: initialPost, token, update }) {
 
         setCommentInput("");
         if (editorRef.current) {
-          editorRef.current.setContent(""); // Ensure editor input clears
+          editorRef.current.setContent(""); // Clear the editor
         }
       }
     }
@@ -299,29 +312,34 @@ function Post({ post: initialPost, token, update }) {
   }, []);
 
   const updateUpvote = async () => {
-    const data = await fetch(token, axios.patch(
-      `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/vote/upvote/${post._id}`,
-      { user: { id: user._id } },
-      { headers: { Authorization: `Bearer ${token.accessToken}` } }
-    ))
+    const data = await fetch(
+      token,
+      axios.patch(
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/vote/upvote/${post._id}`,
+        { user: { id: user._id } },
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      )
+    );
     if (data) {
       await fetchPosts();
     }
   };
 
   const updateDownvote = async () => {
-    const data = await fetch(token, axios.patch(
-      `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/vote/downvote/${post._id}`,
-      { user: { id: user._id } },
-      { headers: { Authorization: `Bearer ${token.accessToken}` } }
-    ))
+    const data = await fetch(
+      token,
+      axios.patch(
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/vote/downvote/${post._id}`,
+        { user: { id: user._id } },
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      )
+    );
     if (data) {
       await fetchPosts();
     }
   };
 
   const handleUpvote = async () => {
-    console.log("upvote");
     if (!isLoggedIn) {
       navigate("/auth/login");
     } else {
@@ -331,19 +349,18 @@ function Post({ post: initialPost, token, update }) {
         updateDownvote();
       }
       if (!isUpvoted) {
-        setIsUpvoted(!isUpvoted);
-        setVoteCount((count) => (!isUpvoted ? count + 1 : count));
+        setIsUpvoted(true);
+        setVoteCount((count) => count + 1);
         updateUpvote();
       } else {
-        setIsUpvoted(!isUpvoted);
-        setVoteCount((count) => (isUpvoted ? count - 1 : count));
+        setIsUpvoted(false);
+        setVoteCount((count) => count - 1);
         updateUpvote();
       }
     }
   };
 
   const handleDownvote = async () => {
-    console.log("downvote");
     if (!isLoggedIn) {
       navigate("/auth/login");
     } else {
@@ -353,12 +370,12 @@ function Post({ post: initialPost, token, update }) {
         updateUpvote();
       }
       if (!isDownvoted) {
-        setIsDownvoted(!isDownvoted);
-        setVoteCount((count) => (!isDownvoted ? count - 1 : count));
+        setIsDownvoted(true);
+        setVoteCount((count) => count - 1);
         updateDownvote();
       } else {
-        setIsDownvoted(!isDownvoted);
-        setVoteCount((count) => (isDownvoted ? count + 1 : count));
+        setIsDownvoted(false);
+        setVoteCount((count) => count + 1);
         updateDownvote();
       }
     }
@@ -368,15 +385,15 @@ function Post({ post: initialPost, token, update }) {
     <div className="updown-button">
       <img
         className="upvote"
-        src={`/src/pages/forum/assets/Upvote${isUpvoted ? "-chosen" : ""}.svg`}
+        src={isUpvoted ? UpvoteChosenIcon : UpvoteIcon}
         alt="Upvote"
         onClick={handleUpvote}
         onMouseEnter={(e) => {
           if (!isUpvoted)
-            e.target.src = "/src/pages/forum/assets/Upvote-hover.svg";
-        }} //mouseEnter is actually better than mouseOver here, research for more info
+            e.target.src = UpvoteChosenIcon;
+        }}
         onMouseLeave={(e) => {
-          if (!isUpvoted) e.target.src = "/src/pages/forum/assets/Upvote.svg";
+          if (!isUpvoted) e.target.src = UpvoteIcon;
         }}
       />
       <span
@@ -387,24 +404,21 @@ function Post({ post: initialPost, token, update }) {
       </span>
       <img
         className="downvote"
-        src={`/src/pages/forum/assets/Downvote${
-          isDownvoted ? "-chosen" : ""
-        }.svg`}
+        src={isDownvoted ? DownvoteChosenIcon : DownvoteIcon}
         alt="Downvote"
         onClick={handleDownvote}
         onMouseEnter={(e) => {
           if (!isDownvoted)
-            e.target.src = "/src/pages/forum/assets/Downvote-hover.svg";
+            e.target.src = DownvoteChosenIcon;
         }}
         onMouseLeave={(e) => {
-          if (!isDownvoted)
-            e.target.src = "/src/pages/forum/assets/Downvote.svg";
+          if (!isDownvoted) e.target.src = DownvoteIcon;
         }}
       />
     </div>
   );
+
   useEffect(() => {
-    console.log(post._id);
     if (user.savedPosts && Array.isArray(user.savedPosts)) {
       const isPostSaved = user.savedPosts.some(
         (savedPost) => savedPost._id.toString() === post._id.toString()
@@ -414,15 +428,18 @@ function Post({ post: initialPost, token, update }) {
   }, [post._id, user.savedPosts]);
 
   const handleSavePost = async () => {
-    const data = await fetch(token, axios.post(
-      `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/save/${post._id}`,
-      {},
-      { headers: { Authorization: `Bearer ${token.accessToken}` } }
-    ))
+    const data = await fetch(
+      token,
+      axios.post(
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/save/${post._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token.accessToken}` } }
+      )
+    );
 
     if (data) {
       setIsSaved(!isSaved);
-    } 
+    }
   };
 
   useEffect(() => {
@@ -450,7 +467,7 @@ function Post({ post: initialPost, token, update }) {
         style={{ display: "flex", alignItems: "center", gap: "6px" }}
       >
         <img
-          src={`/src/pages/forum/assets/${isSaved ? "unsave" : "save"}.svg`}
+          src={isSaved ? UnsaveIcon : SaveIcon}
           alt="Save"
           width="14"
           height="14"
@@ -470,7 +487,7 @@ function Post({ post: initialPost, token, update }) {
           }}
         >
           <img
-            src="/src/pages/forum/assets/delete.svg"
+            src={DeleteIcon}
             alt="Delete"
             width="14"
             height="14"
@@ -488,7 +505,7 @@ function Post({ post: initialPost, token, update }) {
           }}
         >
           <img
-            src="/src/pages/forum/assets/report.svg"
+            src={ReportIcon}
             alt="Report"
             width="14"
             height="14"
@@ -525,11 +542,10 @@ function Post({ post: initialPost, token, update }) {
               <span className="comment-user-name">
                 {comment.userDetails.fullName}
               </span>
-              {/* <span className="comment-time">{comment.time}</span> */}
             </div>
             <div
               className="comment-body"
-              dangerouslySetInnerHTML={{ __html: sanitizedContent }} // Use sanitized HTML content
+              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             ></div>
             <div className="comment-footer">
               <button
@@ -543,7 +559,7 @@ function Post({ post: initialPost, token, update }) {
                 }}
               >
                 <img
-                  src="/src/pages/forum/assets/Comment Icon.svg"
+                  src={CommentIcon}
                   className="comment-action"
                   alt="Reply"
                 />
@@ -662,15 +678,18 @@ function Post({ post: initialPost, token, update }) {
   const [isDeleted, setIsDeleted] = useState(false);
 
   const handleDeletePost = async () => {
-    const data = await fetch(token, axios.delete(
-      `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/delete/${post._id}`,
-      {
-        headers: { Authorization: `Bearer ${token.accessToken}` },
-      }
-    ))
+    const data = await fetch(
+      token,
+      axios.delete(
+        `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/delete/${post._id}`,
+        {
+          headers: { Authorization: `Bearer ${token.accessToken}` },
+        }
+      )
+    );
 
     if (data) {
-      setIsDeleted(true); // Hide the post instead of removing it
+      setIsDeleted(true);
     }
   };
 
@@ -706,7 +725,7 @@ function Post({ post: initialPost, token, update }) {
           src={
             post.userCreated
               ? post.userCreated.avatar
-              : "/src/pages/forum/assets/Post avatar.svg"
+              : PostAvatar
           }
           alt="User Avatar"
           className="user-avatar"
@@ -823,8 +842,6 @@ function Post({ post: initialPost, token, update }) {
                 ▶
               </button>
 
-              {/* <div className="post-gallery-index">{photoIndex + 1} / {post.images.length}</div> */}
-
               <div className="post-gallery-dots">
                 {post.images.map((_, i) => (
                   <span
@@ -850,7 +867,7 @@ function Post({ post: initialPost, token, update }) {
         {renderVoteButtons()}
         <button className="comment-button" onClick={toggleCommentBox}>
           <img
-            src="/src/pages/forum/assets/Comment Icon.svg"
+            src={CommentIcon}
             className="post-action"
             alt="Comment"
           />{" "}
@@ -858,7 +875,7 @@ function Post({ post: initialPost, token, update }) {
         </button>
         <button className="share-button">
           <img
-            src="/src/pages/forum/assets/Share Icon.svg"
+            src={ShareIcon}
             className="post-action"
             alt="Share"
           />{" "}

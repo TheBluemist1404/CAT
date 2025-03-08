@@ -1,3 +1,7 @@
+import settings from "/src/assets/setting.svg"
+import following from "/src/assets/following.svg"
+import followed from "/src/assets/followed.svg"
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useContext } from "react";
@@ -131,7 +135,7 @@ function ProfileTab({
       {id === user._id ? (
         <div style={{ marginRight: "10%" }}>
           <div className="settings" onClick={handleSvgClick}>
-            <img src="/src/assets/setting.svg" alt="" width={30} height={30} />
+            <img src={settings} alt="" width={30} height={30} />
           </div>
 
           {isVisible && (
@@ -175,7 +179,7 @@ function ProfileTab({
               <div
                 style={{ width: "24px", height: "24px", objectFit: "cover" }}
               >
-                <img src="/src/assets/following.svg" alt="" />
+                <img src={following} alt="" />
               </div>
               <div>Follow</div>
             </div>
@@ -184,7 +188,7 @@ function ProfileTab({
               <div
                 style={{ width: "24px", height: "24px", objectFit: "cover" }}
               >
-                <img src="/src/assets/followed.svg" alt="" />
+                <img src={followed} alt="" />
               </div>
               <div>Followed</div>
             </div>

@@ -1,15 +1,19 @@
+import logo from "/src/assets/bg-logo.svg"
+import facebook from "/src/assets/facebook.svg"
+import github from "/src/assets/github.svg"
+
 function Footer() {
     return(
         <>
             <div className="footer">
                 <div className="left">
-                    <img src="./src/assets/bg-logo.svg" alt="" style={{transform: 'translateY(-25px)'}}/>
+                    <img src={logo} alt="" style={{transform: 'translateY(-25px)'}}/>
                     <div>
                         <h1 className="team">DevTeam 1</h1>
                         <p>We create a platform for all the curious minds</p>
                         <div className="social-media">
-                            <img src="./src/assets/facebook.svg" alt="facebook" />
-                            <img src="./src/assets/github.svg" alt="github" />
+                            <img src={facebook} alt="facebook" />
+                            <img src={github} alt="github" />
                         </div>
                     </div>
                 </div>
