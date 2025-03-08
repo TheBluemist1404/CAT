@@ -20,7 +20,7 @@ function Forgot() {
   const handleMail = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/api/v1/auth/forgot', { email: email })
+      const response = await axios.post(`${import.meta.env.VITE_APP_API_URL}/api/v1/auth/forgot`, { email: email })
       if (response.status === 200) {
         setGetOtp(true);
       }
@@ -37,7 +37,7 @@ function Forgot() {
   const handleOTP = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/api/v1/auth/otp', { email: email, otp: otp })
+      const response = await axios.post(`${import.meta.env.VITE_APP_API_URL}/api/v1/auth/otp`, { email: email, otp: otp })
       console.log(response.data.otpToken)
       if (response) {
         setOtpToken(response.data.otpToken)
@@ -56,7 +56,7 @@ function Forgot() {
     e.preventDefault();
     try {
       console.log(otpToken)
-      const response = await axios.patch('http://localhost:3000/api/v1/auth/reset-password', { password: pass, confirmPassword: confirm }, { headers: { 'Authorization': `Bearer ${otpToken}` } })
+      const response = await axios.patch(`${import.meta.env.VITE_APP_API_URL}/api/v1/auth/reset-password`, { password: pass, confirmPassword: confirm }, { headers: { 'Authorization': `Bearer ${otpToken}` } })
       console.log(response)
       if (response.status === 200) {
         navigate('/auth/login')
