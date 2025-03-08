@@ -1,3 +1,5 @@
+import logo from '/src/assets/logo.svg'
+
 import axios from "axios";
 import { useState, useRef, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
@@ -61,7 +63,7 @@ function Header({token, isAuth}) {
 
     return (
         <div className="header">
-            <img src="/src/assets/logo.svg" alt="" onClick={() => navigate('/')} style={{ cursor: 'pointer', width: "60px", height: "60px", marginLeft: "30px", transform: "translateY(5px)" }} />
+            <img src={logo} alt="" onClick={() => navigate('/')} style={{ cursor: 'pointer', width: "60px", height: "60px", marginLeft: "30px", transform: "translateY(5px)" }} />
             <div className="navbar">
                 {navbar.map((obj, index) => (
                     <div key={index} ref={el => linkRefs.current[index] = el}

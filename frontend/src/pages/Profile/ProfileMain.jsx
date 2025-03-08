@@ -1,3 +1,10 @@
+import school from "/src/assets/school.svg"
+import company from "/src/assets/company.svg"
+import logo from "/src/assets/bg-logo.svg"
+import pen from "/src/assets/pen.svg"
+import privatePost from "/src/assets/private.svg"
+import publicPost from "/src/assets/qa.svg"
+
 import axios from "axios";
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
@@ -279,7 +286,7 @@ function ProfileMain({
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <div style={{ cursor: "pointer" }}>
                     <img
-                      src="/src/assets/school.svg"
+                      src={school}
                       alt=""
                       width={30}
                       height={30}
@@ -322,7 +329,7 @@ function ProfileMain({
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <div style={{ cursor: "pointer" }}>
                     <img
-                      src="/src/assets/company.svg"
+                      src={company}
                       alt=""
                       width={30}
                       height={30}
@@ -657,7 +664,7 @@ function ProfileMain({
                           }}
                         >
                           <img
-                            src="/src/assets/bg-logo.svg"
+                            src={logo}
                             alt="Logo"
                             style={{
                               width: "50px",
@@ -817,7 +824,7 @@ function ProfileMain({
                   >
                     {id === user._id && (
                       <img
-                        src="/src/assets/pen.svg"
+                        src={pen}
                         alt="Edit"
                         width={15}
                         height={15}
@@ -883,7 +890,7 @@ function ProfileMain({
                           }}
                         >
                           <img
-                            src="/src/assets/bg-logo.svg"
+                            src={logo}
                             alt="Logo"
                             style={{
                               width: "50px",
@@ -970,15 +977,15 @@ function ProfileMain({
                       )}, ${date.getFullYear()}`;
 
                       // Chọn icon phù hợp
-                      const postIcon =
-                        post.status === "private"
-                          ? "/src/assets/private.svg"
-                          : "/src/assets/qa.svg";
+                      // const postIcon =
+                      //   post.status === "private"
+                      //     ? "/src/assets/private.svg"
+                      //     : "/src/assets/qa.svg";
 
                       return (
                         <div className="post-card" key={index}>
                           <div className="post-icon-title">
-                            <img src={postIcon} alt="" width={30} height={30} />
+                            {(post.status === "private") ? (<img src={privatePost} alt="" width={30} height={30} />): (<img src={publicPost} alt="" width={30} height={30} />)}
                             <div
                               className="post-title"
                               key={post._id}

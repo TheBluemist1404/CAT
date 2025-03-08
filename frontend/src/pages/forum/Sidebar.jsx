@@ -1,6 +1,11 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 
+import homeIcon from "/forum/Home Icon.svg"
+import allPosts from "/forum/All posts Icon.svg"
+import createIcon from "/forum/Create Icon.svg"
+import tagIcon from "/forum/Tags Icon.svg"
+
 const Sidebar = ({ handleCreatePostToggle }) => {
   const navigate = useNavigate();
   const jumpToBottom = () => {
@@ -19,7 +24,7 @@ const Sidebar = ({ handleCreatePostToggle }) => {
     <aside className="sidebar">
       <button className="sidebar-button" onClick={Home} style={{cursor:'pointer'}}>
         <div className="sidebar-icon">
-          <img src="/src/pages/forum/assets/Home Icon.svg" alt="Home" />
+          <img src={homeIcon} alt="Home" />
         </div>
         <div>
           Home
@@ -27,7 +32,7 @@ const Sidebar = ({ handleCreatePostToggle }) => {
       </button>
       <button className="sidebar-button"  onClick={forumHome} style={{cursor:'pointer'}}>
         <div className="sidebar-icon">
-          <img src="/src/pages/forum/assets/All posts Icon.svg" alt="All Posts"/>
+          <img src={allPosts} alt="All Posts"/>
         </div>
         <div>
           All Posts
@@ -36,7 +41,7 @@ const Sidebar = ({ handleCreatePostToggle }) => {
       <hr className="line" />
       <button className="create-post-button" style={{ backgroundColor: '#FF4B5C', cursor:'pointer' }} onClick={handleCreatePostToggle} >
         <div className="sidebar-icon">
-          <img src="/src/pages/forum/assets/Create Icon.svg" alt="Create Post" />
+          <img src={createIcon} alt="Create Post" />
         </div>
         <div>
           Create Post
@@ -44,7 +49,7 @@ const Sidebar = ({ handleCreatePostToggle }) => {
       </button>
       <button className="sidebar-button">
         <div className="sidebar-icon">
-          <img src="/src/pages/forum/assets/Tags Icon.svg" alt="Tags" />
+          <img src={tagIcon} alt="Tags" />
         </div>
         <div>
           Tags

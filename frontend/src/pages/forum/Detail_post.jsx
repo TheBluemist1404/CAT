@@ -1,3 +1,20 @@
+import copyIconPath from "/forum/Copy.svg";
+import  downloadIconPath from "/forum/Download.svg";
+import upvoteChosen from '/forum/Upvote-chosen.svg'
+import upvote from '/forum/Upvote-chosen.svg'
+import upvoteHover from "/forum/Upvote-hover.svg"
+import downvoteChosen from '/forum/Downvote-chosen.svg'
+import downvote from '/forum/Downvote-chosen.svg'
+import downvoteHover from "/forum/Downvote-hover.svg"
+import save from "/forum/save.svg"
+import unsave from "/forum/unsave.svg"
+import deleteSvg from "/forum/delete.svg"
+import report from "/forum/report.svg"
+import commentSvg from "/forum/Comment Icon.svg"
+import postAvatar from "/forum/Post avatar.svg"
+import share from "/forum/Share Icon.svg"
+
+
 import { Editor } from "@tinymce/tinymce-react";
 import axios from "axios";
 import { useEffect, useState, useContext, useRef } from "react";
@@ -78,8 +95,7 @@ function Detail({ token }) {
         const fileExtension = getFileExtension(language);
         const defaultFileName = `snippet-${index + 1}.${fileExtension}`;
 
-        const copyIconPath = "/src/pages/forum/assets/Copy.svg";
-        const downloadIconPath = "/src/pages/forum/assets/Download.svg";
+        
 
         const copyButton = document.createElement("button");
         copyButton.className = "copy-button";
@@ -342,15 +358,15 @@ function Detail({ token }) {
     <div className="updown-button">
       <img
         className="upvote"
-        src={`/src/pages/forum/assets/Upvote${isUpvoted ? "-chosen" : ""}.svg`}
+        src={isUpvoted? upvoteChosen: upvote}
         alt="Upvote"
         onClick={handleUpvote}
         onMouseEnter={(e) => {
           if (!isUpvoted)
-            e.target.src = "/src/pages/forum/assets/Upvote-hover.svg";
+            e.target.src = {upvoteHover};
         }} //mouseEnter is actually better than mouseOver here, research for more info
         onMouseLeave={(e) => {
-          if (!isUpvoted) e.target.src = "/src/pages/forum/assets/Upvote.svg";
+          if (!isUpvoted) e.target.src = {upvote};
         }}
       />
       <span
@@ -361,18 +377,16 @@ function Detail({ token }) {
       </span>
       <img
         className="downvote"
-        src={`/src/pages/forum/assets/Downvote${
-          isDownvoted ? "-chosen" : ""
-        }.svg`}
+        src={isDownvoted ? downvoteChosen: downvote}
         alt="Downvote"
         onClick={handleDownvote}
         onMouseEnter={(e) => {
           if (!isDownvoted)
-            e.target.src = "/src/pages/forum/assets/Downvote-hover.svg";
+            e.target.src = {downvoteHover};
         }}
         onMouseLeave={(e) => {
           if (!isDownvoted)
-            e.target.src = "/src/pages/forum/assets/Downvote.svg";
+            e.target.src = {downvote};
         }}
       />
     </div>
@@ -434,7 +448,7 @@ function Detail({ token }) {
     >
       <div className="dropdown-item" onClick={handleSavePost}>
         <img
-          src={`/src/pages/forum/assets/${isSaved ? "unsave" : "save"}.svg`}
+          src={isSaved ? save: unsave}
           alt="Save"
           style={{ width: 16, height: 16, marginRight: 8 }}
         />
@@ -448,7 +462,7 @@ function Detail({ token }) {
           onClick={handleDeletePost}
         >
           <img
-            src="/src/pages/forum/assets/delete.svg"
+            src={deleteSvg}
             alt="Delete"
             style={{ width: 16, height: 16, marginRight: 8 }}
           />
@@ -457,7 +471,7 @@ function Detail({ token }) {
       ) : (
         <div className="dropdown-item" style={{ color: "#FF4B5C" }}>
           <img
-            src="/src/pages/forum/assets/report.svg"
+            src={report}
             alt="Report"
             style={{ width: 16, height: 16, marginRight: 8 }}
           />
@@ -508,7 +522,7 @@ function Detail({ token }) {
                 onClick={() => toggleReplyEditor(comment._id)}
               >
                 <img
-                  src="/src/pages/forum/assets/Comment Icon.svg"
+                  src={commentSvg}
                   className="comment-action"
                   alt="Reply"
                 />
@@ -660,7 +674,7 @@ function Detail({ token }) {
             src={
               post
                 ? post.userCreated.avatar
-                : "/src/pages/forum/assets/Post avatar.svg"
+                : postAvatar
             }
             alt="User Avatar"
             className="user-avatar"
@@ -787,7 +801,7 @@ function Detail({ token }) {
           {renderVoteButtons()}
           <button className="comment-button">
             <img
-              src="/src/pages/forum/assets/Comment Icon.svg"
+              src={commentSvg}
               className="post-action"
               alt="Comment"
             />{" "}
@@ -795,7 +809,7 @@ function Detail({ token }) {
           </button>
           <button className="share-button">
             <img
-              src="/src/pages/forum/assets/Share Icon.svg"
+              src={share}
               className="post-action"
               alt="Share"
             />{" "}
