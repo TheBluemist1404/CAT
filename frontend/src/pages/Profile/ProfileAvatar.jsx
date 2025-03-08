@@ -158,7 +158,6 @@ function ProfileAvatar({ user, profileData, token, id }) {
             >
               <style>{`body { overflow: hidden; }`}</style>
               <div style={{ textAlign: "center" }}>
-                <h1 style={{ color: "#FFFFFF" }}>Upload Avatar</h1>
                 <div
                   style={{
                     display: "flex",
