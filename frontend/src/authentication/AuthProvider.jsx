@@ -7,6 +7,9 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState({});
 
+  const tokenStr = localStorage.getItem("token");
+  const token = JSON.parse(tokenStr);
+
   async function fetch(token, Promise) {
     try {
       const response = await Promise;
@@ -48,7 +51,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, user, setUser, fetch }}>
+    <AuthContext.Provider value={{ token, isLoggedIn, setIsLoggedIn, user, setUser, fetch }}>
       {children}
     </AuthContext.Provider>
   );

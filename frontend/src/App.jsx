@@ -30,7 +30,7 @@ import NotificationInvites from "./pages/notification/NotificationInvites";
 
 
 function App() {
-  const { isLoggedIn, setIsLoggedIn, setUser, fetch } = useContext(AuthContext);
+  const { token, isLoggedIn, setIsLoggedIn, setUser, fetch } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -50,8 +50,6 @@ function App() {
   }
 
   //Fetch user on mount
-  const tokenStr = localStorage.getItem("token");
-  const token = JSON.parse(tokenStr);
   const user = token ? jwtDecode(token.accessToken) : null;
   const userId = user ? user.id : null;
 
@@ -66,7 +64,7 @@ function App() {
   };
 
   useEffect(() => {
-    if (tokenStr) {
+    if (token) {
       console.log("rerender");
       getUser().then(() => {
         setIsLoggedIn(true);
