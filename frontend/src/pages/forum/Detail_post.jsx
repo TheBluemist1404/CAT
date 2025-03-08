@@ -417,7 +417,7 @@ function Detail({ token }) {
     }
 
     const data = await fetch(token, axios.post(
-      `http://localhost:3000/api/v1/forum/save/${post._id}`,
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/save/${post._id}`,
       {},
       { headers: { Authorization: `Bearer ${token.accessToken}` } }
     ))
@@ -431,7 +431,7 @@ function Detail({ token }) {
 
   const handleDeletePost = async () => {
     const data = await axios.delete(
-      `http://localhost:3000/api/v1/forum/delete/${post._id}`,
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/forum/delete/${post._id}`,
       {
         headers: { Authorization: `Bearer ${token.accessToken}` },
       }
