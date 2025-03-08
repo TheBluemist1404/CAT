@@ -57,7 +57,7 @@ function App() {
 
   const getUser = async () => {
     const response = await fetch(token, axios.get(
-      `http://localhost:3000/api/v1/profile/detail/${userId}`,
+      `${import.meta.env.VITE_APP_API_URL}/api/v1/profile/detail/${userId}`,
       { headers: { Authorization: `Bearer ${token.accessToken}` } }
     ));
     console.log("get user: ",response);
@@ -81,7 +81,7 @@ function App() {
 
   useEffect(() => {
     if (token) {
-      const socket = io("http://localhost:3000", {
+      const socket = io(`${import.meta.env.VITE_APP_API_URL}`, {
         auth: { token: token.accessToken },
       });
   

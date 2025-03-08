@@ -53,7 +53,7 @@ function Header({token, isAuth}) {
 
     const logout = async () => {
         try {
-            await axios.delete('http://localhost:3000/api/v1/auth/logout', {data: {refreshToken: token.refreshToken}}) //axios.delete is treated different
+            await axios.delete(`${import.meta.env.VITE_APP_API_URL}/api/v1/auth/logout`, {data: {refreshToken: token.refreshToken}}) //axios.delete is treated different
             setIsLoggedIn(false)
             localStorage.removeItem('token')
         } catch (error) {

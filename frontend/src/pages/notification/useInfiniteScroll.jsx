@@ -16,7 +16,7 @@ export default function useInfiniteScroll(token, value, pageNumber, type, newNot
   useEffect(() => {
     async function fetchNotis() {
       setLoading(true);
-      const data = await fetch(token, axios.get(`http://localhost:3000/api/v1/notifications?isRead=${value}&type=${type}&skip=${(pageNumber-1)*5}&limit=5`, {
+      const data = await fetch(token, axios.get(`${import.meta.env.VITE_APP_API_URL}/api/v1/notifications?isRead=${value}&type=${type}&skip=${(pageNumber-1)*5}&limit=5`, {
         headers: { Authorization: `Bearer ${token.accessToken}` },
       }))
       if (data) {
