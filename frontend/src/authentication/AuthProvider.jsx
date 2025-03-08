@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
         // accessToken expired
         try {
           const response = await axios.post(
-            `http://localhost:3000/api/v1/token`,
+            `${import.meta.env.VITE_APP_API_URL}/api/v1/token`,
             { refreshToken: token.refreshToken }
           );
           const newAccessToken = response.data.accessToken;
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.delete("http://localhost:3000/api/v1/auth/logout", {
+      await axios.delete(`${import.meta.env.VITE_APP_API_URL}/api/v1/auth/logout`, {
         data: { refreshToken: token.refreshToken },
       }); //axios.delete is treated different
       if (isLoggedIn) setIsLoggedIn(false);
