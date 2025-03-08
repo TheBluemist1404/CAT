@@ -152,6 +152,7 @@ function ProfileAvatar({ user, profileData, token, id }) {
                 borderRadius: "16px",
                 textAlign: "center",
                 display: "block",
+                overflow: "hidden",
               }}
               className="detail"
             >
