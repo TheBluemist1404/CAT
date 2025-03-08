@@ -11,7 +11,7 @@ export default function useInfiniteScroll(token, value, pageNumber, type, newNot
 
   useEffect(() => {
     setNotifications([]);
-  }, [value, newNoti]);
+  }, [value]);
 
   useEffect(() => {
     async function fetchNotis() {
