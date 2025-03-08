@@ -147,8 +147,8 @@ function ProfileAvatar({ user, profileData, token, id }) {
             <div
               style={{
                 width: "50%",
-                height: "70%",
-                marginTop: "5%",
+                height: "60%",
+                marginTop: "-7%",
                 borderRadius: "16px",
                 textAlign: "center",
                 display: "block",
