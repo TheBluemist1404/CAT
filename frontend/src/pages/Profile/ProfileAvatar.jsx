@@ -47,7 +47,7 @@ function ProfileAvatar({ user, profileData, token, id }) {
         )
       );
 
-      alert("Update avatar successfully!");
+      alert("Update avatar successfully, please reload the page to see your update!");
 
       setUser((prevUser) => ({
         ...prevUser,
@@ -241,7 +241,7 @@ function ProfileAvatar({ user, profileData, token, id }) {
                         marginLeft: "10px",
                       }}
                     >
-                      Đóng
+                      Close
                     </button>
                   </div>
                 )}
@@ -255,9 +255,6 @@ function ProfileAvatar({ user, profileData, token, id }) {
                   marginTop: "10px",
                 }}
               >
-                <div style={{ color: "#FFFFFF", marginLeft: "10px" }}>
-                  Update information
-                </div>
               </div>
             </div>
           </div>
