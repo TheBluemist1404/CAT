@@ -230,6 +230,20 @@ function ProfileAvatar({ user, profileData, token, id }) {
                     >
                       Save Avatar
                     </button>
+                    <button
+                      onClick={() => setShowAvatarChange(false)}
+                      style={{
+                        padding: "10px 20px",
+                        backgroundColor: "#ef4444",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      Đóng
+                    </button>
                   </div>
                 )}
               </div>
@@ -245,20 +259,6 @@ function ProfileAvatar({ user, profileData, token, id }) {
                 <div style={{ color: "#FFFFFF", marginLeft: "10px" }}>
                   Update information
                 </div>
-                <button
-                  onClick={() => setShowAvatarChange(false)}
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#ef4444",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    marginRight: "10px",
-                  }}
-                >
-                  Đóng
-                </button>
               </div>
             </div>
           </div>
