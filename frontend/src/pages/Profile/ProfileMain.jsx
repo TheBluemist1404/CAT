@@ -112,8 +112,8 @@ function ProfileMain({
         )
       );
 
-      if (data && Array.isArray(data.schools)) {
-        setCompanies(data.schools);
+      if (data && Array.isArray(data.companies)) {
+        setCompanies(data.companies);
       }
     }
 
