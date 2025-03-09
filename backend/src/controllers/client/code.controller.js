@@ -1,7 +1,6 @@
 // const { spawn } = require("child_process");
 // const WebSocket = require('ws');
 
-
 // const wssExecute = new WebSocket.Server({ port: 3001 }); // ✅ WebSocket Server
 
 // const executions = {}; // Stores active WebSocket connections
@@ -63,7 +62,7 @@
 //     }
 //     delete executions[executionId]; // Clean up
 //   });
-  
+
 //   process.stdin.write(JSON.stringify({ code, input }) + "\n");
 //   process.stdin.end();
 
@@ -87,51 +86,49 @@
 // });
 
 // backend/codeExecution.js
-const axios = require("axios");
+// backend/codeExecution.js
+const axios = require('axios');
 
 // In-memory storage for active executions.
-// Each execution stores an array of logs and, once connected, the SSE response object.
 const executions = {};
 
 /**
- * Handles code execution requests.
- * Expects req.body: { code, input, language }
- * Forwards the code to the appropriate sandbox and returns an executionId.
+ * Executes code by forwarding it to the sandbox.
+ * FE sends a POST request with { code, input, language }.
+ * BE generates an executionId, forwards code (with executionId) to the sandbox,
+ * and immediately returns the executionId to FE.
  */
 module.exports.execute = async (req, res) => {
   const { code, input, language } = req.body;
   if (!code || !language) {
-    return res.status(400).json({ error: "Invalid language or no code provided" });
+    return res
+      .status(400)
+      .json({ error: 'Invalid language or no code provided' });
   }
 
-  // Create a unique executionId.
+  // Generate a unique executionId.
   const executionId = Date.now().toString();
   executions[executionId] = { logs: [] };
 
-  // Map language to the sandbox service URL.
+  // Map language to sandbox URL.
   const sandboxUrls = {
-    javascript: "http://localhost:3001/execute",
-    python: "http://sandbox-python:3000/execute",
-    cpp: "http://sandbox-cpp:3000/execute",
+    javascript: 'https://sandbox-js.fly.dev/execute', // adjust as needed
+    python: 'http://localhost:2995/execute',
+    cpp: 'http://localhost:2996/execute',
   };
 
   const sandboxUrl = sandboxUrls[language];
   if (!sandboxUrl) {
-    return res.status(400).json({ error: "Unsupported language" });
+    return res.status(400).json({ error: 'Unsupported language' });
   }
 
-  // Forward the code to the sandbox.
-  // For this demo, we assume the sandbox streams SSE responses.
-  // In production you might have the sandbox POST log messages back to BE.
-  console.log("lets send the code to sandbox")
-  axios
-    .post(sandboxUrl, { code, input })
-    .catch((error) => {
-      console.error("Error forwarding to sandbox:", error.message);
-      module.exports.pushLog(executionId, { error: error.message });
-    });
+  // Forward code to the sandbox, including executionId.
+  axios.post(sandboxUrl, { code, input, executionId }).catch(error => {
+    console.error('Error forwarding to sandbox:', error.message);
+    module.exports.pushLog(executionId, { error: error.message });
+  });
 
-  // Respond immediately with the executionId.
+  // Return the executionId immediately.
   return res.json({ executionId });
 };
 
@@ -140,44 +137,45 @@ module.exports.execute = async (req, res) => {
  * FE connects to GET /api/v1/code/logs/:executionId.
  */
 module.exports.streamLogs = (req, res) => {
-  console.log("stream logs")
+  console.log('stream logs');
   const { executionId } = req.params;
   if (!executions[executionId]) {
-    return res.status(404).json({ error: "Execution not found" });
+    return res.status(404).json({ error: 'Execution not found' });
   }
   res.writeHead(200, {
-    "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache",
-    Connection: "keep-alive",
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    Connection: 'keep-alive',
   });
 
-  // Send any logs that have been buffered so far.
-  executions[executionId].logs.forEach((log) => {
-    console.log("log: ", log)
+  // Send buffered logs.
+  executions[executionId].logs.forEach(log => {
+    console.log('sending log: ', log);
     res.write(`data: ${JSON.stringify(log)}\n\n`);
   });
 
-  // Save the SSE response so that new logs can be streamed immediately.
+  // Store the SSE response object for real-time updates.
   executions[executionId].sseRes = res;
 };
 
 /**
- * Endpoint for receiving log messages from the sandbox (or intermediary).
- * Expects req.body: { executionId, log }
+ * Endpoint for sandbox to push log messages.
+ * Expects req.body: { executionId, log }.
  */
 module.exports.pushLogEndpoint = (req, res) => {
   const { executionId, log } = req.body;
   if (!executionId || !log) {
-    return res.status(400).json({ error: "Missing executionId or log" });
+    return res.status(400).json({ error: 'Missing executionId or log' });
   }
   module.exports.pushLog(executionId, log);
-  res.json({ status: "ok" });
+  return res.json({ status: 'ok' });
 };
 
 /**
- * Helper: Push a log entry into an execution and, if an SSE connection exists, stream it.
+ * Helper function to push a log entry.
  */
 module.exports.pushLog = (executionId, log) => {
+  console.log('pushing logs');
   if (!executions[executionId]) return;
   executions[executionId].logs.push(log);
   if (executions[executionId].sseRes) {
