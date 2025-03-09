@@ -122,8 +122,8 @@ function ProfileMain({
 
   const handleAddCompany = () => {
     if (newCompany.trim() === "") return;
-    if ([...companies, ...unsavedCompanies].length >= 3) {
-      alert("The limit for companies is 3. Please delete one and enter again.");
+    if ([...companies, ...unsavedCompanies].length > 3) {
+      alert("The limit for companies is 2. Please delete one and enter again.");
       return;
     }
 
